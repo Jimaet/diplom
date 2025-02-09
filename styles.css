@@ -1,117 +1,121 @@
-/* Новые стили для жирных цифр и шрифта Patsy Sans */
-/* Для маленьких экранов */
-@media screen and (max-width: 250px) {
-    body {
-        font-size: 7px;
-    }
-    .card-text {
-        font-size: 8px; /* Уменьшение размера шрифта для скидки на маленьких экранах */
-    }
-    .price_now{
-        font-size: 12px;
-    }
-}
-
-/* Для средних экранов */
-@media screen and (min-width: 577px) and (max-width: 992px) {
-    body {
-        font-size: 16px;
-    }
-}
-
-/* Для больших экранов */
-@media screen and (min-width: 993px) {
-    body {
-        font-size: 18px;
-    }
-}
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
 
 body {
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-}
-
-main {
-    flex: 1;
-}
-
-footer {
-    background-color: rgb(48, 48, 48);
-    color: white;
+    font-family: 'Orbitron', sans-serif;
+    background: radial-gradient(circle, #0f0c29, #302b63, #24243e);
+    color: #0ff;
     text-align: center;
-    padding: 20px 0;
-}
-
-.book img {
-    width: 100%;
-    height: auto;
-}
-
-.order-btn {
-    border: 2px solid orange;
-    border-radius: 20px;
-    padding: 5px 10px;
-    background-color: transparent;
-    color: orange;
-    font-weight: bold;
-    width: 100%;
-}
-
-.new-books {
-    font-family: 'Deledda Open Semibold', sans-serif; /* Использование шрифта Deledda */
-    font-size: 30px;
-}
-
-.price_now {
-    font-size: 100%;
-}
-
-.favorite-btn {
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-    background-color: #f8f9fa;
-    border: 2px solid orange;
+    margin: 0;
     display: flex;
     justify-content: center;
     align-items: center;
+    height: 100vh;
+    overflow: hidden;
+    animation: glowBg 10s infinite alternate;
 }
 
-.favorite-icon {
-    width: 20px;
-    height: 20px;
-    background-image: url('избранное.png'); /* Путь к вашей иконке избранного */
-    background-size: cover;
+/* Анимация мерцающего фона */
+@keyframes glowBg {
+    0% { background: radial-gradient(circle, #0f0c29, #302b63, #24243e); }
+    100% { background: radial-gradient(circle, #0f0c29, #3c2a91, #1d1f2e); }
 }
 
-.price {
-    font-family: 'Patsy Sans', sans-serif; /* Шрифт Patsy Sans */
-    font-size: 100%; /* Увеличенный размер текста для цены */
-    font-weight: bold; /* Жирный текст */
+.container {
+    background: rgba(0, 0, 0, 0.8);
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.7);
+    width: 90%;
+    max-width: 400px;
+    border: 2px solid #0ff;
+    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
 }
 
-.price del {
-    font-size: 100%; /* Увеличенный размер текста для перечеркнутой цены */
-    text-decoration-color: red; /* Красный цвет для линии перечеркивания */
-    text-decoration-style: wavy; /* Изогнутая линия */
-    text-decoration-thickness: 2px; /* Увеличенная толщина линии */
+.container:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 25px rgba(0, 255, 255, 1);
 }
 
-.discount {
-    color: white; /* Белый цвет текста скидки */
-    font-family: 'Patsy Sans', sans-serif; /* Шрифт Patsy Sans */
-    font-weight: bold; /* Жирный текст */
-    background-color: red; /* Красный цвет фона */
-    border-radius: 10px; /* Круглый кружочек */
-    padding: 3px 10px; /* Отступы внутри кружочка */
-    position: absolute; /* Абсолютное позиционирование */
-    top: 5px; /* Отступ сверху */
-    font-size: 12px;
-    right: 5px; /* Отступ справа */
+h1 {
+    margin-bottom: 20px;
+    text-shadow: 0 0 10px #0ff, 0 0 20px #00f;
+    font-size: 24px;
 }
-.card-text
-{
-    color: rgb(0, 0, 0);
-    font-size: 100%;
+
+/* Анимация для стрелки */
+@keyframes rotateArrow {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.arrow {
+    font-size: 28px;
+    color: #ff00ff;
+    text-shadow: 0 0 10px #ff00ff, 0 0 20px #f0f;
+    animation: rotateArrow 4s linear infinite;
+}
+
+.converter {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+/* Поля ввода и селекты */
+.input-group {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+input, select, button {
+    padding: 12px;
+    font-size: 16px;
+    border-radius: 5px;
+    border: 2px solid #0ff;
+    background: rgba(0, 0, 0, 0.8);
+    color: #0ff;
+    text-align: center;
+    font-weight: bold;
+    transition: all 0.3s ease-in-out;
+}
+
+input:focus, select:focus {
+    outline: none;
+    border-color: #ff00ff;
+    box-shadow: 0 0 10px #ff00ff;
+}
+
+/* Кнопка */
+button {
+    background: linear-gradient(45deg, #ff00ff, #00ffff);
+    color: white;
+    cursor: pointer;
+    font-weight: bold;
+    transition: all 0.3s ease-in-out;
+    text-shadow: 0 0 10px white;
+}
+
+button:hover {
+    background: linear-gradient(45deg, #00ffff, #ff00ff);
+    box-shadow: 0 0 15px #ff00ff;
+    transform: scale(1.1);
+}
+
+/* Результат */
+p {
+    font-size: 18px;
+    font-weight: bold;
+    text-shadow: 0 0 10px #0ff, 0 0 20px #00f;
+    margin-top: 10px;
+}
+
+/* Анимация для появления результата */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+#result {
+    animation: fadeIn 0.5s ease-in-out;
 }
