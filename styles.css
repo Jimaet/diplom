@@ -19,11 +19,10 @@ body {
 .container {
     width: 360px;
     height: 100vh;
-    background: #fff;
+    background: #E3E3E3;
     border-radius: 20px;
     overflow: hidden;
     position: relative;
-    box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.1);
 }
 
 /* Верхняя панель */
@@ -34,9 +33,8 @@ body {
     position: fixed;
     width: 100%;
     max-width: 360px;
-    background: #fff;
+    background: #E3E3E3;
     padding: 15px;
-    box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.1);
     z-index: 10;
 }
 
@@ -61,7 +59,6 @@ body {
     margin-left: 10px;
 }
 
-/* Иконка поиска */
 .search-icon {
     font-size: 18px;
     color: #5F5F5F;
@@ -72,13 +69,13 @@ body {
     width: 121px;
     height: 121px;
     border-radius: 50%;
-    background: #C4C4C4; /* Серый заглушка */
+    background: #C4C4C4;
     margin-left: 10px;
 }
 
 /* Карусель */
 .carousel-container {
-    margin-top: 90px; /* Отступ, чтобы не перекрывало поиск */
+    margin-top: 100px;
     overflow-x: auto;
     white-space: nowrap;
     padding-bottom: 10px;
@@ -92,48 +89,64 @@ body {
     transition: transform 0.3s ease-in-out;
 }
 
-/* Большие кнопки */
-.carousel-btn {
-    min-width: 191px;
-    height: 104px;
+/* Первая карусель (фильтры) */
+.filter-btn {
+    min-width: 80px;
+    height: 60px;
     background: #FDFDFD;
-    border-radius: 51px;
-    border: none;
-    font-size: 16px;
-    cursor: pointer;
-    transition: 0.3s;
-    text-align: center;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.carousel-btn:hover {
-    background: #ddd;
-}
-
-/* Маленькие кнопки */
-.small-carousel {
-    margin-top: 20px;
-}
-
-.small-btn {
-    min-width: 140px;
-    height: 80px;
-    background: #FDFDFD;
-    border-radius: 40px;
+    border-radius: 30px;
     border: none;
     font-size: 14px;
     cursor: pointer;
     transition: 0.3s;
-    text-align: center;
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
-.small-btn:hover {
+.filter-btn:hover {
     background: #ddd;
+}
+
+/* Вторая карусель (категории) */
+.category-carousel {
+    margin-top: 20px;
+}
+
+.category-btn {
+    min-width: 140px;
+    height: 180px;
+    background: #FDFDFD;
+    border-radius: 20px;
+    border: none;
+    font-size: 14px;
+    cursor: pointer;
+    transition: 0.3s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px;
+}
+
+.category-btn img {
+    width: 100%;
+    height: auto;
+    border-radius: 10px;
+}
+
+.category-btn span {
+    font-size: 14px;
+    color: #2E2828;
+}
+
+/* Активное состояние кнопки */
+.category-btn:active {
+    background: #5D7B76;
+}
+
+.category-btn:active span {
+    color: #D9E7E6;
 }
 
 /* Скрываем скроллбар */
