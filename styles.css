@@ -1,3 +1,9 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
 body {
     font-family: Arial, sans-serif;
     background: #EAEAEA;
@@ -6,20 +12,39 @@ body {
     align-items: center;
     height: 100vh;
     margin: 0;
+    overflow-x: hidden;
 }
 
+/* Основной контейнер */
 .container {
-    width: 360px; /* Примерная ширина мобильного экрана */
+    width: 360px;
+    height: 100vh;
     background: #fff;
     border-radius: 20px;
-    padding: 20px;
+    overflow: hidden;
+    position: relative;
     box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* Верхняя панель (поиск + аватар) */
+.top-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: fixed;
+    width: 100%;
+    max-width: 360px;
+    background: #fff;
+    padding: 15px;
+    box-shadow: 0px 3px 6px rgba(0, 0, 0, 0.1);
+    z-index: 10;
 }
 
 /* Поисковая строка */
 .search-bar {
     display: flex;
     align-items: center;
+    flex: 1;
     background: #FDFDFD;
     border-radius: 60.5px;
     padding: 10px 15px;
@@ -36,29 +61,35 @@ body {
     margin-left: 10px;
 }
 
+/* Иконка поиска */
 .search-icon {
     font-size: 18px;
     color: #5F5F5F;
 }
 
+/* Аватар пользователя */
 .avatar {
     width: 40px;
     height: 40px;
     border-radius: 50%;
-    background: url('avatar.jpg') center/cover;
+    background: url('https://via.placeholder.com/40') center/cover;
     margin-left: 10px;
 }
 
-/* Карусель кнопок */
+/* Карусель */
 .carousel-container {
+    margin-top: 80px; /* Отступ, чтобы не перекрывало поиск */
     overflow-x: auto;
     white-space: nowrap;
-    margin-top: 15px;
     padding-bottom: 10px;
+    scrollbar-width: none;
 }
 
 .carousel {
-    display: inline-flex;
+    display: flex;
+    gap: 10px;
+    padding: 10px;
+    transition: transform 0.3s ease-in-out;
 }
 
 .carousel-btn {
@@ -68,11 +99,19 @@ body {
     border-radius: 51px;
     border: none;
     font-size: 16px;
-    margin-right: 10px;
     cursor: pointer;
     transition: 0.3s;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .carousel-btn:hover {
     background: #ddd;
+}
+
+/* Скрываем скроллбар */
+.carousel-container::-webkit-scrollbar {
+    display: none;
 }
