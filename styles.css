@@ -23,6 +23,8 @@ body {
     border-radius: 20px;
     overflow: hidden;
     position: relative;
+    display: flex;
+    flex-direction: column;
 }
 
 /* Верхняя панель */
@@ -30,7 +32,8 @@ body {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    position: fixed;
+    position: sticky;
+    top: 0;
     width: 100%;
     max-width: 360px;
     background: #E3E3E3;
@@ -66,8 +69,8 @@ body {
 
 /* Аватар пользователя */
 .avatar {
-    width: 121px;
-    height: 121px;
+    width: 50px;
+    height: 50px;
     border-radius: 50%;
     background: #C4C4C4;
     margin-left: 10px;
@@ -75,11 +78,12 @@ body {
 
 /* Карусель */
 .carousel-container {
-    margin-top: 100px;
+    margin-top: 10px;
     overflow-x: auto;
     white-space: nowrap;
     padding-bottom: 10px;
     scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
 }
 
 .carousel {
