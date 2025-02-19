@@ -131,18 +131,23 @@ body {
     align-items: center;
     justify-content: space-between;
     padding: 10px;
+    position: relative;
 }
 
 .category-btn img {
-    width: 100%;
+    width: calc(100% - 10px); /* Уменьшаем ширину на 10px (по 5px с каждой стороны) */
     height: auto;
-    border-radius: 10px;
+    max-height: 130px; /* Чтобы фото не залезало на текст */
+    border-radius: 50%;
+    margin-top: 5px; /* Отступ сверху */
 }
 
 .category-btn span {
     font-size: 14px;
     color: #2E2828;
+    margin-bottom: 5px; /* Отступ от нижнего края кнопки */
 }
+
 
 /* Активное состояние кнопки */
 .category-btn:active {
