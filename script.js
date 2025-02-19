@@ -8,6 +8,7 @@ document.addEventListener("DOMContentLoaded", function () {
             isDown = true;
             startX = e.pageX - carousel.offsetLeft;
             scrollLeft = carousel.scrollLeft;
+            carousel.style.scrollBehavior = "auto";
         });
 
         carousel.addEventListener("mouseleave", () => {
@@ -26,23 +27,24 @@ document.addEventListener("DOMContentLoaded", function () {
             carousel.scrollLeft = scrollLeft - walk;
         });
 
-        // Поддержка мобильного свайпа
+        // Поддержка мобильного свайпа (плавная)
         let touchStartX = 0;
         let touchEndX = 0;
 
         carousel.addEventListener("touchstart", (e) => {
             touchStartX = e.touches[0].clientX;
+            carousel.style.scrollBehavior = "auto";
         });
 
         carousel.addEventListener("touchmove", (e) => {
             touchEndX = e.touches[0].clientX;
             let moveX = touchStartX - touchEndX;
             carousel.scrollLeft += moveX * 1.5;
+            touchStartX = touchEndX;
         });
 
         carousel.addEventListener("touchend", () => {
-            touchStartX = 0;
-            touchEndX = 0;
+            carousel.style.scrollBehavior = "smooth";
         });
     }
 
