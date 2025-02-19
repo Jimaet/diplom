@@ -3,33 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Конвертер валют</title>
+    <title>Поиск рецептов</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-
     <div class="container">
-        <h1>Конвертер валют</h1>
-        
-        <div class="converter">
-            <div class="input-group">
-                <input type="number" id="amount" placeholder="Введите сумму" min="0">
-                <select id="fromCurrency"></select>
+        <!-- Поисковая строка -->
+        <div class="search-bar">
+            <span class="search-icon">🔍</span>
+            <input type="text" placeholder="Поиск блюд...">
+            <div class="avatar"></div>
+        </div>
+
+        <!-- Карусель кнопок -->
+        <div class="carousel-container">
+            <div class="carousel">
+                <button class="carousel-btn">Простые</button>
+                <button class="carousel-btn">Популярные</button>
+                <button class="carousel-btn">В духовке</button>
+                <button class="carousel-btn">На гриле</button>
+                <button class="carousel-btn">Завтрак</button>
+                <button class="carousel-btn">Обед</button>
+                <button class="carousel-btn">Ужин</button>
             </div>
-
-            <span class="arrow">⇄</span>
-
-            <div class="input-group">
-                <select id="toCurrency"></select>
-            </div>
-
-            <button id="convertBtn">Конвертировать</button>
-
-            <p id="result">Вы получите: -</p>
         </div>
     </div>
-
     <script src="script.js"></script>
-
 </body>
 </html>
