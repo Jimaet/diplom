@@ -2,12 +2,10 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
 
 body {
-    font-family: 'Inter', sans-serif; /* iOS-шрифт */
+    font-family: 'Inter', sans-serif;
     background: #E3E3E3;
     margin: 0;
     padding: 0;
-    font-family: Arial, sans-serif;
-    background-color: #f8f8f8;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -22,7 +20,7 @@ body {
 /* Основной контейнер */
 .container {
     width: 100%;
-    max-width: 360px;
+    max-width: 390px; /* Увеличил max-width, чтобы уменьшить боковые отступы */
     height: 100vh;
     background: #E3E3E3;
     border-radius: 20px;
@@ -31,7 +29,6 @@ body {
     display: flex;
     flex-direction: column;
     padding: 10px;
-    box-sizing: border-box;
 }
 
 /* Верхняя панель */
@@ -39,10 +36,8 @@ body {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    position: sticky;
-    top: 0;
     width: 100%;
-    max-width: 360px;
+    max-width: 390px;
     background: #E3E3E3;
     padding: 15px;
     z-index: 10;
@@ -64,7 +59,6 @@ body {
     border: none;
     outline: none;
     font-size: 16px;
-    font-family: 'Inter', sans-serif; /* iOS-шрифт */
     color: #5F5F5F;
     background: transparent;
     margin-left: 10px;
@@ -77,10 +71,11 @@ body {
 
 /* Аватар пользователя */
 .avatar {
-    width: 50px;
-    height: 50px;
+    width: 45px;
+    height: 45px;
     border-radius: 50%;
     background-color: gray;
+    object-fit: cover; /* Исправляет растягивание */
 }
 
 /* Карусель */
@@ -154,10 +149,10 @@ body {
 }
 
 .category-btn img {
-    width: 60px;
-    height: 60px;
+    width: 80px;
+    height: 80px;
     object-fit: cover;
-    border-radius: 10px;
+    border-radius: 20px; /* Максимально закруглил */
 }
 
 .category-btn span {
@@ -191,6 +186,7 @@ body {
     border-top-left-radius: 25px;
     border-top-right-radius: 25px;
 }
+
 
 /* Маленькие кнопки */
 .nav-btn {
@@ -232,7 +228,6 @@ body {
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
     margin-top: -25px;
     border: 6px solid #E3E3E3;
-    transition: transform 0.2s ease-in-out;
 }
 
 .main-btn img {
