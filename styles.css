@@ -6,11 +6,12 @@ body {
     background: #E3E3E3;
     margin: 0;
     padding: 0;
+    width: 100vw; /* Убираем отступы */
     display: flex;
     flex-direction: column;
     align-items: center;
+    overflow-x: hidden; /* Убираем горизонтальный скролл */
 }
-
 * {
     margin: 0;
     padding: 0;
@@ -19,8 +20,8 @@ body {
 
 /* Основной контейнер */
 .container {
-    width: 100%;
-    max-width: 390px; /* Увеличил max-width, чтобы уменьшить боковые отступы */
+    width: 100vw; /* Растягиваем контейнер на всю ширину */
+    max-width: 420px; /* Можно увеличить, если нужно шире */
     height: 100vh;
     background: #E3E3E3;
     border-radius: 20px;
@@ -29,6 +30,7 @@ body {
     display: flex;
     flex-direction: column;
     padding: 10px;
+    box-sizing: border-box;
 }
 
 /* Верхняя панель */
