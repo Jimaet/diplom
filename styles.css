@@ -4,6 +4,13 @@
 body {
     font-family: 'Inter', sans-serif; /* iOS-шрифт */
     background: #E3E3E3;
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    background-color: #f8f8f8;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 }
 
 * {
@@ -14,7 +21,8 @@ body {
 
 /* Основной контейнер */
 .container {
-    width: 360px;
+    width: 100%;
+    max-width: 360px;
     height: 100vh;
     background: #E3E3E3;
     border-radius: 20px;
@@ -22,6 +30,8 @@ body {
     position: relative;
     display: flex;
     flex-direction: column;
+    padding: 10px;
+    box-sizing: border-box;
 }
 
 /* Верхняя панель */
@@ -70,8 +80,7 @@ body {
     width: 50px;
     height: 50px;
     border-radius: 50%;
-    background: #C4C4C4;
-    margin-left: 10px;
+    background-color: gray;
 }
 
 /* Карусель */
@@ -81,6 +90,7 @@ body {
     white-space: nowrap;
     padding-bottom: 10px;
     scrollbar-width: none;
+    padding: 10px 0;
     -webkit-overflow-scrolling: touch;
 }
 
@@ -144,11 +154,10 @@ body {
 }
 
 .category-btn img {
-    width: calc(100% - 10px);
-    height: auto;
-    max-height: 130px;
-    border-radius: 50%;
-    margin-top: 5px;
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 10px;
 }
 
 .category-btn span {
@@ -207,7 +216,7 @@ body {
     width: 28px;
     height: 28px;
     margin-bottom: 4px;
-    filter: invert(31%) sepia(10%) saturate(360%) hue-rotate(132deg
+    filter: invert(30%) sepia(80%) saturate(200%) hue-rotate(180deg);
     brightness(90%) contrast(85%);
 }
 
@@ -263,8 +272,22 @@ body {
 .carousel-container::-webkit-scrollbar-track {
     background: transparent;
 }
-
+.larger-icon {
+    width: 30px;
+    height: 30px;
+}
 .carousel-container::-webkit-scrollbar-thumb {
     background: #C4C4C4;
     border-radius: 3px;
 }
+.play-circle {
+    width: 50px;
+    height: 50px;
+    background: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
