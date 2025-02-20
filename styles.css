@@ -86,31 +86,40 @@ body {
     -webkit-overflow-scrolling: touch;
 }
 
+/* Стили для первой карусели (фильтры) */
+.filter-btn {
+    min-width: 120px;
+    height: 50px;
+    background: #FDFDFD;
+    border-radius: 25px;
+    border: none;
+    font-size: 14px; /* Сделал текст немного меньше */
+    color: #2E2828;
+    cursor: pointer;
+    transition: background 0.3s, color 0.3s;
+}
+
+/* Изменение стиля при нажатии */
+.filter-btn:active,
+.filter-btn.selected {
+    background: #5D7B76;
+    color: #D9E7E6;
+}
+
+/* Исправление рывков при прокрутке */
 .carousel {
     display: flex;
     gap: 10px;
-    padding: 10px;
-    transition: transform 0.3s ease-in-out;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none; /* Скрытие скроллбара */
 }
 
-/* Первая карусель (фильтры) */
-.filter-btn {
-    min-width: 80px;
-    height: 60px;
-    background: #FDFDFD;
-    border-radius: 30px;
-    border: none;
-    font-size: 14px;
-    cursor: pointer;
-    transition: 0.3s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+.carousel::-webkit-scrollbar {
+    display: none; /* Убираем скроллбар в WebKit браузерах */
 }
 
-.filter-btn:hover {
-    background: #ddd;
-}
 
 /* Вторая карусель (категории) */
 .category-carousel {
