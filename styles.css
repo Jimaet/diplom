@@ -75,6 +75,7 @@ body {
 .avatar {
     width: 45px;
     height: 45px;
+     margin-left: 7px;
     border-radius: 50%;
     background-color: gray;
     object-fit: cover; /* Исправляет растягивание */
