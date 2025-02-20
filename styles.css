@@ -260,8 +260,10 @@ body {
     font-weight: bold;
     margin-left: 16px; /* Отступ слева */
     margin-top: 20px; /* Отступ сверху */
-    color: #333; /* Цвет текста */
-    display: block;
+    color: #ff0000; /* Красный цвет, чтобы было заметно */
+    border: 2px solid blue; /* Временная рамка для отладки */
+    background-color: yellow; /* Желтый фон */
+    padding: 5px;
 }
 
 
