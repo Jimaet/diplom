@@ -83,11 +83,11 @@ body {
 
 /* Карусель */
 .carousel-container {
-    width: 100%; /* Полная ширина */
-    margin-top: 10px;
+    width: 100vw; /* Растягиваем на всю ширину экрана */
+    margin: 0;
+    padding: 0;
     overflow-x: auto;
     white-space: nowrap;
-    padding: 0; /* Убираем отступы */
     scrollbar-width: none;
     -webkit-overflow-scrolling: touch;
 }
@@ -116,12 +116,13 @@ body {
 /* Исправление рывков при прокрутке */
 .carousel {
     display: flex;
-    gap: 0; /* Убираем промежутки между элементами */
+    gap: 10px; /* Вернул небольшой отступ между элементами */
     overflow-x: auto;
     scroll-snap-type: x mandatory;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
-    width: 100%; /* Растягиваем на всю ширину */
+    width: 100%; /* Полная ширина */
+    justify-content: flex-start; /* Элементы прижимаются к началу */
 }
 
 
