@@ -91,6 +91,7 @@ body {
     white-space: nowrap;
     scrollbar-width: none;
     -webkit-overflow-scrolling: touch;
+    margin-left: -10px;
 }
 
 /* Фильтры */
