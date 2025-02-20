@@ -255,14 +255,13 @@ body {
 
 /* Заголовок "Лента рецептов" */
 .feed-title {
-    display: block !important;
-    color: red !important;
-    font-size: 20px !important;
-    font-weight: bold !important;
-    background-color: yellow !important;
-    border: 2px solid blue !important;
-    position: relative !important;
-    z-index: 9999 !important;
+    font-size: 22px; /* Чуть больше для акцента */
+    font-family: -apple-system, BlinkMacSystemFont, "San Francisco", "Helvetica Neue", Arial, sans-serif;
+    font-weight: 600; /* Чуть жирнее, но не слишком */
+    color: #1C1C1E; /* Темно-серый цвет iOS */
+    margin-left: 16px; /* Отступ слева */
+    margin-top: 10px;
+    letter-spacing: -0.3px; /* Легкое сжатие букв */
 }
 
 
