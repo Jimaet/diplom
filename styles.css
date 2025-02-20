@@ -1,17 +1,16 @@
-/* Подключаем шрифт iOS */
+/* Подключаем iOS-шрифт */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
 
 body {
-    font-family: 'Inter', sans-serif; /* Стиль текста во всем приложении */
+    font-family: 'Inter', sans-serif; /* iOS-шрифт */
     background: #E3E3E3;
 }
+
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
-
-
 
 /* Основной контейнер */
 .container {
@@ -55,6 +54,7 @@ body {
     border: none;
     outline: none;
     font-size: 16px;
+    font-family: 'Inter', sans-serif; /* iOS-шрифт */
     color: #5F5F5F;
     background: transparent;
     margin-left: 10px;
@@ -84,20 +84,21 @@ body {
     -webkit-overflow-scrolling: touch;
 }
 
-/* Стили для первой карусели (фильтры) */
+/* Фильтры */
 .filter-btn {
     min-width: 120px;
     height: 50px;
     background: #FDFDFD;
     border-radius: 25px;
     border: none;
-    font-size: 14px; /* Сделал текст немного меньше */
+    font-size: 14px;
+    font-family: 'Inter', sans-serif; /* iOS-шрифт */
     color: #2E2828;
     cursor: pointer;
     transition: background 0.3s, color 0.3s;
 }
 
-/* Изменение стиля при нажатии */
+/* Активный фильтр */
 .filter-btn:active,
 .filter-btn.selected {
     background: #5D7B76;
@@ -111,15 +112,15 @@ body {
     overflow-x: auto;
     scroll-snap-type: x mandatory;
     -webkit-overflow-scrolling: touch;
-    scrollbar-width: none; /* Скрытие скроллбара */
+    scrollbar-width: none;
 }
 
+/* Убираем скроллбар */
 .carousel::-webkit-scrollbar {
-    display: none; /* Убираем скроллбар в WebKit браузерах */
+    display: none;
 }
 
-
-/* Вторая карусель (категории) */
+/* Категории */
 .category-carousel {
     margin-top: 20px;
 }
@@ -131,6 +132,7 @@ body {
     border-radius: 20px;
     border: none;
     font-size: 14px;
+    font-family: 'Inter', sans-serif; /* iOS-шрифт */
     cursor: pointer;
     transition: 0.3s;
     display: flex;
@@ -142,21 +144,21 @@ body {
 }
 
 .category-btn img {
-    width: calc(100% - 10px); /* Уменьшаем ширину на 10px (по 5px с каждой стороны) */
+    width: calc(100% - 10px);
     height: auto;
-    max-height: 130px; /* Чтобы фото не залезало на текст */
+    max-height: 130px;
     border-radius: 50%;
-    margin-top: 5px; /* Отступ сверху */
+    margin-top: 5px;
 }
 
 .category-btn span {
     font-size: 14px;
+    font-family: 'Inter', sans-serif; /* iOS-шрифт */
     color: #2E2828;
-    margin-bottom: 5px; /* Отступ от нижнего края кнопки */
+    margin-bottom: 5px;
 }
 
-
-/* Активное состояние кнопки */
+/* Активная категория */
 .category-btn:active {
     background: #5D7B76;
 }
@@ -165,12 +167,7 @@ body {
     color: #D9E7E6;
 }
 
-/* Скрываем скроллбар */
-.carousel-container::-webkit-scrollbar {
-    display: none;
-}
 /* Нижняя панель */
-
 .bottom-nav {
     position: fixed;
     bottom: 0;
@@ -195,19 +192,23 @@ body {
     align-items: center;
     font-size: 16px;
     font-weight: 500;
+    font-family: 'Inter', sans-serif; /* iOS-шрифт */
     color: #2E2828;
     cursor: pointer;
     transition: opacity 0.2s ease-in-out;
 }
+
 .nav-btn:hover {
     opacity: 0.8;
 }
+
 /* Иконки */
 .nav-btn img {
     width: 28px;
     height: 28px;
     margin-bottom: 4px;
-    filter: invert(31%) sepia(10%) saturate(360%) hue-rotate(132deg) brightness(90%) contrast(85%);
+    filter: invert(31%) sepia(10%) saturate(360%) hue-rotate(132deg
+    brightness(90%) contrast(85%);
 }
 
 /* Центральная кнопка */
@@ -224,15 +225,46 @@ body {
     border: 6px solid #E3E3E3;
     transition: transform 0.2s ease-in-out;
 }
+
 .main-btn img {
     width: 35px;
     height: 35px;
     filter: invert(100%);
 }
 
+/* Заголовок ленты */
 .feed-title {
     font-size: 20px;
     font-weight: 600;
+    font-family: 'Inter', sans-serif; /* iOS-шрифт */
     color: #2E2828;
     margin: 20px 15px 10px;
+}
+
+/* Анимация нажатия кнопок */
+.nav-btn:active, 
+.main-btn:active, 
+.filter-btn:active, 
+.category-btn:active {
+    transform: scale(0.95);
+}
+
+/* Улучшенный скроллбар (для Firefox) */
+.carousel-container {
+    scrollbar-width: thin;
+    scrollbar-color: #C4C4C4 transparent;
+}
+
+/* Улучшенный скроллбар (для WebKit) */
+.carousel-container::-webkit-scrollbar {
+    height: 6px;
+}
+
+.carousel-container::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.carousel-container::-webkit-scrollbar-thumb {
+    background: #C4C4C4;
+    border-radius: 3px;
 }
