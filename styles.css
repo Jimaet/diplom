@@ -1,19 +1,17 @@
+/* Подключаем шрифт iOS */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+
+body {
+    font-family: 'Inter', sans-serif; /* Стиль текста во всем приложении */
+    background: #E3E3E3;
+}
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
-body {
-    font-family: Arial, sans-serif;
-    background: #E3E3E3;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    margin: 0;
-    overflow-x: hidden;
-}
+
 
 /* Основной контейнер */
 .container {
@@ -172,7 +170,7 @@ body {
     display: none;
 }
 /* Нижняя панель */
-/* Нижняя панель */
+
 .bottom-nav {
     position: fixed;
     bottom: 0;
@@ -182,7 +180,7 @@ body {
     display: flex;
     justify-content: space-around;
     align-items: center;
-    padding: 15px 0; /* Увеличил размер панели */
+    padding: 15px 0;
     box-shadow: 0px -2px 10px rgba(0, 0, 0, 0.1);
     border-top-left-radius: 25px;
     border-top-right-radius: 25px;
@@ -195,23 +193,26 @@ body {
     display: flex;
     flex-direction: column;
     align-items: center;
-    font-size: 14px; /* Увеличил размер текста */
-    color: black;
+    font-size: 16px;
+    font-weight: 500;
+    color: #2E2828;
     cursor: pointer;
+    transition: opacity 0.2s ease-in-out;
 }
-
+.nav-btn:hover {
+    opacity: 0.8;
+}
 /* Иконки */
 .nav-btn img {
-    width: 28px; /* Сделал иконки чуть больше */
+    width: 28px;
     height: 28px;
     margin-bottom: 4px;
-    filter: invert(31%) sepia(10%) saturate(360%) hue-rotate(132deg) brightness(90%) contrast(85%); 
-    /* Фильтр для перекраски в #5B7974 */
+    filter: invert(31%) sepia(10%) saturate(360%) hue-rotate(132deg) brightness(90%) contrast(85%);
 }
 
 /* Центральная кнопка */
 .main-btn {
-    width: 75px; /* Увеличил размер кнопки */
+    width: 75px;
     height: 75px;
     background: #5D7B76;
     border-radius: 50%;
@@ -221,10 +222,17 @@ body {
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
     margin-top: -25px;
     border: 6px solid #E3E3E3;
+    transition: transform 0.2s ease-in-out;
+}
+.main-btn img {
+    width: 35px;
+    height: 35px;
+    filter: invert(100%);
 }
 
-.main-btn img {
-    width: 35px; /* Сделал значок плей чуть больше */
-    height: 35px;
-    filter: invert(100%); /* Сделал иконку белой */
+.feed-title {
+    font-size: 20px;
+    font-weight: 600;
+    color: #2E2828;
+    margin: 20px 15px 10px;
 }
