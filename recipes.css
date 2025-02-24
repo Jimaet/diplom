@@ -3,14 +3,14 @@
     flex-grow: 1;
     overflow-y: auto;
     max-height: calc(100vh - 200px); /* Учитываем верхнюю и нижнюю панели */
-    padding: 15px;
+    padding: 15px 8px; /* Отступы слева и справа по 8px */
 }
 
 /* Контейнер для рецептов */
 #recipes-container {
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    gap: 10px;
     padding-bottom: 15px;
 }
 
@@ -18,11 +18,10 @@
 .recipe-card {
     display: flex;
     align-items: center;
-    background: #F2F2F2; /* Цвет фона */
-    border-radius: 20px;
-    padding: 15px;
+    background: #FDFDFD; /* Цвет фона */
+    border-radius: 41px; /* Закругление */
+    padding: 5px; /* Отступ внутри */
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    transition: transform 0.2s ease-in-out;
     position: relative;
 }
 
@@ -30,14 +29,16 @@
 .recipe-card img {
     width: 90px;
     height: 90px;
-    border-radius: 20px;
+    border-radius: 34px;
     object-fit: cover;
-    margin-right: 15px;
+    margin: 5px; /* Отступ сверху, снизу и слева */
+    background: #E0E0E0; /* Заглушка пока без фото */
 }
 
 /* Контейнер для текста */
 .recipe-info {
     flex-grow: 1;
+    padding-left: 10px;
 }
 
 /* Заголовок рецепта */
@@ -45,13 +46,14 @@
     font-size: 18px;
     font-weight: bold;
     margin: 0;
-    color: #333;
+    color: #101213; /* Цвет текста */
+    padding-top: 14px; /* Отступ сверху */
 }
 
 /* Краткое описание */
 .recipe-description {
     font-size: 14px;
-    color: #888;
+    color: #C2C5C3; /* Цвет описания */
     margin-top: 5px;
 }
 
@@ -60,9 +62,9 @@
     position: absolute;
     top: 15px;
     right: 15px;
-    width: 24px;
-    height: 24px;
-    border: 2px solid #5C7360;
+    width: 20px;
+    height: 20px;
+    border: 2px solid #5D7B76;
     border-radius: 50%;
     background: transparent;
     cursor: pointer;
@@ -70,11 +72,14 @@
 
 /* Кнопка "Начать" */
 .start-button {
-    background: #5C7360;
-    color: white;
+    position: absolute;
+    bottom: 4px;
+    right: 8px;
+    background: #5D7B76; /* Цвет кнопки */
+    color: #FFFFFF; /* Цвет текста */
     border: none;
     padding: 8px 15px;
-    border-radius: 20px;
+    border-radius: 34px; /* Закругление */
     cursor: pointer;
     font-size: 14px;
     font-weight: bold;
