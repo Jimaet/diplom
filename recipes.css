@@ -1,1 +1,54 @@
+/* Общие стили для контейнера рецептов */
+#recipes-container {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    padding: 15px;
+}
 
+/* Карточка рецепта */
+.recipe-card {
+    background: #fff;
+    border-radius: 20px;
+    padding: 15px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    transition: transform 0.2s ease-in-out;
+}
+
+.recipe-card:hover {
+    transform: scale(1.02);
+}
+
+/* Название рецепта */
+.recipe-title {
+    font-size: 18px;
+    font-weight: bold;
+    color: #333;
+}
+
+/* Описание рецепта */
+.recipe-description {
+    font-size: 14px;
+    color: #666;
+    line-height: 1.4;
+}
+
+/* Кнопка "Начать" */
+.start-button {
+    background: #ff5722;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 16px;
+    text-align: center;
+    transition: background 0.3s;
+}
+
+.start-button:hover {
+    background: #e64a19;
+}
