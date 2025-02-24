@@ -1,31 +1,12 @@
 /* Подключаем iOS-шрифт */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
-html, body {
-    height: 100%;
-    margin: 0;
-    padding: 0;
-    overflow-y: auto; /* Позволяет прокручивать всю страницу */
-}
 
-.container {
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh; /* Гарантирует, что контейнер занимает всю высоту экрана */
-}
-
-.feed-container {
-    flex-grow: 1; /* Позволяет блоку расти вниз */
-    padding-bottom: 60px; /* Отступ, чтобы не закрывалась панелью */
-}
-
-#recipes-container {
-    overflow: visible; /* Убираем скролл внутри контейнера */
-}
 body {
     font-family: 'Inter', sans-serif;
     background: #E3E3E3;
     margin: 0;
     padding: 0;
+    height: 100%;
     width: 100vw;
     display: flex;
     flex-direction: column;
@@ -33,6 +14,7 @@ body {
     overflow-x: hidden;
     overflow-y: auto;
     min-height: 100vh; /* Теперь body растягивается */
+    
 }
 * {
     margin: 0;
@@ -227,6 +209,7 @@ body {
     box-shadow: 0px -2px 10px rgba(0, 0, 0, 0.1);
     border-top-left-radius: 25px;
     border-top-right-radius: 25px;
+    
 }
 
 
