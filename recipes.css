@@ -1,9 +1,9 @@
-/* Общие стили для контейнера рецептов */
+/* Контейнер для списка рецептов */
 #recipes-container {
     display: flex;
     flex-direction: column;
-    gap: 10px;
-    padding: 5px 5px; /* Уменьшенные отступы слева и справа */
+    gap: 12px;
+    padding: 10px 8px; /* Уменьшенные отступы слева и справа */
 }
 
 /* Карточка рецепта */
@@ -14,8 +14,8 @@
     display: flex;
     align-items: center;
     position: relative;
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
     padding: 8px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
     transition: transform 0.2s ease-in-out;
 }
 
@@ -27,7 +27,7 @@
 .recipe-img {
     width: 80px;
     height: 80px;
-    background: #D9D9D9 url('placeholder.png') center/cover no-repeat; /* Заглушка */
+    background: #D9D9D9; /* Серый фон-заглушка */
     border-radius: 34px;
     margin: 5px;
 }
@@ -38,7 +38,7 @@
     display: flex;
     flex-direction: column;
     justify-content: center;
-    padding-left: 10px;
+    padding-left: 12px;
 }
 
 /* Название рецепта */
@@ -46,7 +46,7 @@
     font-size: 16px;
     font-weight: bold;
     color: #101213;
-    margin-bottom: 4px;
+    margin-bottom: 2px;
 }
 
 /* Описание рецепта */
@@ -58,8 +58,8 @@
 /* Кнопка избранного */
 .favorite-btn {
     position: absolute;
-    top: 10px;
-    right: 10px;
+    top: 14px;
+    right: 14px;
     width: 22px;
     height: 22px;
     border: 2px solid #5D7B76;
@@ -93,7 +93,7 @@
     background: #4A625E;
 }
 
-/* Контейнер для списка рецептов */
+/* Контейнер для фидов */
 .feed-container {
     flex-grow: 1;
     padding: 15px;
@@ -106,5 +106,5 @@ body {
     height: auto;
     min-height: 100vh;
     margin: 0;
-    padding-bottom: 80px; /* Отступ, чтобы нижняя панель не перекрывала контент */
+    padding-bottom: 80px;
 }
