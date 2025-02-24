@@ -109,7 +109,8 @@
         // Импорт Firebase
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-        
+        import { collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
         // 🔹 ТВОИ ДАННЫЕ FIREBASE 🔹
         const firebaseConfig = {
             apiKey: "AIzaSyDqIDTQrS14wTLsh_jFkD0GZAmEEWW8TDk",
@@ -127,41 +128,28 @@
         // Функция загрузки рецептов
         async function loadRecipes() {
             const recipesContainer = document.getElementById("recipes-container");
-            recipesContainer.innerHTML = "";  // Очистка контейнера перед загрузкой
+            recipesContainer.innerHTML = ""; // Очистка перед загрузкой
         
-            try {
-                // Получаем документ "recept" из коллекции "res"
-                const receptRef = doc(db, "res", "recept");  // ← обращаемся к документу "recept"
-                const receptSnap = await getDoc(receptRef);
+            // Получаем все документы из коллекции 'rec'
+            const recipesQuery = collection(db, "rec");
+            const querySnapshot = await getDocs(recipesQuery);
         
-                if (receptSnap.exists()) {
-                    const data = receptSnap.data();  // Получаем данные из документа
-        
-                    // Создаём карточку рецепта
-                    const recipeCard = `
-                        <div class="recipe-card">
-                            <img src="${data.photo || 'placeholder.jpg'}" alt="${data.name}" class="recipe-image">
-                            <div class="recipe-content">
-                                <h3 class="recipe-title">${data.name}</h3>
-                                <p class="recipe-description">${data.des}</p>
-                                <button class="start-button">Начать!</button>
-                            </div>
-                            <button class="favorite-button">♡</button>
-                        </div>
-                    `;
-                    recipesContainer.innerHTML += recipeCard;
-        
-                } else {
-                    console.log("Документ 'recept' не найден!");
-                }
-        
-            } catch (error) {
-                console.error("Ошибка загрузки рецептов:", error);
-            }
+            querySnapshot.forEach((doc) => {
+                const data = doc.data();
+                const recipeCard = `
+                    <div class="recipe-card">
+                        <h3 class="recipe-title">${data.name}</h3>
+                        <p class="recipe-description">${data.des}</p>
+                        <button class="start-button">Начать!</button>
+                    </div>
+                `;
+                recipesContainer.innerHTML += recipeCard;
+            });
         }
         
         // Загружаем рецепты при запуске страницы
         loadRecipes();
+
 
 
 
