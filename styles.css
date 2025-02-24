@@ -91,16 +91,18 @@ body {
     opacity: 0.8;
 }
 /* Карусель */
+
 .carousel-container {
-    width: 100%;
-    display: flex;
+    width: 100vw;
+    margin: 0;
+    padding: 0;
+    padding-left: 0 !important; /* Убираем лишний отступ слева */
     overflow-x: auto;
     white-space: nowrap;
-    padding: 10px;
-    padding-left: 0 !important; /* Убираем отступ слева */
-    margin-left: 0 !important;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    margin-left: -10px;
 }
-
 /* Фильтры */
 .filter-btn {
     min-width: 120px;
@@ -135,6 +137,7 @@ body {
     padding-left: 0 !important; /* Убираем отступ слева */
     margin-left: 0 !important; /* Если margin влияет — убираем */
 }
+
 
 
 /* Убираем скроллбар */
