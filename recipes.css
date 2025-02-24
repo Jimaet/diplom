@@ -16,13 +16,14 @@
 
 /* Карточка рецепта */
 .recipe-card {
+    min-height: 100px;
     display: flex;
     align-items: center;
-    background: #FDFDFD; /* Цвет фона */
-    border-radius: 41px; /* Закругление */
-    padding: 5px; /* Отступ внутри */
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    background: #FDFDFD;
+    border-radius: 41px;
+    padding: 5px;
     position: relative;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
 /* Фото блюда */
@@ -75,11 +76,11 @@
     position: absolute;
     bottom: 4px;
     right: 8px;
-    background: #5D7B76; /* Цвет кнопки */
-    color: #FFFFFF; /* Цвет текста */
+    background: #5D7B76;
+    color: #FFFFFF;
     border: none;
     padding: 8px 15px;
-    border-radius: 34px; /* Закругление */
+    border-radius: 34px;
     cursor: pointer;
     font-size: 14px;
     font-weight: bold;
