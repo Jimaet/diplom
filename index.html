@@ -128,28 +128,39 @@
         
         // Функция загрузки рецептов
         async function loadRecipes() {
-            const recipesContainer = document.getElementById("recipes-container");
-            recipesContainer.innerHTML = ""; // Очистка перед загрузкой
-        
-            // Получаем все документы из коллекции 'rec'
-            const recipesQuery = collection(db, "rec");
-            const querySnapshot = await getDocs(recipesQuery);
-        
-            querySnapshot.forEach((doc) => {
-                const data = doc.data();
-                const recipeCard = `
-                    <div class="recipe-card">
-                        <h3 class="recipe-title">${data.name}</h3>
-                        <p class="recipe-description">${data.dis}</p>
-                        <button class="start-button">Начать!</button>
-                    </div>
-                `;
-                recipesContainer.innerHTML += recipeCard;
-            });
-        }
-        
-        // Загружаем рецепты при запуске страницы
-        loadRecipes();
+    const recipesContainer = document.getElementById("recipes-container");
+    recipesContainer.innerHTML = ""; // Очистка перед загрузкой
+
+    // Получаем все документы из коллекции 'rec'
+    const recipesQuery = collection(db, "rec");
+    const querySnapshot = await getDocs(recipesQuery);
+
+    querySnapshot.forEach((doc) => {
+        const data = doc.data();
+        const recipeCard = `
+            <div class="recipe-card">
+                <!-- Фото рецепта -->
+                <img src="${data.image || 'placeholder.jpg'}" class="recipe-img" alt="${data.name}">
+                
+                <!-- Информация о рецепте -->
+                <div class="recipe-info">
+                    <h3 class="recipe-title">${data.name}</h3>
+                    <p class="recipe-description">${data.dis}</p>
+                </div>
+
+                <!-- Кнопка "Добавить в избранное" -->
+                <button class="favorite-button"></button>
+
+                <!-- Кнопка "Начать!" -->
+                <button class="start-button">Начать!</button>
+            </div>
+        `;
+        recipesContainer.innerHTML += recipeCard;
+    });
+}
+
+// Загружаем рецепты при запуске страницы
+loadRecipes();
 
 
 
