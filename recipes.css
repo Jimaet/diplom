@@ -2,72 +2,83 @@
 #recipes-container {
     display: flex;
     flex-direction: column;
-    gap: 10px;
-    padding: 10px 8px; /* Отступы слева и справа 8px */
+    gap: 15px;
+    padding: 10px 8px;
 }
 
-
+/* Карточка рецепта */
 .recipe-card {
     background: #FDFDFD;
     border-radius: 41px;
-    padding: 10px;
+    height: 120px; /* Фиксированная высота */
     display: flex;
     align-items: center;
     position: relative;
     box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    padding: 10px;
+    transition: transform 0.2s ease-in-out;
 }
 
+.recipe-card:hover {
+    transform: scale(1.02);
+}
+
+/* Фото рецепта */
 .recipe-img {
     width: 80px;
     height: 80px;
-    background: #D9D9D9; 
+    background: #D9D9D9; /* Заглушка */
     border-radius: 34px;
-    margin: 5px;
+    margin-left: 5px;
+    object-fit: cover; /* Если вставлять реальные фото */
 }
 
+/* Информация о рецепте */
 .recipe-info {
     flex: 1;
     display: flex;
     flex-direction: column;
     justify-content: center;
-    padding-left: 10px;
-}
-.recipe-card:hover {
-    transform: scale(1.02);
+    padding-left: 15px;
 }
 
+/* Название рецепта */
 .recipe-title {
     font-size: 16px;
     font-weight: bold;
     color: #101213;
-    margin-top: 14px;
+    margin-bottom: 5px;
 }
 
+/* Описание рецепта */
 .recipe-description {
     font-size: 14px;
     color: #C2C5C3;
-    margin-top: 4px;
 }
+
+/* Кнопка избранного */
 .favorite-btn {
     position: absolute;
-    top: 10px;
-    right: 10px;
+    top: 15px;
+    right: 15px;
     width: 24px;
     height: 24px;
-    background: url('star-icon.svg') no-repeat center center;
-    background-size: cover;
+    border: 2px solid #5D7B76;
+    border-radius: 50%;
+    background: transparent;
     cursor: pointer;
+    transition: background 0.3s;
 }
 
-
-
-.start-btn:hover {
-    background: #4A625E;
+.favorite-btn:hover {
+    background: #5D7B76;
 }
+
+/* Кнопка "Начать" */
 .start-btn {
     position: absolute;
-    bottom: 4px;
-    right: 8px;
+    bottom: 10px;
+    right: 15px;
     background: #5D7B76;
     color: #FFFFFF;
     font-size: 14px;
@@ -79,16 +90,22 @@
     transition: background 0.3s;
 }
 
+.start-btn:hover {
+    background: #4A625E;
+}
+
+/* Контейнер для списка рецептов */
 .feed-container {
     flex-grow: 1;
     padding: 20px;
     overflow-y: auto;
 }
 
+/* Основной стиль для страницы */
 body {
     overflow-y: auto;
     height: auto;
     min-height: 100vh;
     margin: 0;
-    padding-bottom: 80px; 
+    padding-bottom: 80px; /* Отступ, чтобы нижняя панель не перекрывала контент */
 }
