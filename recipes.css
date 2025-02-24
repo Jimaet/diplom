@@ -54,15 +54,15 @@
 }
 /* Убираем ограничение высоты у feed-container */
 .feed-container {
-    width: 100%;
+    flex-grow: 1;
     padding: 20px;
+    overflow-y: auto; /* Теперь рецепты будут скроллиться отдельно */
 }
-
 /* Карточки рецептов идут столбиком */
 #recipes-container {
     display: flex;
     flex-direction: column;
-    gap: 15px; /* Отступы между карточками */
+    gap: 15px;
 }
 
 /* Дизайн карточки */
