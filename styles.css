@@ -234,8 +234,8 @@ body {
 
 /* Иконки */
 .nav-btn img {
-    width: 28px;
-    height: 28px;
+    width: 35px;
+    height: 35px;
     margin-bottom: 4px;
     filter: invert(30%) sepia(80%) saturate(200%) hue-rotate(180deg);
     brightness(90%) contrast(85%);
@@ -263,7 +263,7 @@ body {
 
 /* Заголовок "Лента рецептов" */
 .feed-title {
-    font-size: 16px; /* Чуть больше для акцента */
+    font-size: 24px; /* Чуть больше для акцента */
     font-family: -apple-system, BlinkMacSystemFont, "San Francisco", "Helvetica Neue", Arial, sans-serif;
     font-weight: 600; /* Чуть жирнее, но не слишком */
     color: #2E2E2E; /* Темно-серый цвет iOS */
