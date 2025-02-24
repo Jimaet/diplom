@@ -1,1 +1,54 @@
+/* Контейнер для рецептов */
+#recipes-container {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    padding: 15px;
+    overflow-y: auto;
+    max-height: calc(100vh - 200px); /* Учитываем верхнюю и нижнюю панели */
+}
 
+/* Карточка рецепта */
+.recipe-card {
+    background: #fff;
+    border-radius: 20px;
+    padding: 15px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease-in-out;
+}
+
+.recipe-card:hover {
+    transform: scale(1.02);
+}
+
+/* Заголовок рецепта */
+.recipe-title {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+/* Описание рецепта */
+.recipe-description {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 10px;
+}
+
+/* Кнопка "Начать" */
+.start-button {
+    background: #ff7043;
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 10px;
+    cursor: pointer;
+    width: 100%;
+    font-size: 16px;
+    font-weight: bold;
+    transition: background 0.3s;
+}
+
+.start-button:hover {
+    background: #f4511e;
+}
