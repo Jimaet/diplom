@@ -16,11 +16,11 @@
 
 /* Карточка рецепта */
 .recipe-card {
-    min-height: 100px;
+    min-height: 120px;
     display: flex;
     align-items: center;
     background: #FDFDFD;
-    border-radius: 41px;
+    border-radius: 20px;
     padding: 5px;
     position: relative;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
@@ -30,7 +30,7 @@
 .recipe-card img {
     width: 90px;
     height: 90px;
-    border-radius: 34px;
+    border-radius: 20px;
     object-fit: cover;
     margin: 5px; /* Отступ сверху, снизу и слева */
     background: #E0E0E0; /* Заглушка пока без фото */
@@ -48,7 +48,7 @@
     font-weight: bold;
     margin: 0;
     color: #101213; /* Цвет текста */
-    padding-top: 14px; /* Отступ сверху */
+    padding-top: 8px; /* Отступ сверху */
 }
 
 /* Краткое описание */
@@ -63,8 +63,8 @@
     position: absolute;
     top: 15px;
     right: 15px;
-    width: 20px;
-    height: 20px;
+    width: 25px;
+    height: 25px;
     border: 2px solid #5D7B76;
     border-radius: 50%;
     background: transparent;
