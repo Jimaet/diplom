@@ -3,32 +3,28 @@
     display: flex;
     flex-direction: column;
     gap: 15px;
-    padding: 10px 8px; /* Отступы слева и справа 8px */
+    padding: 10px 8px;
 }
 
 /* Карточка рецепта */
 .recipe-card {
     background: #FDFDFD;
     border-radius: 41px;
-    padding: 10px;
+    height: 120px; /* Фиксированная высота */
     display: flex;
     align-items: center;
     position: relative;
     box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-    transition: transform 0.2s ease-in-out;
+    padding: 10px;
 }
 
-.recipe-card:hover {
-    transform: scale(1.02);
-}
-
-/* Фото рецепта (заглушка) */
+/* Фото рецепта */
 .recipe-img {
     width: 80px;
     height: 80px;
-    background: #D9D9D9; /* Серый фон-заглушка */
+    background: #D9D9D9;
     border-radius: 34px;
-    margin: 5px;
+    object-fit: cover; /* Если вставлять реальные фото */
 }
 
 /* Информация о рецепте */
@@ -37,7 +33,7 @@
     display: flex;
     flex-direction: column;
     justify-content: center;
-    padding-left: 10px;
+    padding-left: 15px;
 }
 
 /* Название рецепта */
@@ -45,33 +41,33 @@
     font-size: 16px;
     font-weight: bold;
     color: #101213;
-    margin-top: 14px;
+    margin-bottom: 5px;
 }
 
 /* Описание рецепта */
 .recipe-description {
     font-size: 14px;
     color: #C2C5C3;
-    margin-top: 4px;
 }
 
 /* Кнопка избранного */
 .favorite-btn {
     position: absolute;
-    top: 10px;
-    right: 10px;
+    top: 15px;
+    right: 15px;
     width: 24px;
     height: 24px;
-    background: url('star-icon.svg') no-repeat center center;
-    background-size: cover;
+    border: 2px solid #5D7B76;
+    border-radius: 50%;
+    background: transparent;
     cursor: pointer;
 }
 
 /* Кнопка "Начать" */
 .start-btn {
     position: absolute;
-    bottom: 4px;
-    right: 8px;
+    bottom: 10px;
+    right: 15px;
     background: #5D7B76;
     color: #FFFFFF;
     font-size: 14px;
@@ -85,13 +81,4 @@
 
 .start-btn:hover {
     background: #4A625E;
-}
-
-/* Позволяет всей странице прокручиваться */
-body {
-    overflow-y: auto;
-    height: auto;
-    min-height: 100vh;
-    margin: 0;
-    padding-bottom: 80px; /* Отступ, чтобы нижняя панель не перекрывала контент */
 }
