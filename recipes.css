@@ -2,38 +2,62 @@
 #recipes-container {
     display: flex;
     flex-direction: column;
-    gap: 15px;
-    padding: 15px;
+    gap: 10px;
+    padding: 10px 8px; /* Отступы слева и справа 8px */
 }
 
-/* Карточка рецепта */
+
 .recipe-card {
-    background: #fff;
-    border-radius: 20px;
-    padding: 15px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    background: #FDFDFD;
+    border-radius: 41px;
+    padding: 10px;
+    display: flex;
+    align-items: center;
+    position: relative;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+/* Фото рецепта (заглушка) */
+.recipe-img {
+    width: 80px;
+    height: 80px;
+    background: #D9D9D9; /* Серый фон-заглушка */
+    border-radius: 34px;
+    margin: 5px;
+}
+
+.recipe-info {
+    flex: 1;
     display: flex;
     flex-direction: column;
-    gap: 10px;
-    transition: transform 0.2s ease-in-out;
+    justify-content: center;
+    padding-left: 10px;
 }
-
 .recipe-card:hover {
     transform: scale(1.02);
 }
 
 /* Название рецепта */
 .recipe-title {
-    font-size: 18px;
+    font-size: 16px;
     font-weight: bold;
-    color: #333;
+    color: #101213;
+    margin-top: 14px;
 }
-
 /* Описание рецепта */
 .recipe-description {
     font-size: 14px;
-    color: #666;
-    line-height: 1.4;
+    color: #C2C5C3;
+    margin-top: 4px;
+}
+.favorite-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 24px;
+    height: 24px;
+    background: url('star-icon.svg') no-repeat center center;
+    background-size: cover;
+    cursor: pointer;
 }
 
 /* Кнопка "Начать" */
@@ -49,8 +73,22 @@
     transition: background 0.3s;
 }
 
-.start-button:hover {
-    background: #e64a19;
+.start-btn:hover {
+    background: #4A625E;
+}
+.start-btn {
+    position: absolute;
+    bottom: 4px;
+    right: 8px;
+    background: #5D7B76;
+    color: #FFFFFF;
+    font-size: 14px;
+    font-weight: bold;
+    border: none;
+    border-radius: 34px;
+    padding: 8px 16px;
+    cursor: pointer;
+    transition: background 0.3s;
 }
 /* Убираем ограничение высоты у feed-container */
 .feed-container {
@@ -65,14 +103,7 @@
     gap: 15px;
 }
 
-/* Дизайн карточки */
-.recipe-card {
-    width: 100%;
-    padding: 15px;
-    border-radius: 15px;
-    background: #fff;
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-}
+
 
 /* Позволяет всей странице прокручиваться */
 body {
