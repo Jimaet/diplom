@@ -4,6 +4,7 @@
     overflow-y: auto;
     max-height: calc(100vh - 200px); /* Учитываем верхнюю и нижнюю панели */
     padding: 15px 8px; /* Отступы слева и справа по 8px */
+    
 }
 
 /* Контейнер для рецептов */
@@ -12,6 +13,7 @@
     flex-direction: column;
     gap: 10px;
     padding-bottom: 15px;
+    overflow: visible;
 }
 
 /* Карточка рецепта */
