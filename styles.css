@@ -32,6 +32,7 @@ body {
     padding: 10px;
     box-sizing: border-box;
     flex-grow: 1; /* Позволяем контейнеру занимать всю высоту */
+    
 }
 
 /* Верхняя панель */
@@ -96,6 +97,8 @@ body {
     overflow-x: auto;
     white-space: nowrap;
     padding: 10px;
+    padding-left: 0 !important; /* Убираем отступ слева */
+    margin-left: 0 !important;
 }
 
 /* Фильтры */
