@@ -2,11 +2,11 @@
 #recipes-container {
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 15px;
     padding: 10px 8px; /* Отступы слева и справа 8px */
 }
 
-
+/* Карточка рецепта */
 .recipe-card {
     background: #FDFDFD;
     border-radius: 41px;
@@ -15,7 +15,13 @@
     align-items: center;
     position: relative;
     box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease-in-out;
 }
+
+.recipe-card:hover {
+    transform: scale(1.02);
+}
+
 /* Фото рецепта (заглушка) */
 .recipe-img {
     width: 80px;
@@ -25,15 +31,13 @@
     margin: 5px;
 }
 
+/* Информация о рецепте */
 .recipe-info {
     flex: 1;
     display: flex;
     flex-direction: column;
     justify-content: center;
     padding-left: 10px;
-}
-.recipe-card:hover {
-    transform: scale(1.02);
 }
 
 /* Название рецепта */
@@ -43,12 +47,15 @@
     color: #101213;
     margin-top: 14px;
 }
+
 /* Описание рецепта */
 .recipe-description {
     font-size: 14px;
     color: #C2C5C3;
     margin-top: 4px;
 }
+
+/* Кнопка избранного */
 .favorite-btn {
     position: absolute;
     top: 10px;
@@ -61,21 +68,6 @@
 }
 
 /* Кнопка "Начать" */
-.start-button {
-    background: #ff5722;
-    color: white;
-    border: none;
-    padding: 10px 15px;
-    border-radius: 10px;
-    cursor: pointer;
-    font-size: 16px;
-    text-align: center;
-    transition: background 0.3s;
-}
-
-.start-btn:hover {
-    background: #4A625E;
-}
 .start-btn {
     position: absolute;
     bottom: 4px;
@@ -90,20 +82,10 @@
     cursor: pointer;
     transition: background 0.3s;
 }
-/* Убираем ограничение высоты у feed-container */
-.feed-container {
-    flex-grow: 1;
-    padding: 20px;
-    overflow-y: auto; /* Теперь рецепты будут скроллиться отдельно */
-}
-/* Карточки рецептов идут столбиком */
-#recipes-container {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-}
 
-
+.start-btn:hover {
+    background: #4A625E;
+}
 
 /* Позволяет всей странице прокручиваться */
 body {
