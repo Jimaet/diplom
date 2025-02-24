@@ -6,11 +6,12 @@ body {
     background: #E3E3E3;
     margin: 0;
     padding: 0;
-    width: 100vw; /* Убираем отступы */
+    width: 100vw;
     display: flex;
     flex-direction: column;
     align-items: center;
-    overflow-x: hidden; /* Убираем горизонтальный скролл */
+    overflow-x: hidden;
+    min-height: 100vh; /* Теперь body растягивается */
 }
 * {
     margin: 0;
@@ -20,9 +21,8 @@ body {
 
 /* Основной контейнер */
 .container {
-    width: 100vw; /* Растягиваем контейнер на всю ширину */
-    max-width: 420px; /* Можно увеличить, если нужно шире */
-    height: 100vh;
+    width: 100vw;
+    max-width: 420px;
     background: #E3E3E3;
     border-radius: 20px;
     overflow: hidden;
@@ -31,6 +31,7 @@ body {
     flex-direction: column;
     padding: 10px;
     box-sizing: border-box;
+    flex-grow: 1; /* Позволяем контейнеру занимать всю высоту */
 }
 
 /* Верхняя панель */
@@ -90,15 +91,11 @@ body {
 }
 /* Карусель */
 .carousel-container {
-    width: 100vw;
-    margin: 0;
-    padding: 0;
-    padding-left: 0 !important; /* Убираем лишний отступ слева */
+    width: 100%;
+    display: flex;
     overflow-x: auto;
     white-space: nowrap;
-    scrollbar-width: none;
-    -webkit-overflow-scrolling: touch;
-    margin-left: -10px;
+    padding: 10px;
 }
 
 /* Фильтры */
