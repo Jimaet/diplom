@@ -3,18 +3,18 @@
     display: flex;
     flex-direction: column;
     gap: 12px;
-    padding: 5px 5px; /* Уменьшил боковые отступы */
+    padding: 8px; /* Уменьшил боковые отступы */
 }
 
 /* Карточка рецепта */
 .recipe-card {
     background: #FDFDFD;
     border-radius: 41px;
-    height: 100px; /* Фиксированная высота */
+    height: 110px; /* Фиксированная высота */
     display: flex;
     align-items: center;
     position: relative;
-    padding: 8px;
+    padding: 10px;
     box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
     transition: transform 0.2s ease-in-out;
 }
@@ -23,11 +23,11 @@
     transform: scale(1.02);
 }
 
-/* Фото рецепта (заглушка) */
+/* Фото рецепта */
 .recipe-img {
-    width: 80px;
-    height: 80px;
-    background: #D9D9D9 url('placeholder-image.jpg') center/cover no-repeat;
+    width: 90px;
+    height: 90px;
+    background: #D9D9D9; /* Заглушка */
     border-radius: 34px;
     margin: 5px;
 }
@@ -38,7 +38,7 @@
     display: flex;
     flex-direction: column;
     justify-content: center;
-    padding-left: 12px;
+    padding-left: 15px;
 }
 
 /* Название рецепта */
@@ -77,8 +77,8 @@
 /* Кнопка "Начать!" */
 .start-btn {
     position: absolute;
-    bottom: 8px;
-    right: 10px;
+    bottom: 10px;
+    right: 12px;
     background: #5D7B76;
     color: #FFFFFF;
     font-size: 14px;
@@ -109,4 +109,3 @@ body {
     margin: 0;
     padding-bottom: 80px;
 }
- 
