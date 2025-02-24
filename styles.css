@@ -11,6 +11,7 @@ body {
     flex-direction: column;
     align-items: center;
     overflow-x: hidden;
+    overflow-y: auto;
     min-height: 100vh; /* Теперь body растягивается */
 }
 * {
@@ -31,6 +32,7 @@ body {
     flex-direction: column;
     padding: 10px;
     box-sizing: border-box;
+    min-height: 100vh;
     flex-grow: 1; /* Позволяем контейнеру занимать всю высоту */
     
 }
