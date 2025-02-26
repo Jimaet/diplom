@@ -27,9 +27,10 @@ if (!receptId) {
 
 async function loadRecipe(receptId) {
     try {
+        // Получаем ID коллекции (например, recept2 → receptmain2)
         const receptMainId = `receptmain${receptId.replace("recept", "")}`;
 
-        // Проверяем, существует ли коллекция
+        // Проверяем, существует ли документ
         const mainRef = doc(db, receptMainId, "main");
         const mainSnap = await getDoc(mainRef);
 
@@ -38,7 +39,7 @@ async function loadRecipe(receptId) {
             return;
         }
 
-        // Загружаем данные
+        // Загружаем продукты и шаги
         const prodRef = doc(db, receptMainId, "prod");
         const stepRef = doc(db, receptMainId, "step");
 
@@ -85,11 +86,19 @@ async function loadRecipe(receptId) {
 // Функция для показа сообщения "Упс.... Рецепт еще не готов("
 function showRecipeNotReady() {
     document.getElementById("recipe-title").textContent = "Упс.... Рецепт еще не готов(";
-    document.getElementById("recipe-description").textContent = "";
+    document.getElementById("recipe-title").style.textAlign = "center";
+    document.getElementById("recipe-title").style.fontSize = "20px";
+    document.getElementById("recipe-title").style.color = "#FF5733"; // Красивый цвет ошибки
+
+    document.getElementById("recipe-description").textContent = "Мы уже работаем над этим!";
+    document.getElementById("recipe-description").style.textAlign = "center";
+
     document.getElementById("recipe-info").textContent = "";
     document.getElementById("ingredients-list").innerHTML = "";
     document.getElementById("steps-container").innerHTML = "";
 }
+
+// Добавляем кнопку "Показать больше" для длинного описания
 document.addEventListener("DOMContentLoaded", function () {
     const description = document.getElementById("recipe-description");
 
