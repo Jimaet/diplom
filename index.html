@@ -127,7 +127,7 @@
         const db = getFirestore(app);
         
         // Функция загрузки рецептов
-        async function loadRecipes() {
+       async function loadRecipes() {
     const recipesContainer = document.getElementById("recipes-container");
     recipesContainer.innerHTML = ""; // Очистка перед загрузкой
 
@@ -137,6 +137,8 @@
 
     querySnapshot.forEach((doc) => {
         const data = doc.data();
+        const recipeId = doc.id; // Получаем ID рецепта из Firebase
+
         const recipeCard = `
             <div class="recipe-card">
                 <!-- Фото рецепта -->
@@ -152,17 +154,19 @@
                 <button class="favorite-button"></button>
 
                 <!-- Кнопка "Начать!" -->
-                <a href="recipe.html?id=recept0" class="recipe-card">
-                <button class="start-button">Начать!</button>
+                <a href="recipe.html?id=${recipeId}" class="recipe-link">
+                    <button class="start-button">Начать!</button>
                 </a>
             </div>
         `;
+
         recipesContainer.innerHTML += recipeCard;
     });
 }
 
 // Загружаем рецепты при запуске страницы
 loadRecipes();
+
 
 
 
