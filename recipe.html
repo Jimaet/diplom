@@ -4,75 +4,28 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Рецепт</title>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js"></script>
-    <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyDqIDTQrS14wTLsh_jFkD0GZAmEEWW8TDk",
-            authDomain: "cooker-62216.firebaseapp.com",
-            projectId: "cooker-62216",
-            storageBucket: "cooker-62216.firebasestorage.app",
-            messagingSenderId: "994568659489",
-            appId: "1:994568659489:web:18c15bc15fa5b723a03960"
-        };
-
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
-
-        document.addEventListener("DOMContentLoaded", function () {
-            const params = new URLSearchParams(window.location.search);
-            const recipeId = params.get("id"); // Получаем ID рецепта из URL
-
-            if (recipeId) {
-                loadRecipe(recipeId);
-            }
-        });
-
-        function loadRecipe(id) {
-            db.collection(id).doc("main").get().then((doc) => {
-                if (doc.exists) {
-                    const data = doc.data();
-                    document.getElementById("recipe-title").innerText = data.name;
-                    document.getElementById("recipe-description").innerText = data.dis;
-                    document.getElementById("recipe-porcii").innerText = `Порции: ${data.porcii}`;
-                    document.getElementById("recipe-time").innerText = `Время: ${data.timemin} мин`;
-                }
-            });
-
-            db.collection(id).doc("prod").get().then((doc) => {
-                if (doc.exists) {
-                    const ingredients = doc.data();
-                    let ingredientsList = "";
-                    Object.keys(ingredients).forEach((key) => {
-                        ingredientsList += `<li>${ingredients[key]}</li>`;
-                    });
-                    document.getElementById("recipe-ingredients").innerHTML = ingredientsList;
-                }
-            });
-
-            db.collection(id).doc("step").get().then((doc) => {
-                if (doc.exists) {
-                    const steps = doc.data();
-                    let stepsList = "";
-                    Object.keys(steps).forEach((key) => {
-                        stepsList += `<li>${steps[key]}</li>`;
-                    });
-                    document.getElementById("recipe-steps").innerHTML = stepsList;
-                }
-            });
-        }
-    </script>
+    <link rel="stylesheet" href="recipes.css">
+    <script type="module" src="recipe.js"></script>
 </head>
 <body>
-    <h1 id="recipe-title">Загрузка...</h1>
-    <p id="recipe-description"></p>
-    <p id="recipe-porcii"></p>
-    <p id="recipe-time"></p>
 
-    <h3>Ингредиенты:</h3>
-    <ul id="recipe-ingredients"></ul>
+<div class="container">
+    <a href="index.html" class="back-button">← Назад</a>
+    <h1 id="recipe-title" class="recipe-title">Загрузка...</h1>
 
-    <h3>Шаги приготовления:</h3>
-    <ol id="recipe-steps"></ol>
+    <div class="recipe-header">
+        <div class="recipe-photo"></div>
+        <p id="recipe-description" class="recipe-description">Загрузка...</p>
+    </div>
+
+    <p id="recipe-info" class="recipe-info">Загрузка...</p>
+
+    <h2 class="ingredients-title">Продукты:</h2>
+    <ul id="ingredients-list" class="ingredients-list"></ul>
+
+    <h2 class="steps-title">Пошаговый рецепт:</h2>
+    <div id="steps-container"></div>
+</div>
+
 </body>
 </html>
