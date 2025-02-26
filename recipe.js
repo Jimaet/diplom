@@ -18,12 +18,13 @@ const db = getFirestore(app);
 // Получаем `receptId` из URL
 const params = new URLSearchParams(window.location.search);
 const receptId = params.get("id") || "recept0"; // По умолчанию recept0
+const receptMainId = `receptmain${receptId.replace("recept", "")}`; // Преобразуем receptX → receptmainX
 
 async function loadRecipe() {
     try {
-        const mainRef = doc(db, receptId, "main");
-        const prodRef = doc(db, receptId, "prod");
-        const stepRef = doc(db, receptId, "step");
+        const mainRef = doc(db, receptMainId, "main");
+        const prodRef = doc(db, receptMainId, "prod");
+        const stepRef = doc(db, receptMainId, "step");
 
         const mainSnap = await getDoc(mainRef);
         const prodSnap = await getDoc(prodRef);
