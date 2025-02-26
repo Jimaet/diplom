@@ -70,5 +70,14 @@ async function loadRecipe() {
         console.error("Ошибка загрузки рецепта:", error);
     }
 }
+document.addEventListener("DOMContentLoaded", function () {
+    const description = document.getElementById("recipe-description");
+    const showMore = document.getElementById("show-more");
+
+    showMore.addEventListener("click", function () {
+        description.classList.toggle("expanded");
+        this.textContent = description.classList.contains("expanded") ? "Скрыть" : "Показать больше";
+    });
+});
 
 loadRecipe();
