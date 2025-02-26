@@ -15,9 +15,11 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// Получаем `receptId` из URL
+// Получаем `id` рецепта из URL
 const params = new URLSearchParams(window.location.search);
 const receptId = params.get("id");
+
+console.log("🔍 Полученный ID рецепта:", receptId);
 
 if (!receptId) {
     showRecipeNotReady();
@@ -27,10 +29,11 @@ if (!receptId) {
 
 async function loadRecipe(receptId) {
     try {
-        // Получаем ID коллекции (например, recept2 → receptmain2)
+        // ✅ Правильное формирование ID коллекции
         const receptMainId = `receptmain${receptId.replace("recept", "")}`;
+        console.log("📁 Загружаем коллекцию:", receptMainId);
 
-        // Проверяем, существует ли документ
+        // Получаем данные рецепта
         const mainRef = doc(db, receptMainId, "main");
         const mainSnap = await getDoc(mainRef);
 
@@ -50,12 +53,14 @@ async function loadRecipe(receptId) {
         const prodData = prodSnap.exists() ? prodSnap.data() : {};
         const stepData = stepSnap.exists() ? stepSnap.data() : {};
 
-        // Обновляем страницу
-        document.getElementById("recipe-title").textContent = mainData.name;
-        document.getElementById("recipe-description").textContent = mainData.dis;
+        console.log("✅ Данные рецепта загружены:", mainData);
+
+        // ✅ Обновляем страницу
+        document.getElementById("recipe-title").textContent = mainData.name || "Без названия";
+        document.getElementById("recipe-description").textContent = mainData.dis || "Описание отсутствует";
         document.getElementById("recipe-info").textContent = `Порции: ${mainData.porcii} | Время: ${mainData.timemin} мин`;
 
-        // Продукты
+        // ✅ Продукты
         const ingredientsList = document.getElementById("ingredients-list");
         ingredientsList.innerHTML = "";
         Object.values(prodData).forEach(item => {
@@ -64,7 +69,7 @@ async function loadRecipe(receptId) {
             ingredientsList.appendChild(li);
         });
 
-        // Шаги
+        // ✅ Шаги приготовления
         const stepsContainer = document.getElementById("steps-container");
         stepsContainer.innerHTML = "";
         Object.entries(stepData).forEach(([stepNum, stepText]) => {
@@ -77,52 +82,46 @@ async function loadRecipe(receptId) {
             stepsContainer.appendChild(stepDiv);
         });
 
+        // ✅ Добавляем кнопку "Показать больше", если текст длинный
+        setupShowMoreButton();
+
     } catch (error) {
-        console.error("Ошибка загрузки рецепта:", error);
+        console.error("🔥 Ошибка загрузки рецепта:", error);
         showRecipeNotReady();
     }
 }
 
-// Функция для показа сообщения "Упс.... Рецепт еще не готов("
+// Функция для показа ошибки, если рецепт не найден
 function showRecipeNotReady() {
-    document.getElementById("recipe-title").textContent = "Упс.... Рецепт еще не готов(";
-    document.getElementById("recipe-title").style.textAlign = "center";
-    document.getElementById("recipe-title").style.fontSize = "20px";
-    document.getElementById("recipe-title").style.color = "#FF5733"; // Красивый цвет ошибки
+    const title = document.getElementById("recipe-title");
+    title.textContent = "Упс.... Рецепт еще не готов(";
+    title.style.textAlign = "center";
+    title.style.fontSize = "20px";
+    title.style.color = "#FF5733";
 
     document.getElementById("recipe-description").textContent = "Мы уже работаем над этим!";
     document.getElementById("recipe-description").style.textAlign = "center";
-
     document.getElementById("recipe-info").textContent = "";
     document.getElementById("ingredients-list").innerHTML = "";
     document.getElementById("steps-container").innerHTML = "";
 }
 
-// Добавляем кнопку "Показать больше" для длинного описания
-document.addEventListener("DOMContentLoaded", function () {
-    const description = document.getElementById("recipe-description");
-
-    if (description.scrollHeight > description.clientHeight) {
-        const expandButton = document.createElement("span");
-        expandButton.classList.add("expand-button");
-        expandButton.textContent = "Показать больше";
-        description.after(expandButton);
-
-        expandButton.addEventListener("click", function () {
-            description.classList.toggle("expanded");
-            expandButton.textContent = description.classList.contains("expanded") ? "Скрыть" : "Показать больше";
-        });
-    }
-});
-document.addEventListener("DOMContentLoaded", function () {
+// ✅ Функция для кнопки "Показать больше"
+function setupShowMoreButton() {
     const description = document.getElementById("recipe-description");
     const showMoreBtn = document.getElementById("show-more");
 
     if (!description || !showMoreBtn) return;
 
+    // Если текста больше, чем вмещается, включаем кнопку
+    if (description.scrollHeight > description.clientHeight) {
+        showMoreBtn.style.display = "inline";
+    } else {
+        showMoreBtn.style.display = "none";
+    }
+
     showMoreBtn.addEventListener("click", function () {
         description.classList.toggle("expanded");
         showMoreBtn.textContent = description.classList.contains("expanded") ? "Скрыть" : "Показать больше";
     });
-});
-
+}
