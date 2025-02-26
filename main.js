@@ -102,3 +102,40 @@ async function loadRecipes() {
 
 // Запускаем загрузку рецептов
 loadRecipes();
+// 🔹 Функция загрузки категорий (карусель) 🔹
+function loadCategoryCarousel() {
+    const categoryContainer = document.querySelector(".category-carousel .carousel");
+
+    const categories = [
+        { name: "Закуски", image: "k2/zakyski.jpg" },
+        { name: "Салаты", image: "k2/salat.jpg" },
+        { name: "Десерты", image: "k2/desert.jpg" },
+        { name: "Выпечка", image: "k2/vipechka.jpg" },
+        { name: "Напитки", image: "k2/napitki.jpg" },
+        { name: "Фастфуд", image: "k2/fastfod.jpg" },
+        { name: "Гарнир", image: "k2/garnir.jpg" },
+        { name: "Горячее", image: "k2/goryachee.jpg" },
+        { name: "Соусы", image: "k2/sousi.jpg" }
+    ];
+
+    categoryContainer.innerHTML = ""; // Очистка перед добавлением категорий
+
+    categories.forEach(category => {
+        const categoryBtn = document.createElement("button");
+        categoryBtn.classList.add("category-btn");
+
+        categoryBtn.innerHTML = `
+            <img src="${category.image}" alt="${category.name}">
+            <span>${category.name}</span>
+        `;
+
+        categoryContainer.appendChild(categoryBtn);
+    });
+}
+
+// Загружаем рецепты и категории при запуске страницы
+document.addEventListener("DOMContentLoaded", () => {
+    loadRecipes();
+    loadCategoryCarousel();
+});
+
