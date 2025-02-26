@@ -90,3 +90,18 @@ function showRecipeNotReady() {
     document.getElementById("ingredients-list").innerHTML = "";
     document.getElementById("steps-container").innerHTML = "";
 }
+document.addEventListener("DOMContentLoaded", function () {
+    const description = document.getElementById("recipe-description");
+
+    if (description.scrollHeight > description.clientHeight) {
+        const expandButton = document.createElement("span");
+        expandButton.classList.add("expand-button");
+        expandButton.textContent = "Показать больше";
+        description.after(expandButton);
+
+        expandButton.addEventListener("click", function () {
+            description.style.maxHeight = "none";
+            expandButton.style.display = "none"; // Скрываем кнопку после раскрытия
+        });
+    }
+});
