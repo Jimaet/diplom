@@ -1,11 +1,15 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap');
+
 body {
     font-family: 'Inter', sans-serif;
-    background: #FFFFFF;
+    background: linear-gradient(135deg, #FFD3A5, #FD6585); /* Красивый градиент */
     color: #2E2828;
     margin: 0;
     padding: 20px;
     display: flex;
     justify-content: center;
+    align-items: center;
+    min-height: 100vh;
 }
 
 .container {
@@ -14,24 +18,32 @@ body {
     background: #FFFFFF;
     padding: 15px;
     border-radius: 20px;
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-} 
+    box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.15);
+    animation: fadeIn 0.5s ease-in-out;
+}
 
 /* Кнопка "Назад" */
 .back-button {
     color: #797878;
     text-decoration: none;
     font-size: 18px;
+    font-weight: 600;
     display: block;
     margin-bottom: 10px;
+    transition: opacity 0.3s;
+}
+
+.back-button:hover {
+    opacity: 0.7;
 }
 
 /* Заголовок рецепта */
 .recipe-title {
-    color: #797878;
+    color: #2E2828;
     font-size: 22px;
     font-weight: bold;
     margin-bottom: 10px;
+    text-align: left;
 }
 
 /* Блок с изображением и описанием */
@@ -39,6 +51,7 @@ body {
     display: flex;
     align-items: flex-start;
     gap: 15px;
+    position: relative;
 }
 
 /* Фото рецепта (пока заглушка) */
@@ -48,26 +61,61 @@ body {
     background: #C4C4C4;
     border-radius: 25px;
     flex-shrink: 0;
+    transition: transform 0.3s ease-in-out;
 }
 
-/* Описание */
+.recipe-photo:hover {
+    transform: scale(1.05);
+}
+
+/* Описание (свернутое) */
 .recipe-description {
     color: #797878;
     font-size: 14px;
     line-height: 1.4;
+    max-height: 60px;
+    overflow: hidden;
+    position: relative;
+    transition: max-height 0.3s ease-in-out;
+}
+
+.recipe-description.expanded {
+    max-height: 200px;
+}
+
+/* Кнопка "Показать больше" */
+.show-more {
+    display: block;
+    color: #FD6585;
+    font-size: 12px;
+    cursor: pointer;
+    margin-top: 5px;
+    text-align: right;
+    transition: color 0.3s;
+}
+
+.show-more:hover {
+    color: #FF3366;
 }
 
 /* Порции и время */
 .recipe-info {
     font-size: 14px;
     color: #2E2828;
-    margin: 10px 0;
+    position: absolute;
+    bottom: 0;
+    left: 135px;
+    background: rgba(255, 255, 255, 0.8);
+    padding: 5px 10px;
+    border-radius: 10px;
+    font-weight: 600;
 }
 
 /* Секция продуктов */
-.ingredients-title {
+.ingredients-title, .steps-title {
     font-size: 18px;
     font-weight: bold;
+    margin-top: 15px;
     margin-bottom: 5px;
 }
 
@@ -80,24 +128,33 @@ body {
 }
 
 /* Пошаговый рецепт */
-.steps-title {
-    font-size: 18px;
-    font-weight: bold;
-    margin-top: 15px;
-    margin-bottom: 5px;
-}
-
 .step {
     margin-bottom: 10px;
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 10px;
+    transition: transform 0.3s;
 }
 
+.step:hover {
+    transform: scale(1.02);
+}
+
+/* Заголовок шагов */
 .step-title {
     color: #797878;
     font-size: 16px;
     font-weight: bold;
 }
 
-.step-description {
-    font-size: 14px;
-    line-height: 1.4;
+/* Анимация появления */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
