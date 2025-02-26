@@ -114,4 +114,15 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 });
+document.addEventListener("DOMContentLoaded", function () {
+    const description = document.getElementById("recipe-description");
+    const showMoreBtn = document.getElementById("show-more");
+
+    if (!description || !showMoreBtn) return;
+
+    showMoreBtn.addEventListener("click", function () {
+        description.classList.toggle("expanded");
+        showMoreBtn.textContent = description.classList.contains("expanded") ? "Скрыть" : "Показать больше";
+    });
+});
 
