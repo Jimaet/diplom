@@ -1,103 +1,92 @@
-body {
-    font-family: 'Inter', sans-serif;
-    background: #FFFFFF;
-    color: #2E2828;
-    margin: 0;
-    padding: 20px;
+/* Контейнер для ленты рецептов */
+.feed-container {
+    flex-grow: 1;
+    padding-bottom: 80px; /* Учитываем нижнюю панель */
+    overflow: visible; /* Теперь скроллится вся страница */
+}
+
+/* Контейнер для рецептов */
+#recipes-container {
     display: flex;
-    justify-content: center;
+    flex-direction: column;
+    gap: 10px;
+    padding-bottom: 15px;
+    overflow: visible;
 }
 
-.container {
-    width: 100%;
-    max-width: 420px;
-    background: #FFFFFF;
-    padding: 15px;
+/* Карточка рецепта */
+.recipe-card {
+    min-height: 120px;
+    display: flex;
+    align-items: center;
+    background: #FDFDFD;
     border-radius: 20px;
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    padding: 5px;
+    position: relative;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
-/* Кнопка "Назад" */
-.back-button {
-    color: #797878;
-    text-decoration: none;
-    font-size: 18px;
-    display: block;
-    margin-bottom: 10px;
+/* Фото блюда */
+.recipe-card img {
+    width: 90px;
+    height: 90px;
+    border-radius: 20px;
+    object-fit: cover;
+    margin: 5px; /* Отступ сверху, снизу и слева */
+    background: #E0E0E0; /* Заглушка пока без фото */
+}
+
+/* Контейнер для текста */
+.recipe-info {
+    flex-grow: 1;
+    padding-left: 10px;
 }
 
 /* Заголовок рецепта */
 .recipe-title {
-    color: #797878;
-    font-size: 22px;
+    font-size: 18px;
     font-weight: bold;
-    margin-bottom: 10px;
+    margin: 0;
+    color: #101213; /* Цвет текста */
+    padding-top: 5px; /* Отступ сверху */
 }
 
-/* Блок с изображением и описанием */
-.recipe-header {
-    display: flex;
-    align-items: flex-start;
-    gap: 15px;
-}
-
-/* Фото рецепта (пока заглушка) */
-.recipe-photo {
-    width: 120px;
-    height: 120px;
-    background: #C4C4C4;
-    border-radius: 25px;
-    flex-shrink: 0;
-}
-
-/* Описание */
+/* Краткое описание */
 .recipe-description {
-    color: #797878;
     font-size: 14px;
-    line-height: 1.4;
+    color: #C2C5C3; /* Цвет описания */
+    margin-top: 5px;
 }
 
-/* Порции и время */
-.recipe-info {
+/* Кнопка "Добавить в избранное" */
+.favorite-button {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    width: 25px;
+    height: 25px;
+    border: 2px solid #5D7B76;
+    border-radius: 50%;
+    background: transparent;
+    cursor: pointer;
+}
+
+/* Кнопка "Начать" */
+.start-button {
+    position: absolute;
+    bottom: 4px;
+    right: 8px;
+    background: #5D7B76;
+    color: #FFFFFF;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 34px;
+    cursor: pointer;
     font-size: 14px;
-    color: #2E2828;
-    margin: 10px 0;
-}
-
-/* Секция продуктов */
-.ingredients-title {
-    font-size: 18px;
     font-weight: bold;
-    margin-bottom: 5px;
+    transition: background 0.3s;
 }
 
-.ingredients-list {
-    padding-left: 15px;
-}
-
-.ingredients-list li {
-    margin-bottom: 5px;
-}
-
-/* Пошаговый рецепт */
-.steps-title {
-    font-size: 18px;
-    font-weight: bold;
-    margin-top: 15px;
-    margin-bottom: 5px;
-}
-
-.step {
-    margin-bottom: 10px;
-}
-
-.step-title {
-    color: #797878;
-    font-size: 16px;
-    font-weight: bold;
-}
-
-.step-description {
-    font-size: 14px;
-    line-height: 1.4;
+.start-button:hover {
+    background: #4A5B50;
 }
