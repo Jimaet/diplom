@@ -18,7 +18,7 @@
             <div class="avatar"></div>
         </div>
 
-        <!-- Первая карусель (фильтры) -->
+        <!-- Фильтры -->
         <div class="carousel-container">
             <div class="carousel">
                 <button class="filter-btn">Простые</button>
@@ -31,48 +31,6 @@
             </div>
         </div>
 
-        <!-- Вторая карусель (категории) -->
-        <div class="carousel-container category-carousel">
-            <div class="carousel">
-                <button class="category-btn">
-                    <img src="k2/zakyski.jpg" alt="Закуски">
-                    <span>Закуски</span>
-                </button>
-                <button class="category-btn">
-                    <img src="k2/salat.jpg" alt="Салаты">
-                    <span>Салаты</span>
-                </button>
-                <button class="category-btn">
-                    <img src="k2/desert.jpg" alt="Десерты">
-                    <span>Десерты</span>
-                </button>
-                <button class="category-btn">
-                    <img src="k2/vipechka.jpg" alt="Выпечка">
-                    <span>Выпечка</span>
-                </button>
-                <button class="category-btn">
-                    <img src="k2/napitki.jpg" alt="Напитки">
-                    <span>Напитки</span>
-                </button>
-                <button class="category-btn">
-                    <img src="k2/fastfod.jpg" alt="Фастфуд">
-                    <span>Фастфуд</span>
-                </button>
-                <button class="category-btn">
-                    <img src="k2/garnir.jpg" alt="Гарнир">
-                    <span>Гарнир</span>
-                </button>
-                <button class="category-btn">
-                    <img src="k2/goryachee.jpg" alt="Горячее">
-                    <span>Горячее</span>
-                </button>
-                <button class="category-btn">
-                    <img src="k2/sousi.jpg" alt="Соусы">
-                    <span>Соусы</span>
-                </button>
-            </div>
-        </div>
-
         <!-- Лента рецептов -->
         <div class="feed-container">
             <p class="feed-title">Лента рецептов:</p>
@@ -80,7 +38,7 @@
         </div>
     </div>
 
-    <!-- Нижняя навигационная панель -->
+    <!-- Навигационная панель -->
     <div class="bottom-nav">
         <button class="nav-btn">
             <img src="icons/home.svg" alt="Home">
@@ -105,73 +63,7 @@
         </button>
     </div>
 
-    <!-- Подключение Firebase -->
-    <script type="module">
-        // Импорт Firebase
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-        import { collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-        // 🔹 ТВОИ ДАННЫЕ FIREBASE 🔹
-        const firebaseConfig = {
-            apiKey: "AIzaSyDqIDTQrS14wTLsh_jFkD0GZAmEEWW8TDk",
-            authDomain: "cooker-62216.firebaseapp.com",
-            projectId: "cooker-62216",
-            storageBucket: "cooker-62216.firebasestorage.app",
-            messagingSenderId: "994568659489",
-            appId: "1:994568659489:web:18c15bc15fa5b723a03960"
-        };
-        
-        // Инициализация Firebase
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-        
-        // Функция загрузки рецептов
-       async function loadRecipes() {
-    const recipesContainer = document.getElementById("recipes-container");
-    recipesContainer.innerHTML = ""; // Очистка перед загрузкой
-
-    // Получаем все документы из коллекции 'rec'
-    const recipesQuery = collection(db, "rec");
-    const querySnapshot = await getDocs(recipesQuery);
-
-    querySnapshot.forEach((doc) => {
-        const data = doc.data();
-        const recipeId = doc.id; // Получаем ID рецепта из Firebase
-
-        const recipeCard = `
-            <div class="recipe-card">
-                <!-- Фото рецепта -->
-                <img src="${data.image || 'placeholder.jpg'}" class="recipe-img" alt="${data.name}">
-                
-                <!-- Информация о рецепте -->
-                <div class="recipe-info">
-                    <h3 class="recipe-title">${data.name}</h3>
-                    <p class="recipe-description">${data.dis}</p>
-                </div>
-
-                <!-- Кнопка "Добавить в избранное" -->
-                <button class="favorite-button"></button>
-
-                <!-- Кнопка "Начать!" -->
-                <a href="recipe.html?id=${recipeId}" class="recipe-link">
-                    <button class="start-button">Начать!</button>
-                </a>
-            </div>
-        `;
-
-        recipesContainer.innerHTML += recipeCard;
-    });
-}
-
-// Загружаем рецепты при запуске страницы
-loadRecipes();
-
-
-
-
-
-    </script>
-
+    <!-- Подключение JavaScript -->
+    <script type="module" src="main.js"></script>
 </body>
 </html>
