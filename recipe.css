@@ -51,52 +51,31 @@ body {
     display: flex;
     align-items: flex-start;
     gap: 15px;
-    position: relative; /* Добавляем позиционирование */
+    position: relative; /* ✅ Фикс: теперь можно закрепить recipe-info */
 }
 
-/* Фото рецепта (пока заглушка) */
+/* Фото рецепта */
 .recipe-photo {
     width: 120px;
     height: 120px;
     background: #C4C4C4;
     border-radius: 25px;
     flex-shrink: 0;
-    position: relative; /* Чтобы родитель мог позиционировать info */
+    position: relative;
 }
-
 
 .recipe-photo:hover {
     transform: scale(1.05);
 }
 
-/* Описание (свернутое) */
+/* Описание рецепта */
 .recipe-description {
     color: #797878;
     font-size: 14px;
     line-height: 1.4;
     max-height: 120px; /* Ограничиваем высоту */
     overflow: hidden; /* Обрезаем текст */
-    position: relative;
-}
-
-
-.recipe-description.expanded {
-    max-height: 200px;
-}
-
-/* Кнопка "Показать больше" */
-.show-more {
-    display: block;
-    color: #FD6585;
-    font-size: 12px;
-    cursor: pointer;
-    margin-top: 5px;
-    text-align: right;
-    transition: color 0.3s;
-}
-
-.show-more:hover {
-    color: #FF3366;
+    padding-bottom: 20px; /* ✅ Фикс: добавил отступ, чтобы не залезало на "Порции и время" */
 }
 
 /* Порции и время */
@@ -106,8 +85,17 @@ body {
     position: absolute;
     bottom: 0;
     left: 0;
-    width: 120px; /* Подгоняем под фото */
+    width: 120px; /* ✅ Фикс: теперь текст не будет гулять */
     text-align: center;
+}
+
+/* Кнопка "Показать больше" */
+.expand-button {
+    color: #007BFF;
+    cursor: pointer;
+    font-size: 14px;
+    display: block;
+    margin-top: 5px;
 }
 
 /* Секция продуктов */
@@ -144,13 +132,6 @@ body {
     color: #797878;
     font-size: 16px;
     font-weight: bold;
-}
-.expand-button {
-    color: #007BFF;
-    cursor: pointer;
-    font-size: 14px;
-    display: block;
-    margin-top: 5px;
 }
 
 /* Анимация появления */
