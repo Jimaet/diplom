@@ -101,17 +101,17 @@ function showRecipeNotReady() {
 // Добавляем кнопку "Показать больше" для длинного описания
 document.addEventListener("DOMContentLoaded", function () {
     const description = document.getElementById("recipe-description");
-    const expandButton = document.createElement("span");
-    expandButton.classList.add("expand-button");
-    expandButton.textContent = "Показать больше";
 
-    // Проверяем, нужно ли показывать кнопку
     if (description.scrollHeight > description.clientHeight) {
+        const expandButton = document.createElement("span");
+        expandButton.classList.add("expand-button");
+        expandButton.textContent = "Показать больше";
         description.after(expandButton);
-    }
 
-    expandButton.addEventListener("click", function () {
-        description.classList.toggle("expanded");
-        expandButton.textContent = description.classList.contains("expanded") ? "Скрыть" : "Показать больше";
-    });
+        expandButton.addEventListener("click", function () {
+            description.classList.toggle("expanded");
+            expandButton.textContent = description.classList.contains("expanded") ? "Скрыть" : "Показать больше";
+        });
+    }
 });
+
