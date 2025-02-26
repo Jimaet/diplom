@@ -17,26 +17,24 @@ const db = getFirestore(app);
 
 // Получаем `receptId` из URL
 const params = new URLSearchParams(window.location.search);
-const receptId = params.get("id"); // Например, recept2
+const receptId = params.get("id");
 
 if (!receptId) {
-    document.getElementById("recipe-title").textContent = "Рецепт не найден";
+    showRecipeNotReady();
 } else {
     loadRecipe(receptId);
 }
 
 async function loadRecipe(receptId) {
     try {
-        const receptMainId = `receptmain${receptId.replace("recept", "")}`; // Преобразуем recept2 → receptmain2
+        const receptMainId = `receptmain${receptId.replace("recept", "")}`;
 
         // Проверяем, существует ли коллекция
         const mainRef = doc(db, receptMainId, "main");
         const mainSnap = await getDoc(mainRef);
 
         if (!mainSnap.exists()) {
-            document.getElementById("recipe-title").textContent = "Рецепт не найден";
-            document.getElementById("recipe-description").textContent = "";
-            document.getElementById("recipe-info").textContent = "";
+            showRecipeNotReady();
             return;
         }
 
@@ -80,5 +78,15 @@ async function loadRecipe(receptId) {
 
     } catch (error) {
         console.error("Ошибка загрузки рецепта:", error);
+        showRecipeNotReady();
     }
+}
+
+// Функция для показа сообщения "Упс.... Рецепт еще не готов("
+function showRecipeNotReady() {
+    document.getElementById("recipe-title").textContent = "Упс.... Рецепт еще не готов(";
+    document.getElementById("recipe-description").textContent = "";
+    document.getElementById("recipe-info").textContent = "";
+    document.getElementById("ingredients-list").innerHTML = "";
+    document.getElementById("steps-container").innerHTML = "";
 }
