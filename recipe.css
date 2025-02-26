@@ -1,0 +1,103 @@
+body {
+    font-family: 'Inter', sans-serif;
+    background: #FFFFFF;
+    color: #2E2828;
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+}
+
+.container {
+    width: 100%;
+    max-width: 420px;
+    background: #FFFFFF;
+    padding: 15px;
+    border-radius: 20px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Кнопка "Назад" */
+.back-button {
+    color: #797878;
+    text-decoration: none;
+    font-size: 18px;
+    display: block;
+    margin-bottom: 10px;
+}
+
+/* Заголовок рецепта */
+.recipe-title {
+    color: #797878;
+    font-size: 22px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+/* Блок с изображением и описанием */
+.recipe-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 15px;
+}
+
+/* Фото рецепта (пока заглушка) */
+.recipe-photo {
+    width: 120px;
+    height: 120px;
+    background: #C4C4C4;
+    border-radius: 25px;
+    flex-shrink: 0;
+}
+
+/* Описание */
+.recipe-description {
+    color: #797878;
+    font-size: 14px;
+    line-height: 1.4;
+}
+
+/* Порции и время */
+.recipe-info {
+    font-size: 14px;
+    color: #2E2828;
+    margin: 10px 0;
+}
+
+/* Секция продуктов */
+.ingredients-title {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.ingredients-list {
+    padding-left: 15px;
+}
+
+.ingredients-list li {
+    margin-bottom: 5px;
+}
+
+/* Пошаговый рецепт */
+.steps-title {
+    font-size: 18px;
+    font-weight: bold;
+    margin-top: 15px;
+    margin-bottom: 5px;
+}
+
+.step {
+    margin-bottom: 10px;
+}
+
+.step-title {
+    color: #797878;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.step-description {
+    font-size: 14px;
+    line-height: 1.4;
+}
