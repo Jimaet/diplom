@@ -2,7 +2,7 @@
 
 body {
     font-family: 'Inter', sans-serif;
-    background: linear-gradient(135deg, #FFD3A5, #FD6585); /* Красивый градиент */
+    background: linear-gradient(135deg, #FFD3A5, #FD6585);
     color: #2E2828;
     margin: 0;
     padding: 20px;
@@ -49,9 +49,9 @@ body {
 /* Блок с изображением и описанием */
 .recipe-header {
     display: flex;
-    align-items: flex-start;
     gap: 15px;
-    position: relative; /* ✅ Фикс: теперь можно закрепить recipe-info */
+    align-items: flex-start;
+    flex-direction: column; /* ✅ Теперь инфа будет под фото */
 }
 
 /* Фото рецепта */
@@ -61,7 +61,6 @@ body {
     background: #C4C4C4;
     border-radius: 25px;
     flex-shrink: 0;
-    position: relative;
 }
 
 .recipe-photo:hover {
@@ -73,20 +72,21 @@ body {
     color: #797878;
     font-size: 14px;
     line-height: 1.4;
-    max-height: 120px; /* Ограничиваем высоту */
-    overflow: hidden; /* Обрезаем текст */
-    padding-bottom: 20px; /* ✅ Фикс: добавил отступ, чтобы не залезало на "Порции и время" */
+    max-height: 60px; /* ✅ Сделал меньше, чтобы показать, что текст скрывается */
+    overflow: hidden;
+    position: relative;
+    transition: max-height 0.3s ease-in-out;
+}
+
+.recipe-description.expanded {
+    max-height: none; /* ✅ Теперь работает кнопка */
 }
 
 /* Порции и время */
 .recipe-info {
     font-size: 14px;
     color: #2E2828;
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 120px; /* ✅ Фикс: теперь текст не будет гулять */
-    text-align: center;
+    margin-top: 5px; /* ✅ Добавил отступ от описания */
 }
 
 /* Кнопка "Показать больше" */
@@ -96,6 +96,11 @@ body {
     font-size: 14px;
     display: block;
     margin-top: 5px;
+    transition: color 0.3s;
+}
+
+.expand-button:hover {
+    color: #FF3366;
 }
 
 /* Секция продуктов */
