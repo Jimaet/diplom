@@ -21,15 +21,15 @@ let userId = window.Telegram?.WebApp?.initDataUnsafe?.user?.id || "guest";
 
 console.log("🟢 User ID:", userId);
 
-// 🔹 Функция проверки избранного 🔹
+// 🔹 Функция проверки, есть ли рецепт в избранном 🔹
 async function checkIfFavourite(recipeId, button) {
-    const userRef = doc(db, "person", userId);
+    const userRef = doc(db, "user", userId);
     const userSnap = await getDoc(userRef);
 
     if (userSnap.exists() && userSnap.data().favourites?.includes(recipeId)) {
-        button.classList.add("active");
+        button.classList.add("active"); // Красное сердечко
     } else {
-        button.classList.remove("active");
+        button.classList.remove("active"); // Белое сердечко
     }
 }
 
@@ -37,22 +37,26 @@ async function checkIfFavourite(recipeId, button) {
 async function toggleFavourite(event) {
     const button = event.target;
     const recipeId = button.dataset.id;
-    const userRef = doc(db, "person", userId);
+    const userRef = doc(db, "user", userId);
 
     try {
         const userSnap = await getDoc(userRef);
         let favRecipes = userSnap.exists() ? userSnap.data().favourites || [] : [];
 
         if (favRecipes.includes(recipeId)) {
+            // Удаляем из избранного
             await updateDoc(userRef, {
                 favourites: arrayRemove(recipeId)
             });
             button.classList.remove("active");
         } else {
+            // Добавляем в избранное
             await updateDoc(userRef, {
                 favourites: arrayUnion(recipeId)
             });
             button.classList.add("active");
+            button.classList.add("heart-pop"); // Анимация
+            setTimeout(() => button.classList.remove("heart-pop"), 300);
         }
     } catch (error) {
         console.error("❌ Ошибка при обновлении избранного:", error);
