@@ -159,3 +159,8 @@ document.addEventListener("DOMContentLoaded", () => {
     loadRecipes();
     loadCategoryCarousel();
 });
+document.addEventListener("DOMContentLoaded", function () {
+    document.querySelector(".nav-btn img[alt='Favourite']").closest("button").addEventListener("click", function () {
+        window.location.href = "favourite.html"; // Переход на страницу избранного
+    });
+});
