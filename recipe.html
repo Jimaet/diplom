@@ -12,7 +12,6 @@
 <div class="container">
     <a href="index.html" class="back-button">← Назад</a>
     <h1 id="recipe-title" class="recipe-title">Загрузка...</h1>
-    <button id="favorite-btn" class="favorite-btn">⭐ В избранное</button>
 
     <div class="recipe-header">
         <img id="recipe-image" src="placeholder.jpg" class="recipe-img" alt="Фото рецепта">
@@ -25,11 +24,13 @@
     <p id="recipe-info" class="recipe-info">Загрузка...</p>
 
     <h2 class="ingredients-title">Продукты:</h2>
-    <ul id="ingredients-list" class="ingredients-list"></ul>
+    <div id="recipe-ingredients"></div>
 
     <h2 class="steps-title">Пошаговый рецепт:</h2>
-    <div id="steps-container"></div>
+    <div id="recipe-steps"></div>
 </div>
+
+<script type="module" src="recipe.js"></script>
 
 </body>
 </html>
