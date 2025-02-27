@@ -148,3 +148,23 @@ function setupShowMoreButton() {
         showMoreBtn.textContent = description.classList.contains("expanded") ? "Скрыть" : "Показать больше";
     });
 }
+function createRecipeCard(recipe, recipeId) {
+    const card = document.createElement("div");
+    card.classList.add("recipe-card");
+
+    card.innerHTML = `
+        <img src="${recipe.photo || 'placeholder.jpg'}" class="recipe-photo">
+        <div class="recipe-info">
+            <h3 class="recipe-title">${recipe.name}</h3>
+            <p class="recipe-description">${recipe.dis}</p>
+            <div class="recipe-actions">
+                <button class="fav-btn" data-id="${recipeId}">❤️</button>
+            </div>
+        </div>
+    `;
+
+    // Добавляем обработчик клика по сердечку
+    card.querySelector(".fav-btn").addEventListener("click", toggleFavourite);
+
+    return card;
+}
