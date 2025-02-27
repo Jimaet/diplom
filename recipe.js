@@ -29,11 +29,11 @@ if (!receptId) {
 
 async function loadRecipe(receptId) {
     try {
-        // ✅ Правильное формирование ID коллекции
+        // ✅ ID коллекции
         const receptMainId = `receptmain${receptId.replace("recept", "")}`;
         console.log("📁 Загружаем коллекцию:", receptMainId);
 
-        // Получаем данные рецепта
+        // Получаем данные
         const mainRef = doc(db, receptMainId, "main");
         const prodRef = doc(db, receptMainId, "prod");
         const stepRef = doc(db, receptMainId, "step");
@@ -65,13 +65,9 @@ async function loadRecipe(receptId) {
 
         // ✅ Установка фото рецепта
         const recipeImage = document.getElementById("recipe-image");
-        if (photoData.url) {
-            recipeImage.src = photoData.url;
-        } else {
-            recipeImage.src = "placeholder.jpg"; // Заглушка, если фото нет
-        }
+        recipeImage.src = photoData.url || "placeholder.jpg"; // Если фото нет, ставим заглушку
 
-        // ✅ Продукты
+        // ✅ Продукты (через точку)
         const ingredientsList = document.getElementById("recipe-ingredients");
         ingredientsList.innerHTML = "";
 
@@ -91,11 +87,10 @@ async function loadRecipe(receptId) {
             }
         });
 
-        Object.values(ingredientsMap).forEach((ingredient) => {
-            const p = document.createElement("p");
-            p.textContent = ingredient;
-            ingredientsList.appendChild(p);
-        });
+        let ingredientsText = Object.values(ingredientsMap).join(". ") + "."; // Добавляем точки
+        const p = document.createElement("p");
+        p.textContent = ingredientsText;
+        ingredientsList.appendChild(p);
 
         // ✅ Шаги приготовления
         const stepsContainer = document.getElementById("recipe-steps");
