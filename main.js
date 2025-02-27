@@ -15,7 +15,11 @@ const firebaseConfig = {
 // 🔹 Инициализация Firebase 🔹
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
-let userId = "12345"; // Тут нужно подставить реальный ID пользователя из Telegram
+
+// Получаем userId из Telegram Web Apps
+let userId = window.Telegram?.WebApp?.initDataUnsafe?.user?.id || "guest";
+
+console.log("🟢 User ID:", userId);
 
 // 🔹 Функция загрузки рецептов 🔹
 async function loadRecipes() {
@@ -32,17 +36,14 @@ async function loadRecipes() {
     const recipesQuery = collection(db, "rec");
     const querySnapshot = await getDocs(recipesQuery);
 
-    let loadedRecipes = new Set(); // Храним ID рецептов, чтобы исключить дубли
+    let loadedRecipes = new Set();
 
     querySnapshot.forEach((doc) => {
         const data = doc.data();
         const recipeId = doc.id;
         const imageUrl = data.image ? data.image : "placeholder.jpg";
 
-        if (loadedRecipes.has(recipeId)) {
-            console.warn(`⚠️ Дубликат рецепта: ${recipeId}`);
-            return;
-        }
+        if (loadedRecipes.has(recipeId)) return;
 
         loadedRecipes.add(recipeId);
 
@@ -61,6 +62,9 @@ async function loadRecipes() {
             </a>
         `;
 
+        // Проверяем, находится ли рецепт в избранном
+        checkIfFavourite(recipeId, recipeCard.querySelector(".favorite-button"));
+
         // Добавляем обработчик клика на кнопку "Добавить в избранное"
         recipeCard.querySelector(".favorite-button").addEventListener("click", toggleFavourite);
 
@@ -68,6 +72,16 @@ async function loadRecipes() {
     });
 
     console.log(`✅ Загружено рецептов: ${loadedRecipes.size}`);
+}
+
+// 🔹 Функция проверки избранного 🔹
+async function checkIfFavourite(recipeId, button) {
+    const userRef = doc(db, "person", userId);
+    const userSnap = await getDoc(userRef);
+
+    if (userSnap.exists() && userSnap.data().favourites?.includes(recipeId)) {
+        button.classList.add("active");
+    }
 }
 
 // 🔹 Функция добавления/удаления из избранного 🔹
@@ -80,27 +94,30 @@ async function toggleFavourite(event) {
         let favRecipes = userSnap.exists() ? userSnap.data().favourites || [] : [];
 
         if (favRecipes.includes(recipeId)) {
-            // Удаляем из избранного
             await updateDoc(userRef, {
                 favourites: arrayRemove(recipeId)
             });
             event.target.classList.remove("active");
         } else {
-            // Добавляем в избранное
-            await setDoc(userRef, {
+            await updateDoc(userRef, {
                 favourites: arrayUnion(recipeId)
-            }, { merge: true });
+            });
             event.target.classList.add("active");
         }
     } catch (error) {
-        console.error("Ошибка при обновлении избранного:", error);
+        console.error("❌ Ошибка при обновлении избранного:", error);
     }
 }
 
 // 🔹 Загружаем рецепты при загрузке страницы 🔹
-document.addEventListener("DOMContentLoaded", () => {
-    loadRecipes();
-});
-document.querySelector(".nav-btn:nth-child(2)").addEventListener("click", () => {
-    window.location.href = "favourites.html";
-});
+document.addEventListener("DOMContentLoaded", loadRecipes);
+
+// Добавляем обработчик на кнопку Favourite
+const favButton = document.querySelector(".nav-btn:nth-child(2)");
+if (favButton) {
+    favButton.addEventListener("click", () => {
+        window.location.href = "favourites.html";
+    });
+} else {
+    console.error("❌ Ошибка: Кнопка 'Favourite' не найдена!");
+}
