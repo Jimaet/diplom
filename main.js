@@ -71,18 +71,32 @@ const db = getFirestore(app);
 // 🔹 Функция загрузки рецептов 🔹
 async function loadRecipes() {
     const recipesContainer = document.getElementById("recipes-container");
+    if (!recipesContainer) {
+        console.error("❌ Ошибка: recipes-container не найден!");
+        return;
+    }
+
     recipesContainer.innerHTML = ""; // Очистка перед загрузкой
 
-    // Получаем все рецепты из коллекции "rec"
+    console.log("🔹 Загрузка рецептов...");
+
     const recipesQuery = collection(db, "rec");
     const querySnapshot = await getDocs(recipesQuery);
 
+    let loadedRecipes = new Set(); // Храним ID рецептов, чтобы исключить дубли
+
     querySnapshot.forEach((doc) => {
         const data = doc.data();
-        const recipeId = doc.id; // Получаем ID рецепта
-        const imageUrl = data.image ? data.image : "placeholder.jpg"; // Фото из Firebase или заглушка
+        const recipeId = doc.id;
+        const imageUrl = data.image ? data.image : "placeholder.jpg";
 
-        // Создаём карточку рецепта
+        if (loadedRecipes.has(recipeId)) {
+            console.warn(`⚠️ Дубликат рецепта: ${recipeId}`);
+            return; // Пропускаем дубликаты
+        }
+
+        loadedRecipes.add(recipeId);
+
         const recipeCard = `
             <div class="recipe-card">
                 <img src="${imageUrl}" class="recipe-img" alt="${data.name}">
@@ -99,10 +113,16 @@ async function loadRecipes() {
 
         recipesContainer.innerHTML += recipeCard;
     });
+
+    console.log(`✅ Загружено рецептов: ${loadedRecipes.size}`);
 }
 
+// Запускаем загрузку один раз
+document.addEventListener("DOMContentLoaded", () => {
+    loadRecipes();
+});
 // Запускаем загрузку рецептов
-loadRecipes();
+
 // 🔹 Функция загрузки категорий (карусель) 🔹
 function loadCategoryCarousel() {
     const categoryContainer = document.querySelector(".category-carousel .carousel");
