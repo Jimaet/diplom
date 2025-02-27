@@ -43,3 +43,16 @@ async function saveUserToFirebase(userId, userName) {
         console.error("🔥 Ошибка при сохранении пользователя:", error);
     }
 }
+if (window.Telegram && window.Telegram.WebApp) {
+    const userData = window.Telegram.WebApp.initDataUnsafe;
+    const userId = userData?.user?.id;
+    const userName = userData?.user?.first_name || "Неизвестный";
+
+    if (userId) {
+        saveUserToFirebase(userId, userName);
+    } else {
+        console.warn("⚠️ ID пользователя не найден!");
+    }
+} else {
+    console.error("❌ Telegram WebApp SDK не доступен. Убедитесь, что код выполняется в Telegram Mini App.");
+}
