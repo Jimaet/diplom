@@ -35,23 +35,26 @@ async function loadRecipe(receptId) {
 
         // Получаем данные рецепта
         const mainRef = doc(db, receptMainId, "main");
-        const mainSnap = await getDoc(mainRef);
+        const prodRef = doc(db, receptMainId, "prod");
+        const stepRef = doc(db, receptMainId, "step");
+        const photoRef = doc(db, receptMainId, "photo");
+
+        const [mainSnap, prodSnap, stepSnap, photoSnap] = await Promise.all([
+            getDoc(mainRef),
+            getDoc(prodRef),
+            getDoc(stepRef),
+            getDoc(photoRef)
+        ]);
 
         if (!mainSnap.exists()) {
             showRecipeNotReady();
             return;
         }
 
-        // Загружаем продукты и шаги
-        const prodRef = doc(db, receptMainId, "prod");
-        const stepRef = doc(db, receptMainId, "step");
-
-        const prodSnap = await getDoc(prodRef);
-        const stepSnap = await getDoc(stepRef);
-
         const mainData = mainSnap.data();
         const prodData = prodSnap.exists() ? prodSnap.data() : {};
         const stepData = stepSnap.exists() ? stepSnap.data() : {};
+        const photoData = photoSnap.exists() ? photoSnap.data() : {};
 
         console.log("✅ Данные рецепта загружены:", mainData);
 
@@ -60,17 +63,42 @@ async function loadRecipe(receptId) {
         document.getElementById("recipe-description").textContent = mainData.dis || "Описание отсутствует";
         document.getElementById("recipe-info").textContent = `Порции: ${mainData.porcii} | Время: ${mainData.timemin} мин`;
 
+        // ✅ Установка фото рецепта
+        const recipeImage = document.getElementById("recipe-image");
+        if (photoData.url) {
+            recipeImage.src = photoData.url;
+        } else {
+            recipeImage.src = "placeholder.jpg"; // Заглушка, если фото нет
+        }
+
         // ✅ Продукты
-        const ingredientsList = document.getElementById("ingredients-list");
+        const ingredientsList = document.getElementById("recipe-ingredients");
         ingredientsList.innerHTML = "";
-        Object.values(prodData).forEach(item => {
-            const li = document.createElement("li");
-            li.textContent = item;
-            ingredientsList.appendChild(li);
+
+        let sortedKeys = Object.keys(prodData).sort((a, b) => {
+            let numA = parseInt(a.split("-")[0]);
+            let numB = parseInt(b.split("-")[0]);
+            return numA - numB;
+        });
+
+        let ingredientsMap = {};
+        sortedKeys.forEach((key) => {
+            let baseKey = key.split("-")[0];
+            if (!ingredientsMap[baseKey]) {
+                ingredientsMap[baseKey] = prodData[key];
+            } else {
+                ingredientsMap[baseKey] += ` - ${prodData[key]}`;
+            }
+        });
+
+        Object.values(ingredientsMap).forEach((ingredient) => {
+            const p = document.createElement("p");
+            p.textContent = ingredient;
+            ingredientsList.appendChild(p);
         });
 
         // ✅ Шаги приготовления
-        const stepsContainer = document.getElementById("steps-container");
+        const stepsContainer = document.getElementById("recipe-steps");
         stepsContainer.innerHTML = "";
         Object.entries(stepData).forEach(([stepNum, stepText]) => {
             const stepDiv = document.createElement("div");
@@ -102,8 +130,8 @@ function showRecipeNotReady() {
     document.getElementById("recipe-description").textContent = "Мы уже работаем над этим!";
     document.getElementById("recipe-description").style.textAlign = "center";
     document.getElementById("recipe-info").textContent = "";
-    document.getElementById("ingredients-list").innerHTML = "";
-    document.getElementById("steps-container").innerHTML = "";
+    document.getElementById("recipe-ingredients").innerHTML = "";
+    document.getElementById("recipe-steps").innerHTML = "";
 }
 
 // ✅ Функция для кнопки "Показать больше"
