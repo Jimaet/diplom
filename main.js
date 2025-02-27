@@ -80,11 +80,12 @@ async function loadRecipes() {
     querySnapshot.forEach((doc) => {
         const data = doc.data();
         const recipeId = doc.id; // Получаем ID рецепта
+        const imageUrl = data.image ? data.image : "placeholder.jpg"; // Фотка из Firebase или заглушка
 
         // Создаём карточку рецепта
         const recipeCard = `
             <div class="recipe-card">
-                <img src="${data.image || 'placeholder.jpg'}" class="recipe-img" alt="${data.name}">
+                <img src="${imageUrl}" class="recipe-img" alt="${data.name}">
                 <div class="recipe-info">
                     <h3 class="recipe-title">${data.name}</h3>
                     <p class="recipe-description">${data.dis}</p>
