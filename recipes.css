@@ -76,18 +76,6 @@
     margin-top: 5px;
 }
 
-/* Кнопка "Добавить в избранное" */
-.favorite-button {
-    position: absolute;
-    top: 15px;
-    right: 15px;
-    width: 25px;
-    height: 25px;
-    border: 2px solid #5D7B76;
-    border-radius: 50%;
-    background: transparent;
-    cursor: pointer;
-}
 
 /* Кнопка "Начать" */
 .start-button {
