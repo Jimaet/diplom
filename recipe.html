@@ -14,7 +14,7 @@
     <h1 id="recipe-title" class="recipe-title">Загрузка...</h1>
 
     <div class="recipe-header">
-        <div class="recipe-photo"></div>
+        <img id="recipe-image" src="placeholder.jpg" class="recipe-img" alt="Фото рецепта">
         <div class="recipe-content">
             <p id="recipe-description" class="recipe-description">Загрузка...</p>
             <span id="show-more" class="show-more">Показать больше</span>
@@ -24,11 +24,13 @@
     <p id="recipe-info" class="recipe-info">Загрузка...</p>
 
     <h2 class="ingredients-title">Продукты:</h2>
-    <ul id="ingredients-list" class="ingredients-list"></ul>
+    <div id="recipe-ingredients"></div>
 
     <h2 class="steps-title">Пошаговый рецепт:</h2>
-    <div id="steps-container"></div>
+    <div id="recipe-steps"></div>
 </div>
+
+<script type="module" src="recipe.js"></script>
 
 </body>
 </html>
