@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
-import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+import { getFirestore, doc, getDoc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
 // 🔹 Данные Firebase
 const firebaseConfig = {
@@ -21,19 +21,23 @@ const receptId = params.get("id");
 
 console.log("🔍 Полученный ID рецепта:", receptId);
 
+// Получаем ID пользователя из Telegram Mini App
+const userData = window.Telegram.WebApp.initDataUnsafe;
+const userId = userData?.user?.id;
+console.log("✅ ID пользователя:", userId);
+
 if (!receptId) {
     showRecipeNotReady();
 } else {
     loadRecipe(receptId);
 }
 
+// Функция загрузки рецепта
 async function loadRecipe(receptId) {
     try {
-        // ✅ ID коллекции
         const receptMainId = `receptmain${receptId.replace("recept", "")}`;
         console.log("📁 Загружаем коллекцию:", receptMainId);
 
-        // Получаем данные
         const mainRef = doc(db, receptMainId, "main");
         const prodRef = doc(db, receptMainId, "prod");
         const stepRef = doc(db, receptMainId, "step");
@@ -65,7 +69,7 @@ async function loadRecipe(receptId) {
 
         // ✅ Установка фото рецепта
         const recipeImage = document.getElementById("recipe-image");
-        recipeImage.src = photoData.url || "placeholder.jpg"; // Если фото нет, ставим заглушку
+        recipeImage.src = photoData.url || "placeholder.jpg";
 
         // ✅ Продукты (через точку)
         const ingredientsList = document.getElementById("recipe-ingredients");
@@ -87,7 +91,7 @@ async function loadRecipe(receptId) {
             }
         });
 
-        let ingredientsText = Object.values(ingredientsMap).join(". ") + "."; // Добавляем точки
+        let ingredientsText = Object.values(ingredientsMap).join(". ") + ".";
         const p = document.createElement("p");
         p.textContent = ingredientsText;
         ingredientsList.appendChild(p);
@@ -108,25 +112,52 @@ async function loadRecipe(receptId) {
         // ✅ Добавляем кнопку "Показать больше", если текст длинный
         setupShowMoreButton();
 
+        // ✅ Проверяем, есть ли рецепт в избранном
+        updateFavoriteButton(userId, receptId);
+
     } catch (error) {
         console.error("🔥 Ошибка загрузки рецепта:", error);
         showRecipeNotReady();
     }
 }
 
-// Функция для показа ошибки, если рецепт не найден
-function showRecipeNotReady() {
-    const title = document.getElementById("recipe-title");
-    title.textContent = "Упс.... Рецепт еще не готов(";
-    title.style.textAlign = "center";
-    title.style.fontSize = "20px";
-    title.style.color = "#FF5733";
+// Функция для проверки избранного
+async function updateFavoriteButton(userId, receptId) {
+    if (!userId) return;
 
-    document.getElementById("recipe-description").textContent = "Мы уже работаем над этим!";
-    document.getElementById("recipe-description").style.textAlign = "center";
-    document.getElementById("recipe-info").textContent = "";
-    document.getElementById("recipe-ingredients").innerHTML = "";
-    document.getElementById("recipe-steps").innerHTML = "";
+    const userRef = doc(db, "person", String(userId));
+    const userSnap = await getDoc(userRef);
+    const favoriteBtn = document.getElementById("favorite-btn");
+
+    if (userSnap.exists() && userSnap.data()[receptId]) {
+        favoriteBtn.classList.add("active");
+        favoriteBtn.textContent = "⭐ В избранном";
+    } else {
+        favoriteBtn.classList.remove("active");
+        favoriteBtn.textContent = "☆ В избранное";
+    }
+}
+
+// Функция для добавления/удаления рецепта в избранное
+async function toggleFavoriteRecipe() {
+    if (!userId) return;
+
+    const userRef = doc(db, "person", String(userId));
+    const userSnap = await getDoc(userRef);
+    const recipeName = document.getElementById("recipe-title").textContent;
+
+    if (!userSnap.exists()) {
+        await setDoc(userRef, { [receptId]: recipeName });
+    } else {
+        const userData = userSnap.data();
+        if (userData.hasOwnProperty(receptId)) {
+            delete userData[receptId];
+            await setDoc(userRef, userData);
+        } else {
+            await updateDoc(userRef, { [receptId]: recipeName });
+        }
+    }
+    updateFavoriteButton(userId, receptId);
 }
 
 // ✅ Функция для кнопки "Показать больше"
@@ -136,7 +167,6 @@ function setupShowMoreButton() {
 
     if (!description || !showMoreBtn) return;
 
-    // Если текста больше, чем вмещается, включаем кнопку
     if (description.scrollHeight > description.clientHeight) {
         showMoreBtn.style.display = "inline";
     } else {
@@ -148,3 +178,20 @@ function setupShowMoreButton() {
         showMoreBtn.textContent = description.classList.contains("expanded") ? "Скрыть" : "Показать больше";
     });
 }
+
+// Функция для показа ошибки, если рецепт не найден
+function showRecipeNotReady() {
+    const title = document.getElementById("recipe-title");
+    title.textContent = "Упс.... Рецепт еще не готов(";
+    title.style.textAlign = "center";
+    title.style.fontSize = "20px";
+    title.style.color = "#FF5733";
+
+    document.getElementById("recipe-description").textContent = "Мы уже работаем над этим!";
+    document.getElementById("recipe-info").textContent = "";
+    document.getElementById("recipe-ingredients").innerHTML = "";
+    document.getElementById("recipe-steps").innerHTML = "";
+}
+
+// ✅ Добавляем обработчик на кнопку избранного
+document.getElementById("favorite-btn").addEventListener("click", toggleFavoriteRecipe);
