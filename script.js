@@ -51,3 +51,63 @@ document.addEventListener("DOMContentLoaded", function () {
     const carousels = document.querySelectorAll(".carousel-container");
     carousels.forEach(enableCarouselScrolling);
 });
+function addToFavourites(recipeId) {
+    let userId = Telegram.WebApp.initDataUnsafe.user.id; // Получаем ID пользователя
+
+    if (!userId) {
+        alert("Ошибка: не удалось получить Telegram ID!");
+        return;
+    }
+
+    firebase.database().ref(`person/${userId}/favourites/${recipeId}`).set(true)
+        .then(() => {
+            alert("✅ Рецепт добавлен в избранное!");
+        })
+        .catch(error => {
+            console.error("Ошибка при добавлении в избранное:", error);
+        });
+}
+function removeFromFavourites(recipeId) {
+    let userId = Telegram.WebApp.initDataUnsafe.user.id;
+
+    if (!userId) {
+        alert("Ошибка: не удалось получить Telegram ID!");
+        return;
+    }
+
+    firebase.database().ref(`person/${userId}/favourites/${recipeId}`).remove()
+        .then(() => {
+            alert("❌ Рецепт удалён из избранного!");
+        })
+        .catch(error => {
+            console.error("Ошибка при удалении из избранного:", error);
+        });
+}
+function toggleFavourite(recipeId, button) {
+    let userId = Telegram.WebApp.initDataUnsafe.user.id;
+
+    if (!userId) {
+        alert("Ошибка: не удалось получить Telegram ID!");
+        return;
+    }
+
+    let favRef = firebase.database().ref(`person/${userId}/favourites/${recipeId}`);
+
+    favRef.get().then(snapshot => {
+        if (snapshot.exists()) {
+            // Уже в избранном — удаляем
+            favRef.remove().then(() => {
+                button.textContent = "🤍 Добавить";
+                alert("❌ Рецепт удалён из избранного!");
+            });
+        } else {
+            // Добавляем в избранное
+            favRef.set(true).then(() => {
+                button.textContent = "❤️ В избранном";
+                alert("✅ Рецепт добавлен в избранное!");
+            });
+        }
+    }).catch(error => {
+        console.error("Ошибка:", error);
+    });
+}
