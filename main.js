@@ -69,70 +69,58 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
 // 🔹 Функция загрузки рецептов 🔹
-async function loadRecipe() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const recipeId = urlParams.get("id");
-    if (!recipeId) {
-        console.error("❌ Ошибка: нет ID рецепта!");
+async function loadRecipes() {
+    const recipesContainer = document.getElementById("recipes-container");
+    if (!recipesContainer) {
+        console.error("❌ Ошибка: recipes-container не найден!");
         return;
     }
 
-    const recipeRef = collection(db, recipeId); // Коллекция рецепта
-    const mainDoc = await getDocs(recipeRef);
-    
-    let recipeData = {};
-    let prodData = {};
+    recipesContainer.innerHTML = ""; // Очистка перед загрузкой
 
-    mainDoc.forEach((doc) => {
-        if (doc.id === "main") {
-            recipeData = doc.data();
-        } else if (doc.id === "prod") {
-            prodData = doc.data();
+    console.log("🔹 Загрузка рецептов...");
+
+    const recipesQuery = collection(db, "rec");
+    const querySnapshot = await getDocs(recipesQuery);
+
+    let loadedRecipes = new Set(); // Храним ID рецептов, чтобы исключить дубли
+
+    querySnapshot.forEach((doc) => {
+        const data = doc.data();
+        const recipeId = doc.id;
+        const imageUrl = data.image ? data.image : "placeholder.jpg";
+
+        if (loadedRecipes.has(recipeId)) {
+            console.warn(`⚠️ Дубликат рецепта: ${recipeId}`);
+            return; // Пропускаем дубликаты
         }
+
+        loadedRecipes.add(recipeId);
+
+        const recipeCard = `
+            <div class="recipe-card">
+                <img src="${imageUrl}" class="recipe-img" alt="${data.name}">
+                <div class="recipe-info">
+                    <h3 class="recipe-title">${data.name}</h3>
+                    <p class="recipe-description">${data.dis}</p>
+                </div>
+                <button class="favorite-button"></button>
+                <a href="recipe.html?id=${recipeId}" class="recipe-link">
+                    <button class="start-button">Начать!</button>
+                </a>
+            </div>
+        `;
+
+        recipesContainer.innerHTML += recipeCard;
     });
 
-    if (!recipeData || Object.keys(recipeData).length === 0) {
-        console.error("❌ Ошибка: рецепт не найден!");
-        return;
-    }
-
-    // 📌 Фото рецепта
-    const recipeImage = document.getElementById("recipe-image");
-    recipeImage.src = recipeData.photo || "placeholder.jpg";
-
-    // 📌 Название, описание и время приготовления
-    document.getElementById("recipe-title").innerText = recipeData.name;
-    document.getElementById("recipe-description").innerText = recipeData.dis;
-    document.getElementById("recipe-info").innerText = 
-        `Порции: ${recipeData.porcii} | Время: ${recipeData.timemin} мин`;
-
-    // 📌 Ингредиенты в одной строке
-    const ingredientsContainer = document.getElementById("recipe-ingredients");
-    ingredientsContainer.innerHTML = "";
-
-    let sortedKeys = Object.keys(prodData).sort((a, b) => {
-        // Сортируем так, чтобы 1-1 шло после 1
-        let numA = parseInt(a.split("-")[0], 10);
-        let numB = parseInt(b.split("-")[0], 10);
-        return numA - numB;
-    });
-
-    let usedKeys = new Set();
-    sortedKeys.forEach((key) => {
-        if (key.includes("-")) return; // Пропускаем ключи вида 1-1, 2-2, т.к. они добавятся вместе с основными
-        let product = prodData[key];
-        let quantity = prodData[key + "-1"] || ""; // Проверяем, есть ли граммовка
-        let ingredient = `${product} - ${quantity}`;
-
-        if (!usedKeys.has(key)) {
-            ingredientsContainer.innerHTML += `<p>${ingredient}</p>`;
-            usedKeys.add(key);
-        }
-    });
+    console.log(`✅ Загружено рецептов: ${loadedRecipes.size}`);
 }
 
-// Запускаем загрузку рецепта при открытии страницы
-document.addEventListener("DOMContentLoaded", loadRecipe);
+// Запускаем загрузку один раз
+document.addEventListener("DOMContentLoaded", () => {
+    loadRecipes();
+});
 // Запускаем загрузку рецептов
 
 // 🔹 Функция загрузки категорий (карусель) 🔹
@@ -171,4 +159,3 @@ document.addEventListener("DOMContentLoaded", () => {
     loadRecipes();
     loadCategoryCarousel();
 });
-
