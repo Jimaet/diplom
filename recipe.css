@@ -11,7 +11,12 @@ body {
     align-items: center;
     min-height: 100vh;
 }
-
+.step-title {
+    font-weight: bold; /* Делаем жирным */
+    color: #797878; /* Устанавливаем серый цвет */
+    font-size: 18px;
+    margin-bottom: 5px;
+}
 .container {
     width: 100%;
     max-width: 420px;
@@ -130,10 +135,12 @@ body {
 }
 
 .ingredients-list {
-    padding-left: 15px;
+    list-style-type: disc; /* Жирные точки */
+    padding-left: 20px; /* Отступ для списка */
 }
 
 .ingredients-list li {
+    font-size: 16px;
     margin-bottom: 5px;
 }
 
