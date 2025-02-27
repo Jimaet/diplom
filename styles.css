@@ -21,7 +21,17 @@ body {
     padding: 0;
     box-sizing: border-box;
 }
-
+.fav-btn {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+.fav-btn.active {
+    color: red;
+    transform: scale(1.2);
+}
 /* Основной контейнер */
 .container {
     width: 100vw;
