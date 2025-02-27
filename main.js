@@ -21,6 +21,44 @@ let userId = window.Telegram?.WebApp?.initDataUnsafe?.user?.id || "guest";
 
 console.log("🟢 User ID:", userId);
 
+// 🔹 Функция проверки избранного 🔹
+async function checkIfFavourite(recipeId, button) {
+    const userRef = doc(db, "person", userId);
+    const userSnap = await getDoc(userRef);
+
+    if (userSnap.exists() && userSnap.data().favourites?.includes(recipeId)) {
+        button.classList.add("active");
+    } else {
+        button.classList.remove("active");
+    }
+}
+
+// 🔹 Функция добавления/удаления из избранного 🔹
+async function toggleFavourite(event) {
+    const button = event.target;
+    const recipeId = button.dataset.id;
+    const userRef = doc(db, "person", userId);
+
+    try {
+        const userSnap = await getDoc(userRef);
+        let favRecipes = userSnap.exists() ? userSnap.data().favourites || [] : [];
+
+        if (favRecipes.includes(recipeId)) {
+            await updateDoc(userRef, {
+                favourites: arrayRemove(recipeId)
+            });
+            button.classList.remove("active");
+        } else {
+            await updateDoc(userRef, {
+                favourites: arrayUnion(recipeId)
+            });
+            button.classList.add("active");
+        }
+    } catch (error) {
+        console.error("❌ Ошибка при обновлении избранного:", error);
+    }
+}
+
 // 🔹 Функция загрузки рецептов 🔹
 async function loadRecipes() {
     const recipesContainer = document.getElementById("recipes-container");
@@ -38,13 +76,12 @@ async function loadRecipes() {
 
     let loadedRecipes = new Set();
 
-    querySnapshot.forEach((doc) => {
+    querySnapshot.forEach(async (doc) => {
         const data = doc.data();
         const recipeId = doc.id;
         const imageUrl = data.image ? data.image : "placeholder.jpg";
 
         if (loadedRecipes.has(recipeId)) return;
-
         loadedRecipes.add(recipeId);
 
         const recipeCard = document.createElement("div");
@@ -62,51 +99,18 @@ async function loadRecipes() {
             </a>
         `;
 
+        const favButton = recipeCard.querySelector(".favorite-button");
+
         // Проверяем, находится ли рецепт в избранном
-        checkIfFavourite(recipeId, recipeCard.querySelector(".favorite-button"));
+        await checkIfFavourite(recipeId, favButton);
 
         // Добавляем обработчик клика на кнопку "Добавить в избранное"
-        recipeCard.querySelector(".favorite-button").addEventListener("click", toggleFavourite);
+        favButton.addEventListener("click", toggleFavourite);
 
         recipesContainer.appendChild(recipeCard);
     });
 
     console.log(`✅ Загружено рецептов: ${loadedRecipes.size}`);
-}
-
-// 🔹 Функция проверки избранного 🔹
-async function checkIfFavourite(recipeId, button) {
-    const userRef = doc(db, "person", userId);
-    const userSnap = await getDoc(userRef);
-
-    if (userSnap.exists() && userSnap.data().favourites?.includes(recipeId)) {
-        button.classList.add("active");
-    }
-}
-
-// 🔹 Функция добавления/удаления из избранного 🔹
-async function toggleFavourite(event) {
-    const recipeId = event.target.dataset.id;
-    const userRef = doc(db, "person", userId);
-
-    try {
-        const userSnap = await getDoc(userRef);
-        let favRecipes = userSnap.exists() ? userSnap.data().favourites || [] : [];
-
-        if (favRecipes.includes(recipeId)) {
-            await updateDoc(userRef, {
-                favourites: arrayRemove(recipeId)
-            });
-            event.target.classList.remove("active");
-        } else {
-            await updateDoc(userRef, {
-                favourites: arrayUnion(recipeId)
-            });
-            event.target.classList.add("active");
-        }
-    } catch (error) {
-        console.error("❌ Ошибка при обновлении избранного:", error);
-    }
 }
 
 // 🔹 Загружаем рецепты при загрузке страницы 🔹
