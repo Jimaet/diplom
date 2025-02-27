@@ -1,6 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
 import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
-import { doc, updateDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+
 // 🔹 Данные Firebase
 const firebaseConfig = {
     apiKey: "AIzaSyDqIDTQrS14wTLsh_jFkD0GZAmEEWW8TDk",
@@ -169,14 +169,4 @@ function createRecipeCard(recipe, recipeId) {
     return card;
 }
 
-async function toggleFavourite(event) {
-    const userId = "USER_ID"; // Заменить на реальный user ID из Telegram
-    const recipeId = event.target.dataset.id;
 
-    const userRef = doc(db, "person", userId);
-    await updateDoc(userRef, {
-        favourites: arrayUnion(recipeId)
-    });
-
-    event.target.classList.toggle("active"); // Добавить эффект "нажатия"
-}
