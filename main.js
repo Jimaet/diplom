@@ -1,6 +1,9 @@
 // 🔹 Импорт Firebase 🔹
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getFirestore, doc, setDoc, getDoc, updateDoc, arrayUnion, arrayRemove } from "https://www.gstatic.com/firebasejs/10.7.2/firebase-firestore.js";
+const db = getFirestore();
+let userId = "12345"; // Заменить на реальный ID из Telegram Mini App
 document.addEventListener("DOMContentLoaded", function () {
     function enableCarouselScrolling(carousel) {
         let isDown = false;
@@ -164,3 +167,28 @@ document.addEventListener("DOMContentLoaded", function () {
         window.location.href = "favourite.html"; // Переход на страницу избранного
     });
 });
+async function toggleFavourite(event) {
+    const recipeId = event.target.dataset.id;
+    const userRef = doc(db, "person", userId);
+
+    try {
+        const userSnap = await getDoc(userRef);
+        let favRecipes = userSnap.exists() ? userSnap.data().favourites || [] : [];
+
+        if (favRecipes.includes(recipeId)) {
+            // Удаляем из избранного
+            await updateDoc(userRef, {
+                favourites: arrayRemove(recipeId)
+            });
+            event.target.classList.remove("active");
+        } else {
+            // Добавляем в избранное
+            await setDoc(userRef, {
+                favourites: arrayUnion(recipeId)
+            }, { merge: true });
+            event.target.classList.add("active");
+        }
+    } catch (error) {
+        console.error("Ошибка при обновлении избранного:", error);
+    }
+}
