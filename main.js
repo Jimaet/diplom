@@ -129,3 +129,18 @@ if (favButton) {
 } else {
     console.error("❌ Ошибка: Кнопка 'Favourite' не найдена!");
 }
+document.addEventListener("DOMContentLoaded", () => {
+    const avatarButton = document.querySelector(".avatar");
+
+    // Получаем ID пользователя из Telegram Mini App
+    const userId = window.Telegram.WebApp.initDataUnsafe?.user?.id;
+
+    if (!userId) {
+        console.error("Не удалось получить ID пользователя");
+        return;
+    }
+
+    avatarButton.addEventListener("click", () => {
+        window.location.href = `profile.html?id=${userId}`;
+    });
+});
