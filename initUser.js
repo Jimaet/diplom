@@ -11,48 +11,35 @@ const firebaseConfig = {
     appId: "1:994568659489:web:18c15bc15fa5b723a03960"
 };
 
-// Инициализация Firebase
+// 🔹 Инициализация Firebase
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// 🔹 Получаем данные пользователя из Telegram Mini App
-const userData = window.Telegram.WebApp.initDataUnsafe;
-const userId = userData?.user?.id;
-const userName = userData?.user?.first_name || "Неизвестный";
+// 🔹 Получаем ID пользователя Telegram
+window.Telegram.WebApp.ready();
+const userId = window.Telegram.WebApp.initDataUnsafe?.user?.id;
 
-// Если есть ID пользователя — сохраняем в Firebase
 if (userId) {
-    saveUserToFirebase(userId, userName);
+    saveUserToFirebase(userId);
+} else {
+    console.error("Не удалось получить ID пользователя Telegram");
 }
 
-async function saveUserToFirebase(userId, userName) {
+// 🔹 Функция сохранения пользователя в Firestore
+async function saveUserToFirebase(userId) {
+    const userRef = doc(db, "person", userId.toString());
+
     try {
-        const userRef = doc(db, "person", String(userId));
         const userSnap = await getDoc(userRef);
 
         if (!userSnap.exists()) {
-            await setDoc(userRef, {
-                name: userName,
-                favorites: {} // Создаём пустой объект для избранного
-            });
-            console.log(`✅ Пользователь ${userName} (ID: ${userId}) добавлен в Firebase.`);
+            // Если пользователя нет — создаём его
+            await setDoc(userRef, {});
+            console.log(`Пользователь ${userId} добавлен в Firebase`);
         } else {
-            console.log(`ℹ️ Пользователь ${userName} (ID: ${userId}) уже существует.`);
+            console.log(`Пользователь ${userId} уже существует в Firebase`);
         }
     } catch (error) {
-        console.error("🔥 Ошибка при сохранении пользователя:", error);
+        console.error("Ошибка при сохранении пользователя в Firebase:", error);
     }
-}
-if (window.Telegram && window.Telegram.WebApp) {
-    const userData = window.Telegram.WebApp.initDataUnsafe;
-    const userId = userData?.user?.id;
-    const userName = userData?.user?.first_name || "Неизвестный";
-
-    if (userId) {
-        saveUserToFirebase(userId, userName);
-    } else {
-        console.warn("⚠️ ID пользователя не найден!");
-    }
-} else {
-    console.error("❌ Telegram WebApp SDK не доступен. Убедитесь, что код выполняется в Telegram Mini App.");
 }
