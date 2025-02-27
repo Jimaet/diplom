@@ -36,7 +36,15 @@ body {
 .back-button:hover {
     opacity: 0.7;
 }
-
+.recipe-img {
+    width: 150px; /* Устанавливаем маленький размер */
+    height: 150px; /* Делаем квадратным */
+    object-fit: cover; /* Чтобы картинка не искажалась */
+    border-radius: 20px; /* Закругляем края */
+    display: block; /* Чтобы не было проблем с выравниванием */
+    margin: 10px auto; /* Центрируем изображение */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Лёгкая тень */
+}
 /* Заголовок */
 .recipe-title {
     color: #2E2828;
