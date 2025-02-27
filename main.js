@@ -101,3 +101,6 @@ async function toggleFavourite(event) {
 document.addEventListener("DOMContentLoaded", () => {
     loadRecipes();
 });
+document.querySelector(".nav-btn:nth-child(2)").addEventListener("click", () => {
+    window.location.href = "favourites.html";
+});
