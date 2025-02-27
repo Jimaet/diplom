@@ -20,6 +20,22 @@ const db = getFirestore(app);
 let userId = window.Telegram?.WebApp?.initDataUnsafe?.user?.id || "guest";
 
 console.log("🟢 User ID:", userId);
+document.addEventListener("DOMContentLoaded", function () {
+    if (window.Telegram && Telegram.WebApp) {
+        Telegram.WebApp.ready();
+        console.log("✅ Telegram API загружен!");
+        console.log("🟢 initDataUnsafe:", Telegram.WebApp.initDataUnsafe);
+        
+        const user = Telegram.WebApp.initDataUnsafe?.user;
+        if (user && user.id) {
+            console.log("🟢 User ID:", user.id);
+        } else {
+            console.warn("⚠️ User ID не найден, вероятно, API не передаёт данные.");
+        }
+    } else {
+        console.error("❌ Telegram API не доступен! Mini App открыт в браузере?");
+    }
+});
 
 // 🔹 Функция проверки, есть ли рецепт в избранном 🔹
 async function checkIfFavourite(recipeId, button) {
