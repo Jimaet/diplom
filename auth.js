@@ -16,27 +16,40 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const provider = new GoogleAuthProvider();
 
-// Ожидаем загрузку DOM
+// Проверяем, где мы находимся (главная или login.html)
 document.addEventListener("DOMContentLoaded", () => {
     const profileButton = document.getElementById("profile-btn");
+    const googleLoginButton = document.getElementById("google-login");
+    const backButton = document.getElementById("back-button");
 
-    if (!profileButton) {
-        console.error("Кнопка профиля не найдена!");
-        return;
+    if (profileButton) {
+        profileButton.addEventListener("click", () => {
+            const userId = localStorage.getItem("userId");
+            if (userId) {
+                logout();
+            } else {
+                window.location.href = "login.html"; // Перенаправление на страницу авторизации
+            }
+        });
     }
 
-    // Проверяем, авторизован ли пользователь
-    auth.onAuthStateChanged((user) => {
-        updateProfileButton(user);
-    });
+    if (googleLoginButton) {
+        googleLoginButton.addEventListener("click", login);
+    }
 
-    // Добавляем обработчик клика
-    profileButton.addEventListener("click", () => {
-        const userId = localStorage.getItem("userId");
-        if (userId) {
-            logout();
-        } else {
-            login();
+    if (backButton) {
+        backButton.addEventListener("click", () => {
+            window.location.href = "index.html"; // Возврат на главную
+        });
+    }
+
+    auth.onAuthStateChanged((user) => {
+        if (user) {
+            localStorage.setItem("userId", user.uid);
+            document.getElementById("login-message").textContent = "Вы вошли!";
+            setTimeout(() => {
+                window.location.href = "index.html"; // После входа вернёмся на главную
+            }, 1500);
         }
     });
 });
@@ -48,7 +61,7 @@ async function login() {
         const user = result.user;
         console.log("Вход выполнен:", user);
         localStorage.setItem("userId", user.uid);
-        updateProfileButton(user);
+        window.location.href = "index.html"; // Возвращаем на главную
     } catch (error) {
         console.error("Ошибка авторизации:", error);
     }
@@ -60,20 +73,8 @@ async function logout() {
         await signOut(auth);
         console.log("Выход выполнен.");
         localStorage.removeItem("userId");
-        updateProfileButton(null);
+        window.location.href = "index.html"; // Перенаправляем на главную
     } catch (error) {
         console.error("Ошибка выхода:", error);
-    }
-}
-
-// Функция обновления кнопки профиля
-function updateProfileButton(user) {
-    const profileButton = document.getElementById("profile-btn");
-    if (!profileButton) return;
-
-    if (user) {
-        profileButton.innerHTML = `<img src="${user.photoURL}" alt="Profile" class="profile-pic">`;
-    } else {
-        profileButton.innerHTML = `<img src="icons/profile.svg" alt="Me">`;
     }
 }
