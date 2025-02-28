@@ -16,68 +16,6 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// Получаем userId из Telegram Web Apps
-let userId = window.Telegram?.WebApp?.initDataUnsafe?.user?.id || "guest";
-
-console.log("🟢 User ID:", userId);
-document.addEventListener("DOMContentLoaded", function () {
-    if (window.Telegram && Telegram.WebApp) {
-        Telegram.WebApp.ready();
-        console.log("✅ Telegram API загружен!");
-        console.log("🟢 initDataUnsafe:", Telegram.WebApp.initDataUnsafe);
-        
-        const user = Telegram.WebApp.initDataUnsafe?.user;
-        if (user && user.id) {
-            console.log("🟢 User ID:", user.id);
-        } else {
-            console.warn("⚠️ User ID не найден, вероятно, API не передаёт данные.");
-        }
-    } else {
-        console.error("❌ Telegram API не доступен! Mini App открыт в браузере?");
-    }
-});
-
-// 🔹 Функция проверки, есть ли рецепт в избранном 🔹
-async function checkIfFavourite(recipeId, button) {
-    const userRef = doc(db, "user", userId);
-    const userSnap = await getDoc(userRef);
-
-    if (userSnap.exists() && userSnap.data().favourites?.includes(recipeId)) {
-        button.classList.add("active"); // Красное сердечко
-    } else {
-        button.classList.remove("active"); // Белое сердечко
-    }
-}
-
-// 🔹 Функция добавления/удаления из избранного 🔹
-async function toggleFavourite(event) {
-    const button = event.target;
-    const recipeId = button.dataset.id;
-    const userRef = doc(db, "user", userId);
-
-    try {
-        const userSnap = await getDoc(userRef);
-        let favRecipes = userSnap.exists() ? userSnap.data().favourites || [] : [];
-
-        if (favRecipes.includes(recipeId)) {
-            // Удаляем из избранного
-            await updateDoc(userRef, {
-                favourites: arrayRemove(recipeId)
-            });
-            button.classList.remove("active");
-        } else {
-            // Добавляем в избранное
-            await updateDoc(userRef, {
-                favourites: arrayUnion(recipeId)
-            });
-            button.classList.add("active");
-            button.classList.add("heart-pop"); // Анимация
-            setTimeout(() => button.classList.remove("heart-pop"), 300);
-        }
-    } catch (error) {
-        console.error("❌ Ошибка при обновлении избранного:", error);
-    }
-}
 
 // 🔹 Функция загрузки рецептов 🔹
 async function loadRecipes() {
