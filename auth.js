@@ -3,12 +3,12 @@ import { getAuth, signInWithPopup, GoogleAuthProvider, signOut } from "firebase/
 
 // Firebase конфигурация (замени на свои данные из Firebase)
 const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_AUTH_DOMAIN",
-    projectId: "YOUR_PROJECT_ID",
-    storageBucket: "YOUR_STORAGE_BUCKET",
-    messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-    appId: "YOUR_APP_ID"
+    apiKey: "AIzaSyDqIDTQrS14wTLsh_jFkD0GZAmEEWW8TDk",
+    authDomain: "cooker-62216.firebaseapp.com",
+    projectId: "cooker-62216",
+    storageBucket: "cooker-62216.firebasestorage.app",
+    messagingSenderId: "994568659489",
+    appId: "1:994568659489:web:18c15bc15fa5b723a03960"
 };
 
 // Инициализация Firebase
