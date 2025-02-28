@@ -73,6 +73,24 @@ async function loadRecipes() {
 
 // 🔹 Загружаем рецепты при загрузке страницы 🔹
 document.addEventListener("DOMContentLoaded", loadRecipes);
+// 🔹 Функция проверки, добавлен ли рецепт в избранное 🔹
+async function checkIfFavourite(recipeId, button) {
+    const userId = window.Telegram.WebApp.initDataUnsafe?.user?.id;
+    if (!userId) {
+        console.error("❌ Ошибка: Не удалось получить ID пользователя!");
+        return;
+    }
+
+    const userRef = doc(db, "person", userId);
+    const userDoc = await getDoc(userRef);
+
+    if (userDoc.exists()) {
+        const favourites = userDoc.data();
+        if (favourites[recipeId]) {
+            button.classList.add("active"); // Добавляем класс, если в избранном
+        }
+    }
+}
 
 // Добавляем обработчик на кнопку Favourite
 const favButton = document.querySelector(".nav-btn:nth-child(2)");
