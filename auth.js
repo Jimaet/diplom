@@ -1,100 +1,57 @@
-<script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-    // Здесь пиши свой код Firebase
-
-
-// Проверка загрузки скрипта
-console.log("Файл auth.js загружен!");
-
-// Firebase конфигурация
+// 🔥 Firebase конфиг (замени на свой!)
 const firebaseConfig = {
     apiKey: "AIzaSyDqIDTQrS14wTLsh_jFkD0GZAmEEWW8TDk",
     authDomain: "cooker-62216.firebaseapp.com",
     projectId: "cooker-62216",
-    storageBucket: "cooker-62216.firebasestorage.app",
+    storageBucket: "cooker-62216.appspot.com",
     messagingSenderId: "994568659489",
     appId: "1:994568659489:web:18c15bc15fa5b723a03960"
 };
 
-// Инициализация Firebase
+// 🚀 Инициализация Firebase
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const provider = new GoogleAuthProvider();
 
-// Проверяем, есть ли кнопка профиля
-document.addEventListener("DOMContentLoaded", () => {
-    const profileButton = document.getElementById("profile-btn");
+// Элементы страницы
+const loginBtn = document.getElementById("login-btn");
+const logoutBtn = document.getElementById("logout-btn");
+const userInfo = document.getElementById("user-info");
+const userPic = document.getElementById("user-pic");
+const userName = document.getElementById("user-name");
 
-    if (!profileButton) {
-        console.error("Ошибка: Кнопка профиля (profile-btn) не найдена!");
-        return;
+// Авторизация через Google
+loginBtn.addEventListener("click", async () => {
+    try {
+        const result = await signInWithPopup(auth, provider);
+        console.log("✅ Вход выполнен:", result.user);
+    } catch (error) {
+        console.error("Ошибка входа:", error);
     }
-
-    profileButton.addEventListener("click", () => {
-        const userId = localStorage.getItem("userId");
-        if (userId) {
-            logout();
-        } else {
-            login();
-        }
-    });
-
-    // Проверяем, авторизован ли пользователь
-    onAuthStateChanged(auth, (user) => {
-        if (user) {
-            console.log("Пользователь авторизован:", user.uid);
-            localStorage.setItem("userId", user.uid);
-            updateProfileButton(user);
-        } else {
-            console.log("Пользователь не авторизован.");
-            localStorage.removeItem("userId");
-            updateProfileButton(null);
-        }
-    });
 });
 
-// Функция входа
-async function login() {
+// Выход
+logoutBtn.addEventListener("click", async () => {
     try {
-        console.log("Попытка входа...");
-        const result = await signInWithPopup(auth, provider);
-        const user = result.user;
-        console.log("Вход выполнен:", user);
-        localStorage.setItem("userId", user.uid);
-        updateProfileButton(user);
-    } catch (error) {
-        console.error("Ошибка авторизации:", error);
-    }
-}
-
-// Функция выхода
-async function logout() {
-    try {
-        console.log("Выход...");
         await signOut(auth);
-        console.log("Выход выполнен.");
-        localStorage.removeItem("userId");
-        updateProfileButton(null);
+        console.log("✅ Выход выполнен");
     } catch (error) {
         console.error("Ошибка выхода:", error);
     }
-}
+});
 
-// Функция обновления кнопки "Me"
-function updateProfileButton(user) {
-    const profileButton = document.getElementById("profile-btn");
-    if (!profileButton) {
-        console.error("Ошибка: Кнопка профиля (profile-btn) не найдена при обновлении!");
-        return;
-    }
-
+// Проверяем статус пользователя
+onAuthStateChanged(auth, (user) => {
     if (user) {
-        profileButton.innerHTML = `<img src="${user.photoURL}" alt="Profile" class="profile-pic">`;
+        userInfo.classList.remove("hidden");
+        loginBtn.classList.add("hidden");
+        userPic.src = user.photoURL;
+        userName.textContent = `Привет, ${user.displayName}!`;
     } else {
-        profileButton.innerHTML = `<img src="icons/profile.svg" alt="Me">`;
+        userInfo.classList.add("hidden");
+        loginBtn.classList.remove("hidden");
     }
-}
-
-</script>
+});
