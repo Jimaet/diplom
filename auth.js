@@ -1,7 +1,7 @@
 import { initializeApp } from "firebase/app";
 import { getAuth, signInWithPopup, GoogleAuthProvider, signOut } from "firebase/auth";
 
-// Firebase конфигурация (замени на свои данные из Firebase)
+// Firebase конфигурация
 const firebaseConfig = {
     apiKey: "AIzaSyDqIDTQrS14wTLsh_jFkD0GZAmEEWW8TDk",
     authDomain: "cooker-62216.firebaseapp.com",
@@ -16,7 +16,32 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const provider = new GoogleAuthProvider();
 
-// Функция для входа через Google
+// Ожидаем загрузку DOM
+document.addEventListener("DOMContentLoaded", () => {
+    const profileButton = document.getElementById("profile-btn");
+
+    if (!profileButton) {
+        console.error("Кнопка профиля не найдена!");
+        return;
+    }
+
+    // Проверяем, авторизован ли пользователь
+    auth.onAuthStateChanged((user) => {
+        updateProfileButton(user);
+    });
+
+    // Добавляем обработчик клика
+    profileButton.addEventListener("click", () => {
+        const userId = localStorage.getItem("userId");
+        if (userId) {
+            logout();
+        } else {
+            login();
+        }
+    });
+});
+
+// Функция входа через Google
 async function login() {
     try {
         const result = await signInWithPopup(auth, provider);
@@ -41,27 +66,14 @@ async function logout() {
     }
 }
 
-// Функция обновления кнопки "Me"
+// Функция обновления кнопки профиля
 function updateProfileButton(user) {
     const profileButton = document.getElementById("profile-btn");
+    if (!profileButton) return;
+
     if (user) {
         profileButton.innerHTML = `<img src="${user.photoURL}" alt="Profile" class="profile-pic">`;
     } else {
         profileButton.innerHTML = `<img src="icons/profile.svg" alt="Me">`;
     }
 }
-
-// Проверяем, авторизован ли пользователь
-auth.onAuthStateChanged((user) => {
-    updateProfileButton(user);
-});
-
-// Добавляем обработчик события для кнопки "Me"
-document.getElementById("profile-btn").addEventListener("click", () => {
-    const userId = localStorage.getItem("userId");
-    if (userId) {
-        logout();
-    } else {
-        login();
-    }
-});
