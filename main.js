@@ -1,6 +1,6 @@
 // 🔹 Импорт Firebase 🔹
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, doc, setDoc, getDoc, updateDoc, arrayUnion, arrayRemove, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getApps, initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getFirestore, doc, setDoc, getDoc, updateDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 // 🔹 Конфигурация Firebase 🔹
 const firebaseConfig = {
@@ -12,10 +12,15 @@ const firebaseConfig = {
     appId: "1:994568659489:web:18c15bc15fa5b723a03960"
 };
 
-// 🔹 Инициализация Firebase 🔹
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+// 🔹 Инициализация Firebase (чтобы не было ошибки "Firebase App already exists") 🔹
+let app;
+if (!getApps().length) {
+    app = initializeApp(firebaseConfig);
+} else {
+    app = getApps()[0];
+}
 
+const db = getFirestore(app);
 
 // 🔹 Функция загрузки рецептов 🔹
 async function loadRecipes() {
@@ -39,6 +44,8 @@ async function loadRecipes() {
         const recipeId = doc.id;
         const imageUrl = data.image ? data.image : "placeholder.jpg";
 
+        console.log("📜 Рецепт:", data); // Проверка загруженных данных
+
         if (loadedRecipes.has(recipeId)) return;
         loadedRecipes.add(recipeId);
 
@@ -57,13 +64,17 @@ async function loadRecipes() {
             </a>
         `;
 
-        const favButton = recipeCard.querySelector(".favorite-button");
+        console.log("🔹 Добавляем карточку рецепта в DOM", recipeCard);
 
         // Проверяем, находится ли рецепт в избранном
-        await checkIfFavourite(recipeId, favButton);
+        if (typeof window.Telegram !== "undefined" && window.Telegram.WebApp) {
+            await checkIfFavourite(recipeId, recipeCard.querySelector(".favorite-button"));
+        } else {
+            console.warn("⚠️ Telegram WebApp не доступен. Пропускаем избранное.");
+        }
 
         // Добавляем обработчик клика на кнопку "Добавить в избранное"
-        favButton.addEventListener("click", toggleFavourite);
+        recipeCard.querySelector(".favorite-button").addEventListener("click", toggleFavourite);
 
         recipesContainer.appendChild(recipeCard);
     });
@@ -71,10 +82,13 @@ async function loadRecipes() {
     console.log(`✅ Загружено рецептов: ${loadedRecipes.size}`);
 }
 
-// 🔹 Загружаем рецепты при загрузке страницы 🔹
-document.addEventListener("DOMContentLoaded", loadRecipes);
 // 🔹 Функция проверки, добавлен ли рецепт в избранное 🔹
 async function checkIfFavourite(recipeId, button) {
+    if (typeof window.Telegram === "undefined" || !window.Telegram.WebApp) {
+        console.error("❌ Ошибка: Telegram WebApp API недоступен!");
+        return;
+    }
+
     const userId = window.Telegram.WebApp.initDataUnsafe?.user?.id;
     if (!userId) {
         console.error("❌ Ошибка: Не удалось получить ID пользователя!");
@@ -92,39 +106,5 @@ async function checkIfFavourite(recipeId, button) {
     }
 }
 
-// Добавляем обработчик на кнопку Favourite
-const favButton = document.querySelector(".nav-btn:nth-child(2)");
-if (favButton) {
-    favButton.addEventListener("click", () => {
-        window.location.href = "favourites.html";
-    });
-} else {
-    console.error("❌ Ошибка: Кнопка 'Favourite' не найдена!");
-}
-document.addEventListener("DOMContentLoaded", () => {
-    const avatarButton = document.querySelector(".avatar");
-
-    // Получаем ID пользователя из Telegram Mini App
-    const userId = window.Telegram.WebApp.initDataUnsafe?.user?.id;
-
-    if (!userId) {
-        console.error("Не удалось получить ID пользователя");
-        return;
-    }
-
-    avatarButton.addEventListener("click", () => {
-        window.location.href = `profile.html?id=${userId}`;
-    });
-});
-document.addEventListener("DOMContentLoaded", () => {
-    const profileButton = document.getElementById("profile-btn");
-
-    if (!profileButton) {
-        console.error("Ошибка: Кнопка профиля не найдена!");
-        return;
-    }
-
-    profileButton.addEventListener("click", () => {
-        window.location.href = "login.html"; // Переход на страницу авторизации
-    });
-});
+// 🔹 Загружаем рецепты при загрузке страницы 🔹
+document.addEventListener("DOMContentLoaded", loadRecipes);
