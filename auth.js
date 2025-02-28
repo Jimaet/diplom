@@ -1,5 +1,9 @@
-import { initializeApp } from "firebase/app";
-import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "firebase/auth";
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+    // Здесь пиши свой код Firebase
+
 
 // Проверка загрузки скрипта
 console.log("Файл auth.js загружен!");
@@ -92,3 +96,5 @@ function updateProfileButton(user) {
         profileButton.innerHTML = `<img src="icons/profile.svg" alt="Me">`;
     }
 }
+
+</script>
