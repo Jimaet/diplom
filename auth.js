@@ -1,57 +1,64 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-
-// 🔥 Firebase конфиг (замени на свой!)
 const firebaseConfig = {
     apiKey: "AIzaSyDqIDTQrS14wTLsh_jFkD0GZAmEEWW8TDk",
     authDomain: "cooker-62216.firebaseapp.com",
     projectId: "cooker-62216",
-    storageBucket: "cooker-62216.appspot.com",
+    storageBucket: "cooker-62216.firebasestorage.app",
     messagingSenderId: "994568659489",
     appId: "1:994568659489:web:18c15bc15fa5b723a03960"
 };
 
-// 🚀 Инициализация Firebase
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const provider = new GoogleAuthProvider();
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
 
-// Элементы страницы
-const loginBtn = document.getElementById("login-btn");
-const logoutBtn = document.getElementById("logout-btn");
-const userInfo = document.getElementById("user-info");
-const userPic = document.getElementById("user-pic");
-const userName = document.getElementById("user-name");
+document.getElementById('google-login').addEventListener('click', () => {
+    const provider = new firebase.auth.GoogleAuthProvider();
+    
+    auth.signInWithPopup(provider)
+        .then(async (result) => {
+            const user = result.user;
 
-// Авторизация через Google
-loginBtn.addEventListener("click", async () => {
-    try {
-        const result = await signInWithPopup(auth, provider);
-        console.log("✅ Вход выполнен:", result.user);
-    } catch (error) {
-        console.error("Ошибка входа:", error);
-    }
+            if (!user) return;
+
+            // Проверяем, есть ли пользователь в БД
+            const userRef = db.collection('users').doc(user.uid);
+            const doc = await userRef.get();
+
+            if (!doc.exists) {
+                // Добавляем пользователя, если его нет
+                await userRef.set({
+                    uid: user.uid,
+                    name: user.displayName,
+                    email: user.email,
+                    photo: user.photoURL,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+            } else {
+                // Обновляем данные пользователя
+                await userRef.update({
+                    lastLogin: firebase.firestore.FieldValue.serverTimestamp()
+                });
+            }
+
+            alert('Вы вошли как ' + user.displayName);
+        })
+        .catch(error => console.error('Ошибка входа:', error));
 });
 
-// Выход
-logoutBtn.addEventListener("click", async () => {
-    try {
-        await signOut(auth);
-        console.log("✅ Выход выполнен");
-    } catch (error) {
-        console.error("Ошибка выхода:", error);
-    }
+// Выход из аккаунта
+document.getElementById('logout')?.addEventListener('click', () => {
+    auth.signOut()
+        .then(() => {
+            alert('Вы вышли из аккаунта');
+        })
+        .catch(error => console.error('Ошибка выхода:', error));
 });
 
-// Проверяем статус пользователя
-onAuthStateChanged(auth, (user) => {
+// Авто-проверка состояния пользователя
+auth.onAuthStateChanged(user => {
     if (user) {
-        userInfo.classList.remove("hidden");
-        loginBtn.classList.add("hidden");
-        userPic.src = user.photoURL;
-        userName.textContent = `Привет, ${user.displayName}!`;
+        console.log('Пользователь авторизован:', user.displayName);
     } else {
-        userInfo.classList.add("hidden");
-        loginBtn.classList.remove("hidden");
+        console.log('Пользователь не вошел в систему');
     }
 });
