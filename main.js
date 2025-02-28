@@ -98,3 +98,15 @@ document.addEventListener("DOMContentLoaded", () => {
         window.location.href = `profile.html?id=${userId}`;
     });
 });
+document.addEventListener("DOMContentLoaded", () => {
+    const profileButton = document.getElementById("profile-btn");
+
+    if (!profileButton) {
+        console.error("Ошибка: Кнопка профиля не найдена!");
+        return;
+    }
+
+    profileButton.addEventListener("click", () => {
+        window.location.href = "login.html"; // Переход на страницу авторизации
+    });
+});
