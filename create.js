@@ -1,3 +1,4 @@
+import { addRecipe } from "./addRecipe.js";
 document.addEventListener("DOMContentLoaded", () => {
     const productList = document.getElementById("product-list");
     const stepList = document.getElementById("step-list");
