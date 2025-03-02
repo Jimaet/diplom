@@ -160,3 +160,6 @@ document.addEventListener("DOMContentLoaded", () => {
         window.location.href = `profile.html?id=${userId}`;
     });
 });
+document.getElementById("my-recipes-btn").addEventListener("click", () => {
+    window.location.href = "create.html";
+});
