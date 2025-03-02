@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Создать рецепт</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="create.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Кнопка назад -->
+        <a href="index.html" class="back-button">⬅ Назад</a>
+
+        <!-- Основной блок -->
+        <div class="content">
+            <div class="left-section">
+                <label for="recipe-name" class="label">Название рецепта:</label>
+                <input type="text" id="recipe-name" class="input-field" placeholder="Введите название...">
+
+                <label for="short-description" class="label">Добавить короткое описание (до 120 символов):</label>
+                <textarea id="short-description" class="input-field" placeholder="Введите короткое описание..."></textarea>
+
+                <label for="about-recipe" class="label">О рецепте:</label>
+                <textarea id="about-recipe" class="input-field" placeholder="Расскажите о чем рецепт..."></textarea>
+            </div>
+
+            <div class="right-section">
+                <label class="label">Добавить фото:</label>
+                <div class="photo-placeholder"></div>
+
+                <div class="additional-info">
+                    <label for="portions" class="label">Кол-во порций:</label>
+                    <input type="number" id="portions" class="small-input">
+
+                    <label for="time" class="label">Примерное время приготовления (мин):</label>
+                    <input type="number" id="time" class="small-input">
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
