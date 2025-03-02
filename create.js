@@ -53,3 +53,26 @@ document.addEventListener("DOMContentLoaded", () => {
         stepCount = steps.length;
     }
 });
+document.addEventListener("DOMContentLoaded", function () {
+    const multiButtons = document.querySelectorAll(".multi-btn");
+    const submitButton = document.querySelector(".submit-btn");
+    const loadingScreen = document.querySelector(".loading-screen");
+    const successMessage = document.querySelector(".success-message");
+
+    // Обработка множественного выбора
+    multiButtons.forEach(button => {
+        button.addEventListener("click", function () {
+            this.classList.toggle("selected");
+        });
+    });
+
+    // Обработка кнопки отправки
+    submitButton.addEventListener("click", function () {
+        loadingScreen.style.display = "flex";
+
+        setTimeout(() => {
+            loadingScreen.style.display = "none";
+            successMessage.style.display = "block";
+        }, 2000); // 2 секунды анимации загрузки
+    });
+});
