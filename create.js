@@ -78,3 +78,46 @@ document.addEventListener("DOMContentLoaded", () => {
         }, 2000); // 2 секунды анимации загрузки
     });
 });
+document.addEventListener("DOMContentLoaded", function () {
+    const submitButton = document.querySelector(".submit-btn");
+    const inputFields = document.querySelectorAll(".input-field, .small-input");
+    const categoryButtons = document.querySelectorAll(".multi-btn");
+    
+    function checkFormValidity() {
+        let allFilled = true;
+
+        // Проверяем все текстовые поля
+        inputFields.forEach(input => {
+            if (input.value.trim() === "") {
+                allFilled = false;
+            }
+        });
+
+        // Проверяем, выбрана ли хотя бы одна категория
+        let categorySelected = false;
+        categoryButtons.forEach(btn => {
+            if (btn.classList.contains("selected")) {
+                categorySelected = true;
+            }
+        });
+
+        // Разблокируем кнопку, если все поля заполнены и выбрана категория
+        submitButton.disabled = !(allFilled && categorySelected);
+    }
+
+    // Следим за изменениями в текстовых полях
+    inputFields.forEach(input => {
+        input.addEventListener("input", checkFormValidity);
+    });
+
+    // Следим за изменением категорий
+    categoryButtons.forEach(btn => {
+        btn.addEventListener("click", function () {
+            this.classList.toggle("selected");
+            checkFormValidity();
+        });
+    });
+
+    // Блокируем кнопку при загрузке
+    checkFormValidity();
+});
