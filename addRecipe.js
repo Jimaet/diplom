@@ -1,15 +1,12 @@
-// Инициализация Firebase
+// Импорт Firebase
 import { getFirestore, collection, doc, setDoc, getDocs } from "firebase/firestore";
-import { app } from "./firebase-config"; // Убедись, что у тебя есть firebase-config.js
-
-const db = getFirestore(app);
+import { db } from "./firebase-config"; // Убедись, что db экспортируется из firebase-config.js
 
 document.addEventListener("DOMContentLoaded", () => {
     const submitButton = document.querySelector(".submit-btn");
     submitButton?.addEventListener("click", async function () {
         const name = document.getElementById("recipe-name").value;
         const dis = document.getElementById("short-description").value;
-        const about = document.getElementById("about-recipe").value;
         const portions = document.getElementById("portions").value;
         const time = document.getElementById("time").value;
         
@@ -18,73 +15,67 @@ document.addEventListener("DOMContentLoaded", () => {
         const selectedTypes = document.querySelectorAll(".filter-btn.selected");
         const selectedType2 = document.querySelectorAll(".category-btn.selected");
         const selectedItems = document.querySelectorAll(".multi-btn.selected");
-        
+
         // Определяем следующий номер рецепта
         const recRef = collection(db, "rec");
         const recSnapshot = await getDocs(recRef);
-        const nextIndex = recSnapshot.size; // Кол-во документов = следующий индекс
+        const nextIndex = recSnapshot.size; 
         const recDocName = `recept${nextIndex}`;
 
-        // Создаём документ в "rec"
+        // Создаём документ в коллекции "rec"
         await setDoc(doc(db, "rec", recDocName), {
             name,
             dis
         });
 
-        // Создаём коллекцию receptmainN
+        // Создаём документ receptmainN
         const receptMainName = `receptmain${nextIndex}`;
-        const receptMainRef = collection(db, receptMainName);
-
-        await setDoc(doc(receptMainRef, "main"), {
+        await setDoc(doc(db, receptMainName, "main"), {
             dis: "О рецепте",
             name,
             porcii: portions,
             timemin: time
         });
 
-        await setDoc(doc(receptMainRef, "photo"), { url: "" }); // Позже заполнишь
+        await setDoc(doc(db, receptMainName, "photo"), { url: "" });
 
         // Добавляем продукты
-        const prodRef = doc(receptMainRef, "prod");
         let prodData = {};
         products.forEach((product, index) => {
             const title = product.children[0].value;
             const weight = product.children[1].value;
             if (title && weight) {
-                prodData[`${index + 1}`] = title;
-                prodData[`${index + 1}-1`] = weight;
+                prodData[`${index + 1}`] = { title, weight };
             }
         });
-        await setDoc(prodRef, prodData);
+        await setDoc(doc(db, receptMainName, "prod"), prodData);
 
         // Добавляем шаги
-        const stepRef = doc(receptMainRef, "step");
         let stepData = {};
         steps.forEach((step, index) => {
             stepData[`${index + 1}`] = step.value;
         });
-        await setDoc(stepRef, stepData);
+        await setDoc(doc(db, receptMainName, "step"), stepData);
 
         // Категории
-        const typeRef = doc(receptMainRef, "type");
         let typeData = {};
         selectedTypes.forEach((btn, index) => {
             typeData[`${index + 1}`] = btn.textContent;
         });
-        await setDoc(typeRef, typeData);
+        await setDoc(doc(db, receptMainName, "type"), typeData);
 
-        const type2Ref = doc(receptMainRef, "type2");
         let type2Data = {};
         selectedType2.forEach((btn, index) => {
             type2Data[`${index + 1}`] = btn.textContent;
         });
-        await setDoc(type2Ref, type2Data);
+        await setDoc(doc(db, receptMainName, "type2"), type2Data);
 
-        const itemsRef = doc(receptMainRef, "items");
         let itemsData = {};
         selectedItems.forEach((btn, index) => {
             itemsData[`${index + 1}`] = btn.textContent;
         });
-        await setDoc(itemsRef, itemsData);
+        await setDoc(doc(db, receptMainName, "items"), itemsData);
+
+        alert("Рецепт добавлен!");
     });
 });
