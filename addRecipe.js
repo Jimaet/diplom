@@ -92,3 +92,13 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 });
+document.addEventListener("DOMContentLoaded", () => {
+    const recipeNameInput = document.getElementById("recipe-name");
+
+    if (!recipeNameInput) {
+        console.error("Элемент #recipe-name не найден!");
+        return;
+    }
+
+    console.log("Элемент найден:", recipeNameInput);
+});
