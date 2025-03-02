@@ -54,7 +54,7 @@ document.addEventListener("DOMContentLoaded", () => {
         steps.forEach((step, index) => {
             step.textContent = `Шаг ${index + 1}`;
         });
-        stepCount = steps.length;
+        stepCount = steps.length; // Теперь stepCount соответствует фактическому количеству шагов
     }
 
     // === Обработка множественного выбора ===
