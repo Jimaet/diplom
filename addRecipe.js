@@ -1,6 +1,5 @@
-// Импорт Firebase
-import { getFirestore, collection, doc, setDoc, getDocs } from "firebase/firestore";
-import { db } from "./firebase-config"; // Убедись, что db экспортируется из firebase-config.js
+import { db } from "./firebase-config.js";
+import { collection, doc, setDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 document.addEventListener("DOMContentLoaded", () => {
     const submitButton = document.querySelector(".submit-btn");
@@ -12,70 +11,48 @@ document.addEventListener("DOMContentLoaded", () => {
         
         const products = document.querySelectorAll("#product-list .product-item");
         const steps = document.querySelectorAll("#step-list .step-item input");
-        const selectedTypes = document.querySelectorAll(".filter-btn.selected");
-        const selectedType2 = document.querySelectorAll(".category-btn.selected");
-        const selectedItems = document.querySelectorAll(".multi-btn.selected");
 
         // Определяем следующий номер рецепта
         const recRef = collection(db, "rec");
         const recSnapshot = await getDocs(recRef);
-        const nextIndex = recSnapshot.size; 
+        const nextIndex = recSnapshot.size;
         const recDocName = `recept${nextIndex}`;
 
-        // Создаём документ в коллекции "rec"
-        await setDoc(doc(db, "rec", recDocName), {
-            name,
-            dis
-        });
+        // Создаём документ в "rec"
+        await setDoc(doc(db, "rec", recDocName), { name, dis });
 
-        // Создаём документ receptmainN
+        // Создаём коллекцию receptmainN
         const receptMainName = `receptmain${nextIndex}`;
-        await setDoc(doc(db, receptMainName, "main"), {
+        const receptMainRef = collection(db, receptMainName);
+
+        await setDoc(doc(receptMainRef, "main"), {
             dis: "О рецепте",
             name,
             porcii: portions,
             timemin: time
         });
 
-        await setDoc(doc(db, receptMainName, "photo"), { url: "" });
+        await setDoc(doc(receptMainRef, "photo"), { url: "" });
 
         // Добавляем продукты
+        const prodRef = doc(receptMainRef, "prod");
         let prodData = {};
         products.forEach((product, index) => {
             const title = product.children[0].value;
             const weight = product.children[1].value;
             if (title && weight) {
-                prodData[`${index + 1}`] = { title, weight };
+                prodData[`${index + 1}`] = title;
+                prodData[`${index + 1}-1`] = weight;
             }
         });
-        await setDoc(doc(db, receptMainName, "prod"), prodData);
+        await setDoc(prodRef, prodData);
 
         // Добавляем шаги
+        const stepRef = doc(receptMainRef, "step");
         let stepData = {};
         steps.forEach((step, index) => {
             stepData[`${index + 1}`] = step.value;
         });
-        await setDoc(doc(db, receptMainName, "step"), stepData);
-
-        // Категории
-        let typeData = {};
-        selectedTypes.forEach((btn, index) => {
-            typeData[`${index + 1}`] = btn.textContent;
-        });
-        await setDoc(doc(db, receptMainName, "type"), typeData);
-
-        let type2Data = {};
-        selectedType2.forEach((btn, index) => {
-            type2Data[`${index + 1}`] = btn.textContent;
-        });
-        await setDoc(doc(db, receptMainName, "type2"), type2Data);
-
-        let itemsData = {};
-        selectedItems.forEach((btn, index) => {
-            itemsData[`${index + 1}`] = btn.textContent;
-        });
-        await setDoc(doc(db, receptMainName, "items"), itemsData);
-
-        alert("Рецепт добавлен!");
+        await setDoc(stepRef, stepData);
     });
 });
