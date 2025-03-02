@@ -155,3 +155,81 @@ body {
     color: #797878;
     font-size: 14px;
 }
+/* Общие стили для секции */
+p {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+/* Кнопки-фильтры */
+.filter-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.filter-btn {
+    background-color: #ffcc66;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 20px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.filter-btn:hover {
+    background-color: #ffb347;
+}
+
+/* Карусель категорий */
+.carousel {
+    display: flex;
+    overflow-x: auto;
+    gap: 10px;
+    padding-bottom: 10px;
+    scrollbar-width: none; /* Убираем скроллбар в Firefox */
+}
+
+.carousel::-webkit-scrollbar {
+    display: none; /* Убираем скроллбар в Chrome/Safari */
+}
+
+/* Кнопки с картинками */
+.category-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 5px;
+    transition: transform 0.2s;
+}
+
+.category-btn img {
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #ffcc66;
+    transition: border 0.3s;
+}
+
+.category-btn span {
+    margin-top: 5px;
+    font-size: 14px;
+    color: #333;
+    font-weight: bold;
+}
+
+.category-btn:hover img {
+    border-color: #ffb347;
+}
+
+.category-btn:active {
+    transform: scale(0.95);
+}
