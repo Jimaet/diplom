@@ -3,11 +3,15 @@ document.addEventListener("DOMContentLoaded", () => {
     const stepList = document.getElementById("step-list");
     const addProductBtn = document.getElementById("add-product");
     const addStepBtn = document.getElementById("add-step");
+    const multiButtons = document.querySelectorAll(".multi-btn");
+    const submitButton = document.querySelector(".submit-btn");
+    const loadingScreen = document.querySelector(".loading-screen");
+    const successMessage = document.querySelector(".success-message");
 
     let stepCount = 0;
 
-    // Добавление продукта
-    addProductBtn.addEventListener("click", () => {
+    // === Добавление продукта ===
+    addProductBtn?.addEventListener("click", () => {
         const productItem = document.createElement("div");
         productItem.classList.add("product-item");
 
@@ -24,8 +28,8 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 
-    // Добавление шага
-    addStepBtn.addEventListener("click", () => {
+    // === Добавление шага ===
+    addStepBtn?.addEventListener("click", () => {
         stepCount++;
         const stepItem = document.createElement("div");
         stepItem.classList.add("step-item");
@@ -44,7 +48,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 
-    // Обновление нумерации шагов
+    // === Обновление нумерации шагов ===
     function updateStepNumbers() {
         const steps = document.querySelectorAll(".step-item span");
         steps.forEach((step, index) => {
@@ -52,27 +56,25 @@ document.addEventListener("DOMContentLoaded", () => {
         });
         stepCount = steps.length;
     }
-});
-document.addEventListener("DOMContentLoaded", function () {
-    const multiButtons = document.querySelectorAll(".multi-btn");
-    const submitButton = document.querySelector(".submit-btn");
-    const loadingScreen = document.querySelector(".loading-screen");
-    const successMessage = document.querySelector(".success-message");
 
-    // Обработка множественного выбора
+    // === Обработка множественного выбора ===
     multiButtons.forEach(button => {
         button.addEventListener("click", function () {
             this.classList.toggle("selected");
         });
     });
 
-    // Обработка кнопки отправки
-    submitButton.addEventListener("click", function () {
+    // === Обработка кнопки отправки ===
+    submitButton?.addEventListener("click", function () {
         loadingScreen.style.display = "flex";
 
         setTimeout(() => {
             loadingScreen.style.display = "none";
             successMessage.style.display = "block";
+
+            setTimeout(() => {
+                window.location.href = "index.html";
+            }, 3000); // Переход через 3 секунды после показа сообщения
         }, 2000); // 2 секунды анимации загрузки
     });
 });
