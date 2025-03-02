@@ -4,16 +4,26 @@ import { collection, doc, setDoc, getDocs } from "https://www.gstatic.com/fireba
 
 document.addEventListener("DOMContentLoaded", () => {
     const submitButton = document.querySelector(".submit-btn");
-    submitButton?.addEventListener("click", async function () {
+    if (!submitButton) {
+        console.error("Кнопка отправки рецепта не найдена!");
+        return;
+    }
+    
+    submitButton.addEventListener("click", async function () {
         try {
             console.log("Кнопка нажата, начинаем создание рецепта...");
             
-            const name = document.getElementById("recipe-name").value;
-            const dis = document.getElementById("short-description").value.substring(0, 120);
-            const about = document.getElementById("about-recipe").value;
-            const portions = document.getElementById("portions").value;
-            const time = document.getElementById("time").value;
-            const imageUrl = document.getElementById("recipe-image").value || "";
+            const name = document.getElementById("recipe-name")?.value.trim();
+            const dis = document.getElementById("short-description")?.value.trim().substring(0, 120) || "";
+            const about = document.getElementById("about-recipe")?.value.trim() || "";
+            const portions = document.getElementById("portions")?.value || "0";
+            const time = document.getElementById("time")?.value || "0";
+            const imageUrl = document.getElementById("recipe-image")?.value || "";
+            
+            if (!name) {
+                console.error("Название рецепта не может быть пустым!");
+                return;
+            }
             
             const products = document.querySelectorAll("#product-list .product-item");
             const steps = document.querySelectorAll("#step-list .step-item input");
@@ -35,7 +45,7 @@ document.addEventListener("DOMContentLoaded", () => {
             console.log("Создаём коллекцию:", receptMainName);
             
             await setDoc(doc(db, receptMainName, "main"), {
-                dis: "О рецепте",
+                dis: about,
                 name,
                 porcii: portions,
                 timemin: time
@@ -46,8 +56,10 @@ document.addEventListener("DOMContentLoaded", () => {
             // Добавляем продукты
             let prodData = {};
             products.forEach((product, index) => {
-                const title = product.children[0].value;
-                const weight = product.children[1].value;
+                const inputs = product.querySelectorAll("input");
+                if (inputs.length < 2) return;
+                const title = inputs[0].value.trim();
+                const weight = inputs[1].value.trim();
                 if (title && weight) {
                     prodData[`${index + 1}`] = title;
                     prodData[`${index + 1}-1`] = weight;
@@ -59,7 +71,8 @@ document.addEventListener("DOMContentLoaded", () => {
             // Добавляем шаги
             let stepData = {};
             steps.forEach((step, index) => {
-                stepData[`${index + 1}`] = step.value;
+                const value = step.value.trim();
+                if (value) stepData[`${index + 1}`] = value;
             });
             console.log("Добавляем шаги:", stepData);
             await setDoc(doc(db, receptMainName, "step"), stepData);
@@ -67,21 +80,21 @@ document.addEventListener("DOMContentLoaded", () => {
             // Категории
             let typeData = {};
             selectedTypes.forEach((btn, index) => {
-                typeData[`${index + 1}`] = btn.textContent;
+                typeData[`${index + 1}`] = btn.textContent.trim();
             });
             console.log("Добавляем категорию type:", typeData);
             await setDoc(doc(db, receptMainName, "type"), typeData);
             
             let type2Data = {};
             selectedType2.forEach((btn, index) => {
-                type2Data[`${index + 1}`] = btn.textContent;
+                type2Data[`${index + 1}`] = btn.textContent.trim();
             });
             console.log("Добавляем категорию type2:", type2Data);
             await setDoc(doc(db, receptMainName, "type2"), type2Data);
             
             let itemsData = {};
             selectedItems.forEach((btn, index) => {
-                itemsData[`${index + 1}`] = btn.textContent;
+                itemsData[`${index + 1}`] = btn.textContent.trim();
             });
             console.log("Добавляем оборудование items:", itemsData);
             await setDoc(doc(db, receptMainName, "items"), itemsData);
@@ -91,14 +104,4 @@ document.addEventListener("DOMContentLoaded", () => {
             console.error("Ошибка при создании рецепта:", error);
         }
     });
-});
-document.addEventListener("DOMContentLoaded", () => {
-    const recipeNameInput = document.getElementById("recipe-name");
-
-    if (!recipeNameInput) {
-        console.error("Элемент #recipe-name не найден!");
-        return;
-    }
-
-    console.log("Элемент найден:", recipeNameInput);
 });
