@@ -1,6 +1,7 @@
 // Инициализация Firebase
-import { getFirestore, collection, doc, setDoc, getDocs } from "firebase/firestore";
-import { app } from "./firebase-config"; // Убедись, что у тебя есть firebase-config.js
+import { db } from "./firebase-config.js"; 
+import { collection, doc, setDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
 
 const db = getFirestore(app);
 
