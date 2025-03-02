@@ -3,17 +3,16 @@ document.addEventListener("DOMContentLoaded", () => {
     const stepList = document.getElementById("step-list");
     const addProductBtn = document.getElementById("add-product");
     const addStepBtn = document.getElementById("add-step");
-    const multiButtons = document.querySelectorAll(".multi-btn");
     const submitButton = document.querySelector(".submit-btn");
     const loadingScreen = document.querySelector(".loading-screen");
     const successMessage = document.querySelector(".success-message");
 
     let stepCount = 0;
 
+    // === Проверка формы перед отправкой ===
     function checkFormValidity() {
         let allFilled = true;
 
-        // Проверяем все статические поля
         document.querySelectorAll(".input-field, .small-input").forEach(input => {
             if (input.value.trim() === "") {
                 showError(input, "Это поле обязательно!");
@@ -23,7 +22,6 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         });
 
-        // Проверяем динамически добавленные поля продуктов
         document.querySelectorAll("#product-list input").forEach(input => {
             if (input.value.trim() === "") {
                 showError(input, "Заполните продукт!");
@@ -33,7 +31,6 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         });
 
-        // Проверяем динамически добавленные шаги
         document.querySelectorAll("#step-list input").forEach(input => {
             if (input.value.trim() === "") {
                 showError(input, "Заполните шаг!");
@@ -43,17 +40,13 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         });
 
-        // Проверяем, выбрана ли хотя бы одна категория
-        let categorySelected = Array.from(multiButtons).some(btn => btn.classList.contains("selected"));
+        let category1Selected = document.querySelector(".category1 .selected") !== null;
+        let category2Selected = document.querySelectorAll(".category2 .selected").length > 0;
 
-        if (!categorySelected) {
-            document.querySelector(".category-error").style.display = "block";
-        } else {
-            document.querySelector(".category-error").style.display = "none";
-        }
+        document.querySelector(".category1-error").style.display = category1Selected ? "none" : "block";
+        document.querySelector(".category2-error").style.display = category2Selected ? "none" : "block";
 
-        // Разблокируем кнопку, если всё заполнено и есть категория
-        submitButton.disabled = !(allFilled && categorySelected);
+        submitButton.disabled = !(allFilled && category1Selected && category2Selected);
     }
 
     function showError(input, message) {
@@ -124,7 +117,6 @@ document.addEventListener("DOMContentLoaded", () => {
         checkFormValidity();
     });
 
-    // === Обновление нумерации шагов ===
     function updateStepNumbers() {
         document.querySelectorAll(".step-item span").forEach((step, index) => {
             step.textContent = `Шаг ${index + 1}`;
@@ -132,20 +124,25 @@ document.addEventListener("DOMContentLoaded", () => {
         stepCount = document.querySelectorAll(".step-item").length;
     }
 
-    // === Обработка множественного выбора ===
-    multiButtons.forEach((button, index) => {
+    // === Кнопки категорий ===
+    document.querySelectorAll(".category1 .multi-btn").forEach(button => {
         button.addEventListener("click", function () {
-            if (index < 2) {
-                // Первые две кнопки можно выбирать одновременно
-                this.classList.toggle("selected");
-            } else {
-                // Остальные кнопки работают как раньше
-                multiButtons.forEach(btn => {
-                    if (btn !== this) btn.classList.remove("selected");
-                });
-                this.classList.toggle("selected");
-            }
+            document.querySelectorAll(".category1 .multi-btn").forEach(btn => btn.classList.remove("selected"));
+            this.classList.add("selected");
             checkFormValidity();
+        });
+    });
+
+    document.querySelectorAll(".category2 .multi-btn").forEach(button => {
+        button.addEventListener("click", function () {
+            this.classList.toggle("selected");
+            checkFormValidity();
+        });
+    });
+
+    document.querySelectorAll(".category3 .multi-btn").forEach(button => {
+        button.addEventListener("click", function () {
+            this.classList.toggle("selected");
         });
     });
 
@@ -163,7 +160,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }, 2000);
     });
 
-    // Следим за изменениями в статических полях
+    // Следим за изменениями в полях ввода
     document.querySelectorAll(".input-field, .small-input").forEach(input => {
         input.addEventListener("input", checkFormValidity);
     });
