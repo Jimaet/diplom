@@ -124,15 +124,24 @@ document.addEventListener("DOMContentLoaded", () => {
         stepCount = document.querySelectorAll(".step-item").length;
     }
 
-    // === Кнопки категорий ===
+    // === Обработчик выбора категорий ===
+    
+    // === Первая категория (Один выбор) ===
     document.querySelectorAll(".category1 .multi-btn").forEach(button => {
         button.addEventListener("click", function () {
-            document.querySelectorAll(".category1 .multi-btn").forEach(btn => btn.classList.remove("selected"));
-            this.classList.add("selected");
+            // Если кнопка уже активна, выключаем её
+            if (this.classList.contains("selected")) {
+                this.classList.remove("selected");
+            } else {
+                // Выключаем все другие кнопки
+                document.querySelectorAll(".category1 .multi-btn").forEach(btn => btn.classList.remove("selected"));
+                this.classList.add("selected");
+            }
             checkFormValidity();
         });
     });
 
+    // === Вторая категория (Много выборов) ===
     document.querySelectorAll(".category2 .multi-btn").forEach(button => {
         button.addEventListener("click", function () {
             this.classList.toggle("selected");
@@ -140,6 +149,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 
+    // === Третья категория (Много выборов, без изменений) ===
     document.querySelectorAll(".category3 .multi-btn").forEach(button => {
         button.addEventListener("click", function () {
             this.classList.toggle("selected");
