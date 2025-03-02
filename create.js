@@ -18,23 +18,15 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         });
 
-        let category1Selected = document.querySelector(".category1 .selected") !== null;
+        let category1Selected = document.querySelectorAll(".category1 .selected").length > 0;
         let category2Selected = document.querySelectorAll(".category2 .selected").length > 0;
         let category3Selected = document.querySelectorAll(".category3 .selected").length > 0;
 
         submitButton.disabled = !(allFilled && category1Selected && category2Selected && category3Selected);
     }
 
-    // Обработчики для выбора категорий
-    document.querySelectorAll(".category1 .multi-btn").forEach(button => {
-        button.addEventListener("click", function () {
-            document.querySelectorAll(".category1 .multi-btn").forEach(btn => btn.classList.remove("selected"));
-            this.classList.add("selected");
-            checkFormValidity();
-        });
-    });
-
-    document.querySelectorAll(".category2 .multi-btn, .category3 .multi-btn").forEach(button => {
+    // Множественный выбор для всех категорий
+    document.querySelectorAll(".category1 .multi-btn, .category2 .multi-btn, .category3 .multi-btn").forEach(button => {
         button.addEventListener("click", function () {
             this.classList.toggle("selected");
             checkFormValidity();
