@@ -1,114 +1,90 @@
-import { initializeApp } from "firebase/app";
-import { getFirestore, collection, doc, setDoc, getDocs } from "firebase/firestore";
-
-// Конфигурация Firebase
-const firebaseConfig = {
-    apiKey: "AIzaSyDqIDTQrS14wTLsh_jFkD0GZAmEEWW8TDk",
-    authDomain: "cooker-62216.firebaseapp.com",
-    projectId: "cooker-62216",
-    storageBucket: "cooker-62216.appspot.com",
-    messagingSenderId: "994568659489",
-    appId: "1:994568659489:web:18c15bc15fa5b723a03960"
-};
-
 // Инициализация Firebase
-const app = initializeApp(firebaseConfig);
+import { getFirestore, collection, doc, setDoc, getDocs } from "firebase/firestore";
+import { app } from "./firebase-config"; // Убедись, что у тебя есть firebase-config.js
+
 const db = getFirestore(app);
 
-async function addRecipe(recipeData) {
-    try {
-        // Получаем количество существующих рецептов
-        const recCollection = collection(db, "rec");
-        const recSnapshot = await getDocs(recCollection);
-        const nextRecId = `recept${recSnapshot.size}`;
+document.addEventListener("DOMContentLoaded", () => {
+    const submitButton = document.querySelector(".submit-btn");
+    submitButton?.addEventListener("click", async function () {
+        const name = document.getElementById("recipe-name").value;
+        const dis = document.getElementById("short-description").value;
+        const about = document.getElementById("about-recipe").value;
+        const portions = document.getElementById("portions").value;
+        const time = document.getElementById("time").value;
+        
+        const products = document.querySelectorAll("#product-list .product-item");
+        const steps = document.querySelectorAll("#step-list .step-item input");
+        const selectedTypes = document.querySelectorAll(".filter-btn.selected");
+        const selectedType2 = document.querySelectorAll(".category-btn.selected");
+        const selectedItems = document.querySelectorAll(".multi-btn.selected");
+        
+        // Определяем следующий номер рецепта
+        const recRef = collection(db, "rec");
+        const recSnapshot = await getDocs(recRef);
+        const nextIndex = recSnapshot.size; // Кол-во документов = следующий индекс
+        const recDocName = `recept${nextIndex}`;
 
         // Создаём документ в "rec"
-        await setDoc(doc(db, "rec", nextRecId), {
-            name: recipeData.name,
-            dis: recipeData.description.substring(0, 120) // Обрезаем до 120 символов
+        await setDoc(doc(db, "rec", recDocName), {
+            name,
+            dis
         });
 
-        // Определяем порядковый номер для receptmain
-        const receptmainSnapshot = await getDocs(collection(db, "receptmain"));
-        const nextReceptMainId = `receptmain${receptmainSnapshot.size}`;
+        // Создаём коллекцию receptmainN
+        const receptMainName = `receptmain${nextIndex}`;
+        const receptMainRef = collection(db, receptMainName);
 
-        const receptmainRef = collection(db, nextReceptMainId);
-
-        // Создаём документ main
-        await setDoc(doc(receptmainRef, "main"), {
+        await setDoc(doc(receptMainRef, "main"), {
             dis: "О рецепте",
-            name: recipeData.name,
-            porcii: recipeData.portions,
-            timemin: recipeData.time
+            name,
+            porcii: portions,
+            timemin: time
         });
 
-        // Создаём документ photo
-        await setDoc(doc(receptmainRef, "photo"), {
-            url: recipeData.photoUrl
+        await setDoc(doc(receptMainRef, "photo"), { url: "" }); // Позже заполнишь
+
+        // Добавляем продукты
+        const prodRef = doc(receptMainRef, "prod");
+        let prodData = {};
+        products.forEach((product, index) => {
+            const title = product.children[0].value;
+            const weight = product.children[1].value;
+            if (title && weight) {
+                prodData[`${index + 1}`] = title;
+                prodData[`${index + 1}-1`] = weight;
+            }
         });
+        await setDoc(prodRef, prodData);
 
-        // Создаём документ prod (ингредиенты)
-        const prodData = {};
-        recipeData.ingredients.forEach((item, index) => {
-            const num = index + 1;
-            prodData[num] = item.name;
-            prodData[`${num}-${num}`] = item.amount;
+        // Добавляем шаги
+        const stepRef = doc(receptMainRef, "step");
+        let stepData = {};
+        steps.forEach((step, index) => {
+            stepData[`${index + 1}`] = step.value;
         });
-        await setDoc(doc(receptmainRef, "prod"), prodData);
+        await setDoc(stepRef, stepData);
 
-        // Создаём документ step (шаги)
-        const stepData = {};
-        recipeData.steps.forEach((step, index) => {
-            stepData[index + 1] = step;
+        // Категории
+        const typeRef = doc(receptMainRef, "type");
+        let typeData = {};
+        selectedTypes.forEach((btn, index) => {
+            typeData[`${index + 1}`] = btn.textContent;
         });
-        await setDoc(doc(receptmainRef, "step"), stepData);
+        await setDoc(typeRef, typeData);
 
-        // Создаём документ type (первая категория)
-        const typeData = {};
-        recipeData.category1.forEach((item, index) => {
-            typeData[index + 1] = item;
+        const type2Ref = doc(receptMainRef, "type2");
+        let type2Data = {};
+        selectedType2.forEach((btn, index) => {
+            type2Data[`${index + 1}`] = btn.textContent;
         });
-        await setDoc(doc(receptmainRef, "type"), typeData);
+        await setDoc(type2Ref, type2Data);
 
-        // Создаём документ type2 (вторая категория)
-        const type2Data = {};
-        recipeData.category2.forEach((item, index) => {
-            type2Data[index + 1] = item;
+        const itemsRef = doc(receptMainRef, "items");
+        let itemsData = {};
+        selectedItems.forEach((btn, index) => {
+            itemsData[`${index + 1}`] = btn.textContent;
         });
-        await setDoc(doc(receptmainRef, "type2"), type2Data);
-
-        // Создаём документ items (третья категория)
-        const itemsData = {};
-        recipeData.category3.forEach((item, index) => {
-            itemsData[index + 1] = item;
-        });
-        await setDoc(doc(receptmainRef, "items"), itemsData);
-
-        console.log(`✅ Рецепт "${recipeData.name}" успешно добавлен в Firebase!`);
-    } catch (error) {
-        console.error("❌ Ошибка при добавлении рецепта:", error);
-    }
-}
-
-// Пример данных для теста
-const newRecipe = {
-    name: "Борщ",
-    description: "Вкусный украинский борщ с мясом.",
-    portions: 4,
-    time: 90,
-    photoUrl: "https://example.com/photo.jpg",
-    ingredients: [
-        { name: "Картошка", amount: 400 },
-        { name: "Свекла", amount: 200 }
-    ],
-    steps: [
-        "Подготовьте необходимые ингредиенты.",
-        "Очистите и нарежьте картошку."
-    ],
-    category1: ["Обед"],
-    category2: ["Гарнир", "Напитки"],
-    category3: ["Плита", "Духовка", "Миксер"]
-};
-
-// Вызов функции
-addRecipe(newRecipe);
+        await setDoc(itemsRef, itemsData);
+    });
+});
