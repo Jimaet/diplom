@@ -22,31 +22,36 @@ document.addEventListener("DOMContentLoaded", () => {
             }
         });
 
-        document.querySelectorAll("#product-list input").forEach(input => {
-            if (input.value.trim() === "") {
-                showError(input, "Заполните продукт!");
-                allFilled = false;
-            } else {
-                hideError(input);
-            }
-        });
+        if (document.querySelectorAll(".product-item").length > 0) {
+            document.querySelectorAll("#product-list input").forEach(input => {
+                if (input.value.trim() === "") {
+                    showError(input, "Заполните продукт!");
+                    allFilled = false;
+                } else {
+                    hideError(input);
+                }
+            });
+        }
 
-        document.querySelectorAll("#step-list input").forEach(input => {
-            if (input.value.trim() === "") {
-                showError(input, "Заполните шаг!");
-                allFilled = false;
-            } else {
-                hideError(input);
-            }
-        });
+        if (document.querySelectorAll(".step-item").length > 0) {
+            document.querySelectorAll("#step-list input").forEach(input => {
+                if (input.value.trim() === "") {
+                    showError(input, "Заполните шаг!");
+                    allFilled = false;
+                } else {
+                    hideError(input);
+                }
+            });
+        }
 
         let category1Selected = document.querySelector(".category1 .selected") !== null;
         let category2Selected = document.querySelectorAll(".category2 .selected").length > 0;
+        let category3Selected = document.querySelectorAll(".category3 .selected").length > 0;
 
         document.querySelector(".category1-error").style.display = category1Selected ? "none" : "block";
         document.querySelector(".category2-error").style.display = category2Selected ? "none" : "block";
 
-        submitButton.disabled = !(allFilled && category1Selected && category2Selected);
+        submitButton.disabled = !(allFilled && category1Selected && category2Selected && category3Selected);
     }
 
     function showError(input, message) {
@@ -125,15 +130,15 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // === Обработчик выбора категорий ===
-    
-    // === Первая категория (Один выбор) ===
+
+    // === Первая категория (Один выбор, остаётся включённой) ===
     document.querySelectorAll(".category1 .multi-btn").forEach(button => {
         button.addEventListener("click", function () {
-            // Если кнопка уже активна, выключаем её
+            // Если уже выбрана — выключаем
             if (this.classList.contains("selected")) {
                 this.classList.remove("selected");
             } else {
-                // Выключаем все другие кнопки
+                // Выключаем другие и включаем текущую
                 document.querySelectorAll(".category1 .multi-btn").forEach(btn => btn.classList.remove("selected"));
                 this.classList.add("selected");
             }
@@ -141,7 +146,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 
-    // === Вторая категория (Много выборов) ===
+    // === Вторая категория (Можно выбрать несколько, остаются включёнными) ===
     document.querySelectorAll(".category2 .multi-btn").forEach(button => {
         button.addEventListener("click", function () {
             this.classList.toggle("selected");
@@ -149,26 +154,29 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 
-    // === Третья категория (Много выборов, без изменений) ===
+    // === Третья категория (Можно выбрать несколько, остаются включёнными) ===
     document.querySelectorAll(".category3 .multi-btn").forEach(button => {
         button.addEventListener("click", function () {
             this.classList.toggle("selected");
+            checkFormValidity();
         });
     });
 
     // === Обработка кнопки отправки ===
-    submitButton?.addEventListener("click", function () {
-        loadingScreen.style.display = "flex";
-
-        setTimeout(() => {
-            loadingScreen.style.display = "none";
-            successMessage.style.display = "block";
+    if (submitButton) {
+        submitButton.addEventListener("click", function () {
+            loadingScreen.style.display = "flex";
 
             setTimeout(() => {
-                window.location.href = "index.html";
-            }, 3000);
-        }, 2000);
-    });
+                loadingScreen.style.display = "none";
+                successMessage.style.display = "block";
+
+                setTimeout(() => {
+                    window.location.href = "index.html";
+                }, 3000);
+            }, 2000);
+        });
+    }
 
     // Следим за изменениями в полях ввода
     document.querySelectorAll(".input-field, .small-input").forEach(input => {
