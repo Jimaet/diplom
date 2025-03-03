@@ -29,21 +29,20 @@ if (!receptId) {
 
 async function loadRecipe(receptId) {
     try {
-        // ✅ ID коллекции
         const receptMainId = `receptmain${receptId.replace("recept", "")}`;
-        console.log("📁 Загружаем коллекцию:", receptMainId);
 
-        // Получаем данные
         const mainRef = doc(db, receptMainId, "main");
         const prodRef = doc(db, receptMainId, "prod");
         const stepRef = doc(db, receptMainId, "step");
         const photoRef = doc(db, receptMainId, "photo");
+        const itemsRef = doc(db, receptMainId, "items"); // 🔹 Добавляем ссылку на items
 
-        const [mainSnap, prodSnap, stepSnap, photoSnap] = await Promise.all([
+        const [mainSnap, prodSnap, stepSnap, photoSnap, itemsSnap] = await Promise.all([
             getDoc(mainRef),
             getDoc(prodRef),
             getDoc(stepRef),
-            getDoc(photoRef)
+            getDoc(photoRef),
+            getDoc(itemsRef) // 🔹 Загружаем items
         ]);
 
         if (!mainSnap.exists()) {
@@ -52,17 +51,39 @@ async function loadRecipe(receptId) {
         }
 
         const mainData = mainSnap.data();
-        const prodData = prodSnap.exists() ? prodSnap.data() : {};
         const stepData = stepSnap.exists() ? stepSnap.data() : {};
         const photoData = photoSnap.exists() ? photoSnap.data() : {};
+        const itemsData = itemsSnap.exists() ? itemsSnap.data() : {}; // 🔹 Получаем items
 
-        console.log("✅ Данные рецепта загружены:", mainData);
-
-        // ✅ Обновляем страницу
         document.getElementById("recipe-title").textContent = mainData.name || "Без названия";
         document.getElementById("recipe-description").textContent = mainData.dis || "Описание отсутствует";
         document.getElementById("recipe-info").textContent = `Порции: ${mainData.porcii} | Время: ${mainData.timemin} мин`;
+        document.getElementById("recipe-image").src = photoData.url || "placeholder.jpg";
 
+        // 🔹 Добавляем посуду и технику
+        if (Object.keys(itemsData).length > 0) {
+            const itemsContainer = document.createElement("div");
+            itemsContainer.classList.add("items-container");
+
+            const title = document.createElement("h3");
+            title.textContent = "Рекомендуемая посуда и техника:";
+            itemsContainer.appendChild(title);
+
+            Object.values(itemsData).forEach((item) => {
+                const itemBox = document.createElement("div");
+                itemBox.classList.add("item-box");
+                itemBox.textContent = item;
+                itemsContainer.appendChild(itemBox);
+            });
+
+            document.getElementById("recipe-steps").after(itemsContainer);
+        }
+
+    } catch (error) {
+        console.error("🔥 Ошибка загрузки рецепта:", error);
+        showRecipeNotReady();
+    }
+}
         // ✅ Установка фото рецепта
         const recipeImage = document.getElementById("recipe-image");
         recipeImage.src = photoData.url || "placeholder.jpg"; // Если фото нет, ставим заглушку
