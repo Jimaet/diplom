@@ -20,15 +20,15 @@ document.addEventListener("DOMContentLoaded", () => {
                 return;
             }
 
-            const name = nameInput.value.trim();
-            const dis = disInput.value.substring(0, 120).trim();
-            const about = aboutInput.value.trim();
-            const portions = portionsInput.value.trim();
-            const time = timeInput.value.trim();
+            const name = nameInput.value;
+            const dis = disInput.value.substring(0, 120);
+            const about = aboutInput.value;
+            const portions = portionsInput.value;
+            const time = timeInput.value;
             const imageFile = imageInput.files[0];
 
-            if (!name || !dis || !about || !portions || !time || !imageFile) {
-                console.error("Ошибка: все поля должны быть заполнены.");
+            if (!imageFile) {
+                console.error("Ошибка: изображение не выбрано.");
                 return;
             }
 
@@ -38,21 +38,34 @@ document.addEventListener("DOMContentLoaded", () => {
             const recDocName = `recept${nextIndex}`;
             const receptMainName = `receptmain${nextIndex}`;
 
-            let imageUrl = await uploadImageToGitHub(imageFile, recDocName);
-            if (!imageUrl) {
-                console.error("Ошибка загрузки изображения. Прерываем выполнение.");
-                return;
-            }
+            console.log("Загружаем изображение в Storage...");
+            const storage = getStorage();
+            const imageRef = ref(storage, `recipes/${recDocName}.jpg`);
+            await uploadBytes(imageRef, imageFile);
+            const imageUrl = await getDownloadURL(imageRef);
             console.log("Изображение загружено:", imageUrl);
 
+            console.log("Создаём документ в rec:", recDocName);
             await setDoc(doc(db, "rec", recDocName), { name, dis, image: imageUrl });
-            await setDoc(doc(db, receptMainName, "main"), { dis: about, name, porcii: portions, timemin: time });
+
+            console.log("Создаём коллекцию:", receptMainName);
+            await setDoc(doc(db, receptMainName, "main"), {
+                dis: "О рецепте",
+                name,
+                porcii: portions,
+                timemin: time
+            });
+
             await setDoc(doc(db, receptMainName, "photo"), { url: imageUrl });
 
+            // Добавляем продукты
             let prodData = {};
             document.querySelectorAll("#product-list .product-item").forEach((product, index) => {
                 const titleEl = product.querySelector("input:nth-of-type(1)");
                 const weightEl = product.querySelector("input:nth-of-type(2)");
+
+                console.log(`🟢 Найден продукт ${index + 1}:", titleEl?.value, weightEl?.value);
+
                 if (titleEl && weightEl) {
                     const title = titleEl.value.trim();
                     const weight = weightEl.value.trim();
@@ -62,21 +75,26 @@ document.addEventListener("DOMContentLoaded", () => {
                     }
                 }
             });
+            console.log("✅ Итоговый объект prodData:", prodData);
             await setDoc(doc(db, receptMainName, "prod"), prodData);
 
+            // Добавляем шаги
             let stepData = {};
             document.querySelectorAll("#step-list .step-item input").forEach((step, index) => {
-                if (step.value.trim()) {
-                    stepData[`${index + 1}`] = step.value.trim();
+                if (step.value) {
+                    stepData[`${index + 1}`] = step.value;
                 }
             });
+            console.log("Добавляем шаги:", stepData);
             await setDoc(doc(db, receptMainName, "step"), stepData);
 
+            // Добавляем категории
             async function saveCategory(selector, docName) {
                 let categoryData = {};
                 document.querySelectorAll(selector).forEach((btn, index) => {
                     categoryData[`${index + 1}`] = btn.textContent.trim();
                 });
+                console.log(`Добавляем ${docName}:", categoryData);
                 await setDoc(doc(db, receptMainName, docName), categoryData);
             }
 
@@ -90,55 +108,30 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-    async function uploadImageToGitHub(file, fileName) {
-        const reader = new FileReader();
-        return new Promise((resolve, reject) => {
-            reader.onloadend = async function () {
-                const base64Image = reader.result.split(',')[1];
-                const githubApiUrl = `https://api.github.com/repos/Jimaet/diplom/contents/images/${fileName}.jpg`;
-                const githubToken = YOUR_GITHUB_TOKEN; // <-- Передавай токен безопасно!
-                try {
-                    const response = await fetch(githubApiUrl, {
-                        method: "PUT",
-                        headers: {
-                            "Authorization": `Bearer ${githubToken}`,
-                            "Accept": "application/vnd.github.v3+json",
-                            "Content-Type": "application/json"
-                        },
-                        body: JSON.stringify({
-                            message: `Добавлено изображение ${fileName}`,
-                            content: base64Image
-                        })
-                    });
-                    const result = await response.json();
-                    if (response.ok && result.content?.download_url) {
-                        resolve(result.content.download_url);
-                    } else {
-                        console.error("Ошибка загрузки на GitHub:", result);
-                        reject(null);
-                    }
-                } catch (error) {
-                    console.error("Ошибка сети или авторизации:", error);
-                    reject(null);
-                }
-            };
-            reader.readAsDataURL(file);
-        });
-    }
-
+    // Настройка множественного выбора
     function setupMultiSelect(selector) {
         document.querySelectorAll(selector).forEach(btn => {
             btn.addEventListener("click", () => {
+                console.log(`🔹 Нажата кнопка: ${btn.textContent.trim()}`);
                 btn.classList.toggle("selected");
-                btn.style.backgroundColor = btn.classList.contains("selected") ? "#4CAF50" : "";
-                btn.style.color = btn.classList.contains("selected") ? "#fff" : "";
+
+                if (btn.classList.contains("selected")) {
+                    btn.style.backgroundColor = "#4CAF50"; // Выбранный цвет
+                    btn.style.color = "#fff";
+                } else {
+                    btn.style.backgroundColor = ""; // Вернуть стандартный стиль
+                    btn.style.color = "";
+                }
+
+                console.log(`📌 ${btn.textContent.trim()} теперь ${btn.classList.contains("selected") ? "выбран" : "снят"}`);
             });
         });
     }
 
+    // Дожидаемся полной загрузки DOM перед навешиванием событий
     setTimeout(() => {
-        setupMultiSelect(".filter-btn");
-        setupMultiSelect(".category-btn");
-        setupMultiSelect(".tech-btn");
+        setupMultiSelect(".filter-btn");   // Первая категория (карусель)
+        setupMultiSelect(".category-btn"); // Вторая категория (например, горячее, закуски)
+        setupMultiSelect(".tech-btn");    // Третья категория (оборудование)
     }, 500);
 });
