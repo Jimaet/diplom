@@ -35,14 +35,14 @@ async function loadRecipe(receptId) {
         const prodRef = doc(db, receptMainId, "prod");
         const stepRef = doc(db, receptMainId, "step");
         const photoRef = doc(db, receptMainId, "photo");
-        const itemsRef = doc(db, receptMainId, "items"); // 🔹 Добавляем ссылку на items
+        const itemsRef = doc(db, receptMainId, "items"); 
 
         const [mainSnap, prodSnap, stepSnap, photoSnap, itemsSnap] = await Promise.all([
             getDoc(mainRef),
             getDoc(prodRef),
             getDoc(stepRef),
             getDoc(photoRef),
-            getDoc(itemsRef) // 🔹 Загружаем items
+            getDoc(itemsRef)
         ]);
 
         if (!mainSnap.exists()) {
@@ -51,9 +51,12 @@ async function loadRecipe(receptId) {
         }
 
         const mainData = mainSnap.data();
+        const prodData = prodSnap.exists() ? prodSnap.data() : {}; // 🔹 Исправлено
         const stepData = stepSnap.exists() ? stepSnap.data() : {};
         const photoData = photoSnap.exists() ? photoSnap.data() : {};
-        const itemsData = itemsSnap.exists() ? itemsSnap.data() : {}; // 🔹 Получаем items
+        const itemsData = itemsSnap.exists() ? itemsSnap.data() : {}; 
+
+        console.log("📌 Загруженные данные рецепта:", { mainData, prodData, stepData, photoData, itemsData });
 
         document.getElementById("recipe-title").textContent = mainData.name || "Без названия";
         document.getElementById("recipe-description").textContent = mainData.dis || "Описание отсутствует";
@@ -61,7 +64,7 @@ async function loadRecipe(receptId) {
         document.getElementById("recipe-image").src = photoData.url || "placeholder.jpg";
 
         // 🔹 Добавляем посуду и технику
-        if (Object.keys(itemsData).length > 0) {
+        if (itemsSnap.exists()) { 
             const itemsContainer = document.createElement("div");
             itemsContainer.classList.add("items-container");
 
@@ -76,17 +79,8 @@ async function loadRecipe(receptId) {
                 itemsContainer.appendChild(itemBox);
             });
 
-            document.getElementById("recipe-steps").after(itemsContainer);
+            document.getElementById("recipe-steps")?.after(itemsContainer);
         }
-
-    } catch (error) {
-        console.error("🔥 Ошибка загрузки рецепта:", error);
-        showRecipeNotReady();
-    }
-}
-        // ✅ Установка фото рецепта
-        const recipeImage = document.getElementById("recipe-image");
-        recipeImage.src = photoData.url || "placeholder.jpg"; // Если фото нет, ставим заглушку
 
         // ✅ Продукты (через точку)
         const ingredientsList = document.getElementById("recipe-ingredients");
@@ -108,7 +102,7 @@ async function loadRecipe(receptId) {
             }
         });
 
-        let ingredientsText = Object.values(ingredientsMap).join(". ") + "."; // Добавляем точки
+        let ingredientsText = Object.values(ingredientsMap).join(". ") + "."; 
         const p = document.createElement("p");
         p.textContent = ingredientsText;
         ingredientsList.appendChild(p);
@@ -126,28 +120,12 @@ async function loadRecipe(receptId) {
             stepsContainer.appendChild(stepDiv);
         });
 
-        // ✅ Добавляем кнопку "Показать больше", если текст длинный
         setupShowMoreButton();
 
     } catch (error) {
         console.error("🔥 Ошибка загрузки рецепта:", error);
         showRecipeNotReady();
     }
-}
-
-// Функция для показа ошибки, если рецепт не найден
-function showRecipeNotReady() {
-    const title = document.getElementById("recipe-title");
-    title.textContent = "Упс.... Рецепт еще не готов(";
-    title.style.textAlign = "center";
-    title.style.fontSize = "20px";
-    title.style.color = "#FF5733";
-
-    document.getElementById("recipe-description").textContent = "Мы уже работаем над этим!";
-    document.getElementById("recipe-description").style.textAlign = "center";
-    document.getElementById("recipe-info").textContent = "";
-    document.getElementById("recipe-ingredients").innerHTML = "";
-    document.getElementById("recipe-steps").innerHTML = "";
 }
 
 // ✅ Функция для кнопки "Показать больше"
@@ -157,7 +135,6 @@ function setupShowMoreButton() {
 
     if (!description || !showMoreBtn) return;
 
-    // Если текста больше, чем вмещается, включаем кнопку
     if (description.scrollHeight > description.clientHeight) {
         showMoreBtn.style.display = "inline";
     } else {
@@ -169,12 +146,14 @@ function setupShowMoreButton() {
         showMoreBtn.textContent = description.classList.contains("expanded") ? "Скрыть" : "Показать больше";
     });
 }
+
+// ✅ Улучшенная карточка рецепта
 function createRecipeCard(recipe, recipeId) {
     const card = document.createElement("div");
     card.classList.add("recipe-card");
 
     card.innerHTML = `
-        <img src="${recipe.photo || 'placeholder.jpg'}" class="recipe-photo">
+        <img src="${recipe.url || 'placeholder.jpg'}" class="recipe-photo">
         <div class="recipe-info">
             <h3 class="recipe-title">${recipe.name}</h3>
             <p class="recipe-description">${recipe.dis}</p>
@@ -184,10 +163,9 @@ function createRecipeCard(recipe, recipeId) {
         </div>
     `;
 
-    // Добавляем обработчик клика по сердечку
-    card.querySelector(".fav-btn").addEventListener("click", toggleFavourite);
+    card.addEventListener("click", () => {
+        window.location.href = `recipe.html?id=${recipeId}`;
+    });
 
     return card;
 }
-
-
