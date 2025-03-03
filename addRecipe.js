@@ -1,9 +1,11 @@
 import { db } from "./firebase-config.js";
 import { collection, doc, setDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
+
+const IMGBB_API_KEY = "6353a9ccc652efaad72bf6c7b2b4fbf3"; // Вставь свой ключ от ImgBB
 
 document.addEventListener("DOMContentLoaded", () => {
     const submitButton = document.querySelector(".submit-btn");
+
     submitButton?.addEventListener("click", async function () {
         try {
             console.log("Кнопка нажата, начинаем создание рецепта...");
@@ -32,25 +34,24 @@ document.addEventListener("DOMContentLoaded", () => {
                 return;
             }
 
+            // Загрузка изображения в ImgBB
+            console.log("Загружаем изображение в ImgBB...");
+            const imageUrl = await uploadToImgBB(imageFile);
+            console.log("✅ Изображение загружено:", imageUrl);
+
+            // Получаем индекс для нового рецепта
             const recRef = collection(db, "rec");
             const recSnapshot = await getDocs(recRef);
             const nextIndex = recSnapshot.size;
             const recDocName = `recept${nextIndex}`;
             const receptMainName = `receptmain${nextIndex}`;
 
-            console.log("Загружаем изображение в Storage...");
-            const storage = getStorage();
-            const imageRef = ref(storage, `recipes/${recDocName}.jpg`);
-            await uploadBytes(imageRef, imageFile);
-            const imageUrl = await getDownloadURL(imageRef);
-            console.log("Изображение загружено:", imageUrl);
-
-            console.log("Создаём документ в rec:", recDocName);
+            console.log("Создаём документ в Firestore:", recDocName);
             await setDoc(doc(db, "rec", recDocName), { name, dis, image: imageUrl });
 
             console.log("Создаём коллекцию:", receptMainName);
             await setDoc(doc(db, receptMainName, "main"), {
-                dis: "О рецепте",
+                dis: about,
                 name,
                 porcii: portions,
                 timemin: time
@@ -64,8 +65,6 @@ document.addEventListener("DOMContentLoaded", () => {
                 const titleEl = product.querySelector("input:nth-of-type(1)");
                 const weightEl = product.querySelector("input:nth-of-type(2)");
 
-                console.log(`🟢 Найден продукт ${index + 1}:", titleEl?.value, weightEl?.value);
-
                 if (titleEl && weightEl) {
                     const title = titleEl.value.trim();
                     const weight = weightEl.value.trim();
@@ -75,17 +74,17 @@ document.addEventListener("DOMContentLoaded", () => {
                     }
                 }
             });
-            console.log("✅ Итоговый объект prodData:", prodData);
+            console.log("✅ Продукты:", prodData);
             await setDoc(doc(db, receptMainName, "prod"), prodData);
 
-            // Добавляем шаги
+            // Добавляем шаги приготовления
             let stepData = {};
             document.querySelectorAll("#step-list .step-item input").forEach((step, index) => {
                 if (step.value) {
                     stepData[`${index + 1}`] = step.value;
                 }
             });
-            console.log("Добавляем шаги:", stepData);
+            console.log("✅ Шаги приготовления:", stepData);
             await setDoc(doc(db, receptMainName, "step"), stepData);
 
             // Добавляем категории
@@ -94,7 +93,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 document.querySelectorAll(selector).forEach((btn, index) => {
                     categoryData[`${index + 1}`] = btn.textContent.trim();
                 });
-                console.log(`Добавляем ${docName}:", categoryData);
+                console.log(`✅ Категории ${docName}:`, categoryData);
                 await setDoc(doc(db, receptMainName, docName), categoryData);
             }
 
@@ -102,13 +101,31 @@ document.addEventListener("DOMContentLoaded", () => {
             await saveCategory(".category-btn.selected", "type2");
             await saveCategory(".tech-btn.selected", "items");
 
-            console.log("Рецепт успешно создан!");
+            console.log("🎉 Рецепт успешно создан!");
         } catch (error) {
-            console.error("Ошибка при создании рецепта:", error);
+            console.error("❌ Ошибка при создании рецепта:", error);
         }
     });
 
-    // Настройка множественного выбора
+    // Функция загрузки изображения в ImgBB
+    async function uploadToImgBB(imageFile) {
+        let formData = new FormData();
+        formData.append("image", imageFile);
+
+        const response = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
+            method: "POST",
+            body: formData
+        });
+
+        const result = await response.json();
+        if (result.success) {
+            return result.data.url; // Ссылка на изображение
+        } else {
+            throw new Error("Ошибка загрузки изображения на ImgBB");
+        }
+    }
+
+    // Настройка множественного выбора категорий
     function setupMultiSelect(selector) {
         document.querySelectorAll(selector).forEach(btn => {
             btn.addEventListener("click", () => {
