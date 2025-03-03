@@ -63,7 +63,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             // Добавляем продукты
             let prodData = {};
-            products.forEach((product, index) => {
+            document.querySelectorAll("#product-list .product-item").forEach((product, index) => {
                 const titleEl = product.querySelector(".product-title");
                 const weightEl = product.querySelector(".product-weight");
             
@@ -78,6 +78,7 @@ document.addEventListener("DOMContentLoaded", () => {
             });
             console.log("Добавляем продукты:", prodData);
             await setDoc(doc(db, receptMainName, "prod"), prodData);
+
 
 
             // Добавляем шаги
@@ -108,11 +109,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
             // Добавляем третью категорию (оборудование)
             let itemsData = {};
-            selectedItems.forEach((text, index) => {
-                itemsData[`${index + 1}`] = text.trim(); // Оборудование
+            document.querySelectorAll(".multi-btn.selected").forEach((btn, index) => {
+                const text = btn.textContent.trim();
+                if (text) {
+                    itemsData[`${index + 1}`] = text;
+                }
             });
             console.log("Добавляем оборудование:", itemsData);
             await setDoc(doc(db, receptMainName, "items"), itemsData);
+
 
 
             console.log("Рецепт успешно создан!");
