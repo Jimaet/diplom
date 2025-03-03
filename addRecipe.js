@@ -78,13 +78,13 @@ document.addEventListener("DOMContentLoaded", () => {
             await setDoc(doc(db, receptMainName, "step"), stepData);
 
             // Добавляем категории
-            function saveCategory(selector, docName) {
+            async function saveCategory(selector, docName) {
                 let categoryData = {};
                 document.querySelectorAll(selector).forEach((btn, index) => {
                     categoryData[`${index + 1}`] = btn.textContent.trim();
                 });
-                console.log(`Добавляем ${docName}:", categoryData);
-                return setDoc(doc(db, receptMainName, docName), categoryData);
+                console.log(`Добавляем ${docName}:`, categoryData);
+                await setDoc(doc(db, receptMainName, docName), categoryData);
             }
 
             await saveCategory(".filter-btn.selected", "type");
