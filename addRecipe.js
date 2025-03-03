@@ -1,7 +1,11 @@
 // Инициализация Firebase
 import { db } from "./firebase-config.js";
 import { collection, doc, setDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-
+document.querySelectorAll('.tech-btn').forEach(button => {
+    button.addEventListener('click', () => {
+        button.classList.toggle('selected');
+    });
+});
 document.addEventListener("DOMContentLoaded", () => {
     const submitButton = document.querySelector(".submit-btn");
     submitButton?.addEventListener("click", async function () {
