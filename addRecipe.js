@@ -96,7 +96,7 @@ document.addEventListener("DOMContentLoaded", () => {
             reader.onloadend = async function () {
                 const base64Image = reader.result.split(',')[1];
                 const githubApiUrl = `https://api.github.com/repos/Jimaet/diplom/contents/images/${fileName}.jpg`;
-                const githubToken = "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";
+                const githubToken = YOUR_GITHUB_TOKEN; // <-- Передавай токен безопасно!
                 try {
                     const response = await fetch(githubApiUrl, {
                         method: "PUT",
