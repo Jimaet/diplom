@@ -1,19 +1,7 @@
 // Инициализация Firebase
 import { db } from "./firebase-config.js";
 import { collection, doc, setDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-document.querySelectorAll("#product-list .product-item").forEach((product, index) => {
-    const titleEl = product.querySelector("input:nth-of-type(1)"); // Первый input (название продукта)
-    const weightEl = product.querySelector("input:nth-of-type(2)"); // Второй input (граммовка)
 
-    if (titleEl && weightEl) {
-        const title = titleEl.value.trim();
-        const weight = weightEl.value.trim();
-        if (title && weight) {
-            prodData[`${index + 1}`] = title;    // Название продукта
-            prodData[`${index + 1}-1`] = weight; // Вес продукта
-        }
-    }
-});
 document.addEventListener("DOMContentLoaded", () => {
     const submitButton = document.querySelector(".submit-btn");
     submitButton?.addEventListener("click", async function () {
@@ -39,15 +27,6 @@ document.addEventListener("DOMContentLoaded", () => {
             const time = timeInput.value;
             const imageUrl = imageUrlInput ? imageUrlInput.value : "";
 
-            const products = document.querySelectorAll("#product-list .product-item");
-            const steps = document.querySelectorAll("#step-list .step-item input");
-
-            // Исправленный множественный выбор категорий
-            const selectedTypes = [...document.querySelectorAll(".filter-btn.selected")].map(btn => btn.textContent);
-            const selectedType2 = [...document.querySelectorAll(".category-btn.selected")].map(btn => btn.textContent);
-            const selectedItems = [...document.querySelectorAll(".multi-btn.selected")].map(btn => btn.textContent);
-
-            // Определяем следующий номер рецепта
             const recRef = collection(db, "rec");
             const recSnapshot = await getDocs(recRef);
             const nextIndex = recSnapshot.size;
@@ -56,7 +35,6 @@ document.addEventListener("DOMContentLoaded", () => {
             console.log("Создаём документ в rec:", recDocName);
             await setDoc(doc(db, "rec", recDocName), { name, dis, image: imageUrl });
 
-            // Создаём коллекцию receptmainN
             const receptMainName = `receptmain${nextIndex}`;
             console.log("Создаём коллекцию:", receptMainName);
 
@@ -72,11 +50,11 @@ document.addEventListener("DOMContentLoaded", () => {
             // Добавляем продукты
             let prodData = {};
             document.querySelectorAll("#product-list .product-item").forEach((product, index) => {
-                const titleEl = product.querySelector(".product-title");
-                const weightEl = product.querySelector(".product-weight");
-            
-                console.log(`🟢 Найден продукт ${index + 1}:`, titleEl?.value, weightEl?.value); // Проверяем, что данные загружаются
-            
+                const titleEl = product.querySelector("input:nth-of-type(1)");
+                const weightEl = product.querySelector("input:nth-of-type(2)");
+
+                console.log(`🟢 Найден продукт ${index + 1}:`, titleEl?.value, weightEl?.value);
+
                 if (titleEl && weightEl) {
                     const title = titleEl.value.trim();
                     const weight = weightEl.value.trim();
@@ -87,13 +65,11 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
             });
             console.log("✅ Итоговый объект prodData:", prodData);
-
-
-
+            await setDoc(doc(db, receptMainName, "prod"), prodData);
 
             // Добавляем шаги
             let stepData = {};
-            steps.forEach((step, index) => {
+            document.querySelectorAll("#step-list .step-item input").forEach((step, index) => {
                 if (step.value) {
                     stepData[`${index + 1}`] = step.value;
                 }
@@ -101,36 +77,19 @@ document.addEventListener("DOMContentLoaded", () => {
             console.log("Добавляем шаги:", stepData);
             await setDoc(doc(db, receptMainName, "step"), stepData);
 
-            // Добавляем первую категорию (карусель)
-            let typeData = {};
-            selectedTypes.forEach((text, index) => {
-                typeData[`${index + 1}`] = text;
-            });
-            console.log("Добавляем категорию type:", typeData);
-            await setDoc(doc(db, receptMainName, "type"), typeData);
+            // Добавляем категории
+            function saveCategory(selector, docName) {
+                let categoryData = {};
+                document.querySelectorAll(selector).forEach((btn, index) => {
+                    categoryData[`${index + 1}`] = btn.textContent.trim();
+                });
+                console.log(`Добавляем ${docName}:", categoryData);
+                return setDoc(doc(db, receptMainName, docName), categoryData);
+            }
 
-            // Добавляем вторую категорию (например, горячее, закуски и т. д.)
-            let type2Data = {};
-            selectedType2.forEach((text, index) => {
-                type2Data[`${index + 1}`] = text;
-            });
-            console.log("Добавляем категорию type2:", type2Data);
-            await setDoc(doc(db, receptMainName, "type2"), type2Data);
-
-            // Добавляем третью категорию (оборудование)
-            let itemsData = {};
-            document.querySelectorAll(".multi-btn.selected").forEach((btn, index) => {
-                const text = btn.textContent.trim();
-                if (text) {
-                    itemsData[`${index + 1}`] = text;
-                }
-            });
-            console.log("Добавляем оборудование:", itemsData);
-            await setDoc(doc(db, receptMainName, "items"), itemsData);
-            console.log("🔍 Поиск оборудования...");
-            console.log("📦 Найдено кнопок .multi-btn.selected:", document.querySelectorAll(".multi-btn.selected").length);
-
-
+            await saveCategory(".filter-btn.selected", "type");
+            await saveCategory(".category-btn.selected", "type2");
+            await saveCategory(".multi-btn.selected", "items");
 
             console.log("Рецепт успешно создан!");
         } catch (error) {
@@ -138,11 +97,12 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-    // Добавляем логику множественного выбора для категорий
+    // Настройка множественного выбора
     function setupMultiSelect(selector) {
         document.querySelectorAll(selector).forEach(btn => {
             btn.addEventListener("click", () => {
                 btn.classList.toggle("selected");
+                console.log(`🔹 ${btn.textContent} ${btn.classList.contains("selected") ? "выбран" : "снят"}`);
             });
         });
     }
