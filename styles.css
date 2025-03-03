@@ -3,7 +3,7 @@
 
 body {
     font-family: 'Inter', sans-serif;
-    background: #E3E3E3;
+    background: linear-gradient(to bottom, #C8B467, #FF8888);
     margin: 0;
     padding: 0;
     height: auto; /* Даем телу расти */
