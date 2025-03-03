@@ -67,17 +67,19 @@ document.addEventListener("DOMContentLoaded", () => {
                 const titleEl = product.querySelector(".product-title");
                 const weightEl = product.querySelector(".product-weight");
             
+                console.log(`🟢 Найден продукт ${index + 1}:`, titleEl?.value, weightEl?.value); // Проверяем, что данные загружаются
+            
                 if (titleEl && weightEl) {
                     const title = titleEl.value.trim();
                     const weight = weightEl.value.trim();
                     if (title && weight) {
-                        prodData[`${index + 1}`] = title;    // Название продукта
-                        prodData[`${index + 1}-1`] = weight; // Вес продукта
+                        prodData[`${index + 1}`] = title;
+                        prodData[`${index + 1}-1`] = weight;
                     }
                 }
             });
-            console.log("Добавляем продукты:", prodData);
-            await setDoc(doc(db, receptMainName, "prod"), prodData);
+            console.log("✅ Итоговый объект prodData:", prodData);
+
 
 
 
@@ -117,6 +119,8 @@ document.addEventListener("DOMContentLoaded", () => {
             });
             console.log("Добавляем оборудование:", itemsData);
             await setDoc(doc(db, receptMainName, "items"), itemsData);
+            console.log("🔍 Поиск оборудования...");
+            console.log("📦 Найдено кнопок .multi-btn.selected:", document.querySelectorAll(".multi-btn.selected").length);
 
 
 
