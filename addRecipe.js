@@ -88,7 +88,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
             await saveCategory(".filter-btn.selected", "type");
             await saveCategory(".category-btn.selected", "type2");
-            await saveCategory(".multi-btn.selected", "items");
+            await saveCategory(".tech-btn.selected", "items");
 
             console.log("Рецепт успешно создан!");
         } catch (error) {
