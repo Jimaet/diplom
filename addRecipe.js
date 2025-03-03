@@ -1,8 +1,22 @@
 import { db } from "./firebase-config.js";
 import { collection, doc, setDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
 
 document.addEventListener("DOMContentLoaded", () => {
+    const storage = getStorage();
     const submitButton = document.querySelector(".submit-btn");
+
+    document.getElementById("recipe-image").addEventListener("change", function (event) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                document.getElementById("preview-image").src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
     submitButton?.addEventListener("click", async function () {
         try {
             console.log("Кнопка нажата, начинаем создание рецепта...");
@@ -12,9 +26,9 @@ document.addEventListener("DOMContentLoaded", () => {
             const aboutInput = document.getElementById("about-recipe");
             const portionsInput = document.getElementById("portions");
             const timeInput = document.getElementById("time");
-            const imageUrlInput = document.getElementById("recipe-image");
+            const imageInput = document.getElementById("recipe-image");
 
-            if (!nameInput || !disInput || !aboutInput || !portionsInput || !timeInput) {
+            if (!nameInput || !disInput || !aboutInput || !portionsInput || !timeInput || !imageInput) {
                 console.error("Ошибка: один из обязательных элементов не найден.");
                 return;
             }
@@ -24,7 +38,15 @@ document.addEventListener("DOMContentLoaded", () => {
             const about = aboutInput.value;
             const portions = portionsInput.value;
             const time = timeInput.value;
-            const imageUrl = imageUrlInput ? imageUrlInput.value : "";
+            
+            let imageUrl = "";
+            const file = imageInput.files[0];
+            if (file) {
+                const storageRef = ref(storage, `recipe-images/${file.name}`);
+                await uploadBytes(storageRef, file);
+                imageUrl = await getDownloadURL(storageRef);
+                console.log("Фото загружено:", imageUrl);
+            }
 
             const recRef = collection(db, "rec");
             const recSnapshot = await getDocs(recRef);
@@ -46,14 +68,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
             await setDoc(doc(db, receptMainName, "photo"), { url: imageUrl });
 
-            // Добавляем продукты
             let prodData = {};
             document.querySelectorAll("#product-list .product-item").forEach((product, index) => {
                 const titleEl = product.querySelector("input:nth-of-type(1)");
                 const weightEl = product.querySelector("input:nth-of-type(2)");
-
-                console.log(`🟢 Найден продукт ${index + 1}:`, titleEl?.value, weightEl?.value);
-
                 if (titleEl && weightEl) {
                     const title = titleEl.value.trim();
                     const weight = weightEl.value.trim();
@@ -63,26 +81,21 @@ document.addEventListener("DOMContentLoaded", () => {
                     }
                 }
             });
-            console.log("✅ Итоговый объект prodData:", prodData);
             await setDoc(doc(db, receptMainName, "prod"), prodData);
 
-            // Добавляем шаги
             let stepData = {};
             document.querySelectorAll("#step-list .step-item input").forEach((step, index) => {
                 if (step.value) {
                     stepData[`${index + 1}`] = step.value;
                 }
             });
-            console.log("Добавляем шаги:", stepData);
             await setDoc(doc(db, receptMainName, "step"), stepData);
 
-            // Добавляем категории
             async function saveCategory(selector, docName) {
                 let categoryData = {};
                 document.querySelectorAll(selector).forEach((btn, index) => {
                     categoryData[`${index + 1}`] = btn.textContent.trim();
                 });
-                console.log(`Добавляем ${docName}:`, categoryData);
                 await setDoc(doc(db, receptMainName, docName), categoryData);
             }
 
@@ -96,30 +109,24 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-    // Настройка множественного выбора
     function setupMultiSelect(selector) {
-    document.querySelectorAll(selector).forEach(btn => {
-        btn.addEventListener("click", () => {
-            console.log(`🔹 Нажата кнопка: ${btn.textContent.trim()}`);
-            btn.classList.toggle("selected");
-
-            if (btn.classList.contains("selected")) {
-                btn.style.backgroundColor = "#4CAF50"; // Выбранный цвет
-                btn.style.color = "#fff";
-            } else {
-                btn.style.backgroundColor = ""; // Вернуть стандартный стиль
-                btn.style.color = "";
-            }
-
-            console.log(`📌 ${btn.textContent.trim()} теперь ${btn.classList.contains("selected") ? "выбран" : "снят"}`);
+        document.querySelectorAll(selector).forEach(btn => {
+            btn.addEventListener("click", () => {
+                btn.classList.toggle("selected");
+                if (btn.classList.contains("selected")) {
+                    btn.style.backgroundColor = "#4CAF50";
+                    btn.style.color = "#fff";
+                } else {
+                    btn.style.backgroundColor = "";
+                    btn.style.color = "";
+                }
+            });
         });
-    });
-}
+    }
 
-    // Дожидаемся полной загрузки DOM перед навешиванием событий
     setTimeout(() => {
-        setupMultiSelect(".filter-btn");   // Первая категория (карусель)
-        setupMultiSelect(".category-btn"); // Вторая категория (например, горячее, закуски)
-        setupMultiSelect(".tech-btn");    // Третья категория (оборудование)
+        setupMultiSelect(".filter-btn");
+        setupMultiSelect(".category-btn");
+        setupMultiSelect(".tech-btn");
     }, 500);
 });
