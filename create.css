@@ -241,13 +241,12 @@ p {
     margin-top: 15px;
 }
 .filter-btn.selected,
-.multi-btn.selected,
-.tech-btn.selected {  /* Добавили tech-btn */
-    background-color: #ff9800; /* Цвет выделения */
+.category-btn.selected,
+.multi-btn.selected {
+    background-color: #ff9800; /* Оранжевый цвет при выборе */
     color: white;
     border-color: #ff9800;
 }
-
 
 .multi-btn {
     background-color: #ffcc66;
@@ -346,4 +345,11 @@ p {
     margin-top: 20px;
     font-size: 20px;
     font-weight: bold;
+}
+.filter-btn.selected,
+.multi-btn.selected,
+.tech-btn.selected {  /* Добавили tech-btn */
+    background-color: #ff9800; /* Цвет выделения */
+    color: white;
+    border-color: #ff9800;
 }
