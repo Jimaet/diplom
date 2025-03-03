@@ -25,9 +25,12 @@
                 <textarea id="about-recipe" class="input-field" placeholder="Расскажите о чем рецепт..."></textarea>
             </div>
 
-            <div class="right-section">
+            <div class="photo-upload">
                 <label class="label">Добавить фото:</label>
-                <div class="photo-placeholder"></div>
+                <input type="file" id="recipe-image" accept="image/*">
+                <img id="preview-image" class="photo-placeholder" src="" alt="Предпросмотр фото">
+            </div>
+
 
                 <div class="additional-info">
                     <label for="portions" class="label">Кол-во порций:</label>
