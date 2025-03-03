@@ -208,6 +208,7 @@ p {
     border: none;
     cursor: pointer;
     padding: 5px;
+    background: color #C8B467;
     transition: transform 0.2s;
 }
 
