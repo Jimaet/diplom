@@ -120,6 +120,6 @@ document.addEventListener("DOMContentLoaded", () => {
     setTimeout(() => {
         setupMultiSelect(".filter-btn");   // Первая категория (карусель)
         setupMultiSelect(".category-btn"); // Вторая категория (например, горячее, закуски)
-        setupMultiSelect(".multi-btn");    // Третья категория (оборудование)
+        setupMultiSelect(".tech-btn");    // Третья категория (оборудование)
     }, 500);
 });
