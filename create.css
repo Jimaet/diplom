@@ -353,3 +353,26 @@ p {
     color: white;
     border-color: #ff9800;
 }
+.multi-btn, .tech-btn {
+    background-color: #ffcc66;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 20px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.3s, transform 0.2s;
+}
+
+.multi-btn:hover, .tech-btn:hover {
+    background-color: #ffb347;
+}
+
+.multi-btn:active, .tech-btn:active {
+    transform: scale(0.95);
+}
+
+/* Выбранное состояние */
+.multi-btn.selected, .tech-btn.selected {
+    background-color: #5D7B76;
+    color: white;
+}
