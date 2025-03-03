@@ -1,10 +1,18 @@
 // Инициализация Firebase
 import { db } from "./firebase-config.js";
 import { collection, doc, setDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-document.querySelectorAll('.tech-btn').forEach(button => {
-    button.addEventListener('click', () => {
-        button.classList.toggle('selected');
-    });
+document.querySelectorAll("#product-list .product-item").forEach((product, index) => {
+    const titleEl = product.querySelector("input:nth-of-type(1)"); // Первый input (название продукта)
+    const weightEl = product.querySelector("input:nth-of-type(2)"); // Второй input (граммовка)
+
+    if (titleEl && weightEl) {
+        const title = titleEl.value.trim();
+        const weight = weightEl.value.trim();
+        if (title && weight) {
+            prodData[`${index + 1}`] = title;    // Название продукта
+            prodData[`${index + 1}-1`] = weight; // Вес продукта
+        }
+    }
 });
 document.addEventListener("DOMContentLoaded", () => {
     const submitButton = document.querySelector(".submit-btn");
