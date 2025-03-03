@@ -43,8 +43,8 @@ document.addEventListener("DOMContentLoaded", () => {
             const recRef = collection(db, "rec");
             const recSnapshot = await getDocs(recRef);
             const nextIndex = recSnapshot.size;
-            const recDocName = recept${nextIndex};
-            const receptMainName = receptmain${nextIndex};
+            const recDocName = `recept${nextIndex}`;
+            const receptMainName = `receptmain${nextIndex}`;
 
             console.log("Создаём документ в Firestore:", recDocName);
             await setDoc(doc(db, "rec", recDocName), { name, dis, image: imageUrl });
@@ -69,8 +69,8 @@ document.addEventListener("DOMContentLoaded", () => {
                     const title = titleEl.value.trim();
                     const weight = weightEl.value.trim();
                     if (title && weight) {
-                        prodData[${index + 1}] = title;
-                        prodData[${index + 1}-1] = weight;
+                        prodData[`${index + 1}`] = title;
+                        prodData[`${index + 1}-1`] = weight;
                     }
                 }
             });
@@ -81,7 +81,7 @@ document.addEventListener("DOMContentLoaded", () => {
             let stepData = {};
             document.querySelectorAll("#step-list .step-item input").forEach((step, index) => {
                 if (step.value) {
-                    stepData[${index + 1}] = step.value;
+                    stepData[`${index + 1}`] = step.value;
                 }
             });
             console.log("✅ Шаги приготовления:", stepData);
@@ -91,9 +91,9 @@ document.addEventListener("DOMContentLoaded", () => {
             async function saveCategory(selector, docName) {
                 let categoryData = {};
                 document.querySelectorAll(selector).forEach((btn, index) => {
-                    categoryData[${index + 1}] = btn.textContent.trim();
+                    categoryData[`${index + 1}`] = btn.textContent.trim();
                 });
-                console.log(✅ Категории ${docName}:, categoryData);
+                console.log(`✅ Категории ${docName}:`, categoryData);
                 await setDoc(doc(db, receptMainName, docName), categoryData);
             }
 
@@ -112,7 +112,7 @@ document.addEventListener("DOMContentLoaded", () => {
         let formData = new FormData();
         formData.append("image", imageFile);
 
-        const response = await fetch(https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}, {
+        const response = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
             method: "POST",
             body: formData
         });
@@ -129,7 +129,7 @@ document.addEventListener("DOMContentLoaded", () => {
     function setupMultiSelect(selector) {
         document.querySelectorAll(selector).forEach(btn => {
             btn.addEventListener("click", () => {
-                console.log(🔹 Нажата кнопка: ${btn.textContent.trim()});
+                console.log(`🔹 Нажата кнопка: ${btn.textContent.trim()}`);
                 btn.classList.toggle("selected");
 
                 if (btn.classList.contains("selected")) {
@@ -140,7 +140,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     btn.style.color = "";
                 }
 
-                console.log(📌 ${btn.textContent.trim()} теперь ${btn.classList.contains("selected") ? "выбран" : "снят"});
+                console.log(`📌 ${btn.textContent.trim()} теперь ${btn.classList.contains("selected") ? "выбран" : "снят"}`);
             });
         });
     }
