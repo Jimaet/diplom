@@ -29,6 +29,8 @@ body {
     background: #E3E3E3;
     border-radius: 20px;
     overflow: hidden;
+    
+    background: linear-gradient(to bottom, #C8B467, #FF8888);
     position: relative;
     display: flex;
     flex-direction: column;
