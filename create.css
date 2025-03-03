@@ -241,12 +241,13 @@ p {
     margin-top: 15px;
 }
 .filter-btn.selected,
-.category-btn.selected,
-.multi-btn.selected {
-    background-color: #ff9800; /* Оранжевый цвет при выборе */
+.multi-btn.selected,
+.tech-btn.selected {  /* Добавили tech-btn */
+    background-color: #ff9800; /* Цвет выделения */
     color: white;
     border-color: #ff9800;
 }
+
 
 .multi-btn {
     background-color: #ffcc66;
