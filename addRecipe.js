@@ -1,4 +1,3 @@
-// Инициализация Firebase
 import { db } from "./firebase-config.js";
 import { collection, doc, setDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
@@ -102,12 +101,15 @@ document.addEventListener("DOMContentLoaded", () => {
         document.querySelectorAll(selector).forEach(btn => {
             btn.addEventListener("click", () => {
                 btn.classList.toggle("selected");
-                console.log(`🔹 ${btn.textContent} ${btn.classList.contains("selected") ? "выбран" : "снят"}`);
+                console.log(`🔹 ${btn.textContent.trim()} ${btn.classList.contains("selected") ? "выбран" : "снят"}`);
             });
         });
     }
 
-    setupMultiSelect(".filter-btn");   // Первая категория (карусель)
-    setupMultiSelect(".category-btn"); // Вторая категория (например, горячее, закуски)
-    setupMultiSelect(".multi-btn");    // Третья категория (оборудование)
+    // Дожидаемся полной загрузки DOM перед навешиванием событий
+    setTimeout(() => {
+        setupMultiSelect(".filter-btn");   // Первая категория (карусель)
+        setupMultiSelect(".category-btn"); // Вторая категория (например, горячее, закуски)
+        setupMultiSelect(".multi-btn");    // Третья категория (оборудование)
+    }, 500);
 });
