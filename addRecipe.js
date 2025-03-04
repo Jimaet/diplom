@@ -132,7 +132,7 @@ document.addEventListener("DOMContentLoaded", () => {
     function setupMultiSelect(selector) {
         document.querySelectorAll(selector).forEach(btn => {
             btn.addEventListener("click", () => {
-                console.log(🔹 Нажата кнопка: ${btn.textContent.trim()});
+                console.log(`🔹 Нажата кнопка: ${btn.textContent.trim()}`);
                 btn.classList.toggle("selected");
 
                 if (btn.classList.contains("selected")) {
@@ -143,7 +143,8 @@ document.addEventListener("DOMContentLoaded", () => {
                     btn.style.color = "";
                 }
 
-                console.log(📌 ${btn.textContent.trim()} теперь ${btn.classList.contains("selected") ? "выбран" : "снят"});
+                console.log(`📌 ${btn.textContent.trim()} теперь ${btn.classList.contains("selected") ? "выбран" : "снят"}`);
+
             });
         });
     }
