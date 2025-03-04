@@ -1,3 +1,4 @@
+// 🔹 Импорт Firebase 🔹
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getFirestore, doc, setDoc, getDoc, updateDoc, arrayUnion, arrayRemove, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
@@ -144,8 +145,6 @@ if (favButton) {
 } else {
     console.error("❌ Ошибка: Кнопка 'Favourite' не найдена!");
 }
-
-// 🔹 Обработчик для кнопки аватара 🔹
 document.addEventListener("DOMContentLoaded", () => {
     const avatarButton = document.querySelector(".avatar");
 
@@ -161,13 +160,6 @@ document.addEventListener("DOMContentLoaded", () => {
         window.location.href = `profile.html?id=${userId}`;
     });
 });
-
-// 🔹 Обработчик кнопки "Мои рецепты" 🔹
-const myRecipesBtn = document.getElementById("my-recipes-btn");
-if (myRecipesBtn) {
-    myRecipesBtn.addEventListener("click", () => {
-        window.location.href = "create.html";
-    });
-} else {
-    console.error("❌ Ошибка: Кнопка 'Мои рецепты' не найдена!");
-}
+document.getElementById("my-recipes-btn").addEventListener("click", () => {
+    window.location.href = "create.html";
+});
