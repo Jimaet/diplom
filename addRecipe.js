@@ -68,16 +68,23 @@ document.addEventListener("DOMContentLoaded", () => {
             document.querySelectorAll(".filter-btn.selected").forEach(btn => {
                 type.push(btn.textContent.trim());
             });
-
+            
             let type2 = [];
             document.querySelectorAll(".category-btn.selected").forEach(btn => {
                 type2.push(btn.textContent.trim());
             });
-
+            
             let items = [];
             document.querySelectorAll(".tech-btn.selected").forEach(btn => {
                 items.push(btn.textContent.trim());
             });
+            
+            console.log("✅ Категории (type):", type);
+            console.log("✅ Подкатегории (type2):", type2);
+            console.log("✅ Техника (items):", items);
+            
+            // Сохраняем напрямую массив строк, а не объект с полем data
+            await setDoc(doc(db, receptMainName), { type, type2, items }, { merge: true });
 
             console.log("✅ Категории (type):", type);
             console.log("✅ Подкатегории (type2):", type2);
