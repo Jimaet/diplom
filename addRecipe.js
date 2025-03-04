@@ -47,7 +47,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const receptMainName = `receptmain${nextIndex}`;
 
             console.log("Создаём документ в Firestore:", recDocName);
-            await setDoc(doc(db, "rec", recDocName), { name, dis, image: imageUrl });
+            await setDoc(doc(db, "rec", recDocName), { name, dis, image: imageUrl, status: "pending" });
 
             console.log("Создаём коллекцию:", receptMainName);
             await setDoc(doc(db, receptMainName, "main"), {
@@ -84,23 +84,7 @@ document.addEventListener("DOMContentLoaded", () => {
             console.log("✅ Шаги приготовления:", stepData);
             await setDoc(doc(db, receptMainName, "step"), stepData);
 
-            async function saveCategory(selector, docName) {
-                let categoryData = {};
-                document.querySelectorAll(selector).forEach((btn, index) => {
-                    categoryData[`${index + 1}`] = btn.textContent.trim();
-                });
-                console.log(`✅ Категории ${docName}:`, categoryData);
-
-                await setDoc(doc(db, receptMainName, docName), categoryData);
-            }
-
-            await saveCategory(".filter-btn.selected", "type");
-            await saveCategory(".category-btn.selected", "type2");
-            await saveCategory(".tech-btn.selected", "items");
-
-            console.log("🎉 Рецепт успешно создан!");
-
-            await sendToTelegram(name, dis, about, time, portions, prodData, stepData, imageUrl);
+            await sendToTelegram(nextIndex, name, dis, about, time, portions, prodData, stepData, imageUrl);
 
         } catch (error) {
             console.error("❌ Ошибка при создании рецепта:", error);
@@ -119,41 +103,36 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    async function sendToTelegram(name, dis, about, time, portions, prodData, stepData, imageUrl) {
-    let categories = [];
-    document.querySelectorAll(".filter-btn.selected, .category-btn.selected, .tech-btn.selected").forEach(btn => {
-        categories.push(btn.textContent.trim());
-    });
+    async function sendToTelegram(recipeId, name, dis, about, time, portions, prodData, stepData, imageUrl) {
+        const message = `📌 <b>Новый рецепт на модерацию</b>\n\n`
+            + `🍽 <b>Название:</b> ${name}\n`
+            + `📝 <b>Описание:</b> ${dis}\n`
+            + `📖 <b>О рецепте:</b> ${about}\n`
+            + `⏳ <b>Время:</b> ${time} мин\n`
+            + `🍴 <b>Порции:</b> ${portions}\n\n`
+            + `📌 <b>Шаги:</b>\n${Object.entries(stepData).map(([key, value]) => `➡️ ${key}. ${value}`).join("\n")}`;
 
-    const message = `📌 <b>Новый рецепт на модерацию</b>\n\n`
-        + `🍽 <b>Название:</b> ${name}\n`
-        + `📝 <b>Описание:</b> ${dis}\n`
-        + `📖 <b>О рецепте:</b> ${about}\n`
-        + `⏳ <b>Время:</b> ${time} мин\n`
-        + `🍴 <b>Порции:</b> ${portions}\n\n`
-        + `🥦 <b>Продукты:</b>\n${Object.entries(prodData).filter(([key]) => !key.includes('-')).map(([key, value]) => `🔸 ${value} - ${prodData[key + '-1'] || ''}`).join("\n")}\n\n`
-        + `📌 <b>Шаги:</b>\n${Object.entries(stepData).map(([key, value]) => `➡️ ${key}. ${value}`).join("\n")}\n\n`
-        + `🏷 <b>Категории:</b> ${categories.length > 0 ? categories.join(', ') : 'Не указаны'}`;
+        const telegramUrl = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendPhoto`;
 
-    const telegramUrl = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendPhoto`;
+        await fetch(telegramUrl, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                chat_id: TELEGRAM_CHAT_ID,
+                photo: imageUrl,
+                caption: message,
+                parse_mode: "HTML",
+                reply_markup: {
+                    inline_keyboard: [
+                        [{ text: "✅ Подтвердить", callback_data: `approve_${recipeId}` }],
+                        [{ text: "❌ Отклонить", callback_data: `reject_${recipeId}` }]
+                    ]
+                }
+            })
+        });
+    }
+});
 
-    await fetch(telegramUrl, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-            chat_id: TELEGRAM_CHAT_ID,
-            photo: imageUrl,
-            caption: message,
-            parse_mode: "HTML",
-            reply_markup: {
-                inline_keyboard: [
-                    [{ text: "✅ Подтвердить", callback_data: `approve_${name}` }],
-                    [{ text: "❌ Отклонить", callback_data: `reject_${name}` }]
-                ]
-            }
-        })
-    });
-}
 
 
     function setupMultiSelect(selector) {
