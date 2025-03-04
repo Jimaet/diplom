@@ -62,23 +62,30 @@ document.addEventListener("DOMContentLoaded", () => {
             console.log("✅ Шаги приготовления:", stepData);
             await setDoc(doc(db, receptMainName, "step"), stepData);
 
-            // 📌 Категории (type, type2, items) → теперь это строки, а не массивы
-            let type = document.querySelector(".filter-btn.selected")?.textContent.trim() || "";
-            let type2 = document.querySelector(".category-btn.selected")?.textContent.trim() || "";
-            let items = document.querySelector(".tech-btn.selected")?.textContent.trim() || "";
+            // 📌 Категории (type, type2, items) → сохраняем как отдельные поля
+            await saveCategories(receptMainName, "type", ".filter-btn");
+            await saveCategories(receptMainName, "type2", ".category-btn");
+            await saveCategories(receptMainName, "items", ".tech-btn");
 
-            console.log("✅ Категория (type):", type);
-            console.log("✅ Подкатегория (type2):", type2);
-            console.log("✅ Техника (items):", items);
-
-            await setDoc(doc(db, receptMainName, "type"), { data: type });
-            await setDoc(doc(db, receptMainName, "type2"), { data: type2 });
-            await setDoc(doc(db, receptMainName, "items"), { data: items });
+            console.log("🎉 Рецепт успешно сохранён!");
 
         } catch (error) {
             console.error("❌ Ошибка при создании рецепта:", error);
         }
     });
+
+    // Функция для сохранения выбранных категорий в виде отдельных полей
+    async function saveCategories(docName, fieldName, selector) {
+        let selectedItems = Array.from(document.querySelectorAll(selector + ".selected")).map(btn => btn.textContent.trim());
+
+        let categoryData = {};
+        selectedItems.forEach((item, index) => {
+            categoryData[`${fieldName}${index + 1}`] = item; // Генерируем ключи: type1, type2, type3...
+        });
+
+        console.log(`✅ ${fieldName}:`, categoryData);
+        await setDoc(doc(db, docName, fieldName), categoryData);
+    }
 
     async function getNextRecipeNumber() {
         const usedNumbers = new Set();
