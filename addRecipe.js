@@ -32,14 +32,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
             console.log("Создаём документы в Firestore...");
 
-            // Создаём документ в p_rec
+            // Создаём документ в p_rec (только receptX)
             await setDoc(doc(db, "p_rec", recDocName), { name, dis, image: imageUrl, status: "pending" });
 
-
-
-            // Создаём документ рецепта
-            await setDoc(doc(db, "p_rec", receptMainName, "main"), { dis: about, name, porcii: portions, timemin: time });
-            await setDoc(doc(db, "p_rec", receptMainName, "photo"), { url: imageUrl });
+            // Создаём основной документ рецепта
+            await setDoc(doc(db, receptMainName, "main"), { dis: about, name, porcii: portions, timemin: time });
+            await setDoc(doc(db, receptMainName, "photo"), { url: imageUrl });
 
             // 📌 Продукты
             let prodData = {};
@@ -52,7 +50,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
             });
             console.log("✅ Продукты:", prodData);
-            await setDoc(doc(db, "p_rec", receptMainName, "prod"), prodData);
+            await setDoc(doc(db, receptMainName, "prod"), prodData);
 
             // 📌 Шаги
             let stepData = {};
@@ -62,33 +60,15 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
             });
             console.log("✅ Шаги приготовления:", stepData);
-            await setDoc(doc(db, "p_rec", receptMainName, "step"), stepData);
+            await setDoc(doc(db, receptMainName, "step"), stepData);
 
-            // 📌 Категории (type, type2, items)
-            let type = [];
-            document.querySelectorAll(".filter-btn.selected").forEach(btn => {
-                type.push(btn.textContent.trim());
-            });
-            
-            let type2 = [];
-            document.querySelectorAll(".category-btn.selected").forEach(btn => {
-                type2.push(btn.textContent.trim());
-            });
-            
-            let items = [];
-            document.querySelectorAll(".tech-btn.selected").forEach(btn => {
-                items.push(btn.textContent.trim());
-            });
-            
-            console.log("✅ Категории (type):", type);
-            console.log("✅ Подкатегории (type2):", type2);
-            console.log("✅ Техника (items):", items);
-            
-            // Сохраняем напрямую массив строк, а не объект с полем data
-            await setDoc(doc(db, "p_rec", receptMainName), { type, type2, items }, { merge: true });
+            // 📌 Категории (type, type2, items) → теперь это строки, а не массивы
+            let type = document.querySelector(".filter-btn.selected")?.textContent.trim() || "";
+            let type2 = document.querySelector(".category-btn.selected")?.textContent.trim() || "";
+            let items = document.querySelector(".tech-btn.selected")?.textContent.trim() || "";
 
-            console.log("✅ Категории (type):", type);
-            console.log("✅ Подкатегории (type2):", type2);
+            console.log("✅ Категория (type):", type);
+            console.log("✅ Подкатегория (type2):", type2);
             console.log("✅ Техника (items):", items);
 
             await setDoc(doc(db, receptMainName, "type"), { data: type });
