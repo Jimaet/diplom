@@ -2,7 +2,7 @@ import { db } from "./firebase-config.js";
 import { collection, doc, setDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 const IMGBB_API_KEY = "6353a9ccc652efaad72bf6c7b2b4fbf3"; // Вставь свой ключ от ImgBB
-const TELEGRAM_BOT_TOKEN = "8028042723:AAEVS6TZ-2wTwBQXWDUu109Z3qIOBBzEbxA"; // Вставь свой токен бота
+const TELEGRAM_BOT_TOKEN = "8028042723:AAWXYZ"; // Вставь свой токен бота
 const TELEGRAM_CHAT_ID = "1217160426"; // Вставь ID чата
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -12,27 +12,15 @@ document.addEventListener("DOMContentLoaded", () => {
         try {
             console.log("Кнопка нажата, начинаем создание рецепта...");
 
-            const nameInput = document.getElementById("recipe-name");
-            const disInput = document.getElementById("short-description");
-            const aboutInput = document.getElementById("about-recipe");
-            const portionsInput = document.getElementById("portions");
-            const timeInput = document.getElementById("time");
-            const imageInput = document.getElementById("recipe-image");
+            const name = document.getElementById("recipe-name").value;
+            const dis = document.getElementById("short-description").value.substring(0, 120);
+            const about = document.getElementById("about-recipe").value;
+            const portions = document.getElementById("portions").value;
+            const time = document.getElementById("time").value;
+            const imageFile = document.getElementById("recipe-image").files[0];
 
-            if (!nameInput || !disInput || !aboutInput || !portionsInput || !timeInput || !imageInput) {
-                console.error("Ошибка: один из обязательных элементов не найден.");
-                return;
-            }
-
-            const name = nameInput.value;
-            const dis = disInput.value.substring(0, 120);
-            const about = aboutInput.value;
-            const portions = portionsInput.value;
-            const time = timeInput.value;
-            const imageFile = imageInput.files[0];
-
-            if (!imageFile) {
-                console.error("Ошибка: изображение не выбрано.");
+            if (!name || !dis || !about || !portions || !time || !imageFile) {
+                console.error("Ошибка: заполнены не все поля.");
                 return;
             }
 
@@ -40,38 +28,26 @@ document.addEventListener("DOMContentLoaded", () => {
             const imageUrl = await uploadToImgBB(imageFile);
             console.log("✅ Изображение загружено:", imageUrl);
 
-            const recRef = collection(db, "p_rec");
+            const nextIndex = await getNextRecipeNumber(); // Найти первый свободный номер
 
-            const recSnapshot = await getDocs(recRef);
-            const nextIndex = recSnapshot.size;
             const recDocName = `recept${nextIndex}`;
             const receptMainName = `receptmain${nextIndex}`;
 
             console.log("Создаём документ в Firestore:", recDocName);
             await setDoc(doc(db, "p_rec", recDocName), { name, dis, image: imageUrl, status: "pending" });
 
-
             console.log("Создаём коллекцию:", receptMainName);
-            await setDoc(doc(db, receptMainName, "main"), {
-                dis: about,
-                name,
-                porcii: portions,
-                timemin: time
-            });
+            await setDoc(doc(db, receptMainName, "main"), { dis: about, name, porcii: portions, timemin: time });
 
             await setDoc(doc(db, receptMainName, "photo"), { url: imageUrl });
 
             let prodData = {};
             document.querySelectorAll("#product-list .product-item").forEach((product, index) => {
-                const titleEl = product.querySelector("input:nth-of-type(1)");
-                const weightEl = product.querySelector("input:nth-of-type(2)");
-                if (titleEl && weightEl) {
-                    const title = titleEl.value.trim();
-                    const weight = weightEl.value.trim();
-                    if (title && weight) {
-                        prodData[`${index + 1}`] = title;
-                        prodData[`${index + 1}-1`] = weight;
-                    }
+                const title = product.querySelector("input:nth-of-type(1)").value.trim();
+                const weight = product.querySelector("input:nth-of-type(2)").value.trim();
+                if (title && weight) {
+                    prodData[`${index + 1}`] = title;
+                    prodData[`${index + 1}-1`] = weight;
                 }
             });
             console.log("✅ Продукты:", prodData);
@@ -92,6 +68,31 @@ document.addEventListener("DOMContentLoaded", () => {
             console.error("❌ Ошибка при создании рецепта:", error);
         }
     });
+
+    async function getNextRecipeNumber() {
+        const usedNumbers = new Set();
+
+        // Проверяем рецепты в p_rec
+        const pRecSnapshot = await getDocs(collection(db, "p_rec"));
+        pRecSnapshot.forEach((doc) => {
+            const match = doc.id.match(/^recept(\d+)$/);
+            if (match) usedNumbers.add(parseInt(match[1]));
+        });
+
+        // Проверяем рецепты в rec
+        const recSnapshot = await getDocs(collection(db, "rec"));
+        recSnapshot.forEach((doc) => {
+            const match = doc.id.match(/^recept(\d+)$/);
+            if (match) usedNumbers.add(parseInt(match[1]));
+        });
+
+        let newNumber = 1;
+        while (usedNumbers.has(newNumber)) {
+            newNumber += 1;
+        }
+
+        return newNumber;
+    }
 
     async function uploadToImgBB(imageFile) {
         let formData = new FormData();
@@ -134,6 +135,7 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 });
+
 
 
 
