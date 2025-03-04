@@ -2,8 +2,8 @@ import { db } from "./firebase-config.js";
 import { collection, doc, setDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 const IMGBB_API_KEY = "6353a9ccc652efaad72bf6c7b2b4fbf3"; // Вставь свой ключ от ImgBB
-const TELEGRAM_BOT_TOKEN = "YOUR_TELEGRAM_BOT_TOKEN"; // Вставь свой токен бота
-const TELEGRAM_CHAT_ID = "YOUR_TELEGRAM_CHAT_ID"; // Вставь ID чата
+const TELEGRAM_BOT_TOKEN = "8028042723:AAEVS6TZ-2wTwBQXWDUu109Z3qIOBBzEbxA"; // Вставь свой токен бота
+const TELEGRAM_CHAT_ID = "1217160426"; // Вставь ID чата
 
 document.addEventListener("DOMContentLoaded", () => {
     const submitButton = document.querySelector(".submit-btn");
