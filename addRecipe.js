@@ -40,14 +40,16 @@ document.addEventListener("DOMContentLoaded", () => {
             const imageUrl = await uploadToImgBB(imageFile);
             console.log("✅ Изображение загружено:", imageUrl);
 
-            const recRef = collection(db, "rec");
+            const recRef = collection(db, "p_rec");
+
             const recSnapshot = await getDocs(recRef);
             const nextIndex = recSnapshot.size;
             const recDocName = `recept${nextIndex}`;
             const receptMainName = `receptmain${nextIndex}`;
 
             console.log("Создаём документ в Firestore:", recDocName);
-            await setDoc(doc(db, "rec", recDocName), { name, dis, image: imageUrl, status: "pending" });
+            await setDoc(doc(db, "p_rec", recDocName), { name, dis, image: imageUrl, status: "pending" });
+
 
             console.log("Создаём коллекцию:", receptMainName);
             await setDoc(doc(db, receptMainName, "main"), {
