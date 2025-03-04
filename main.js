@@ -1,6 +1,7 @@
 // 🔹 Импорт Firebase 🔹
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getFirestore, doc, setDoc, getDoc, updateDoc, arrayUnion, arrayRemove, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 // 🔹 Конфигурация Firebase 🔹
 const firebaseConfig = {
@@ -91,7 +92,8 @@ async function loadRecipes() {
 
     console.log("🔹 Загрузка рецептов...");
 
-    const recipesQuery = collection(db, "rec");
+    // Фильтруем только одобренные рецепты
+    const recipesQuery = query(collection(db, "rec"), where("status", "==", "approved"));
     const querySnapshot = await getDocs(recipesQuery);
 
     let loadedRecipes = new Set();
