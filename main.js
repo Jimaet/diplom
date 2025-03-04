@@ -75,6 +75,9 @@ async function loadRecipes() {
     await Promise.all(recipePromises);
     console.log(`✅ Загружено подтверждённых рецептов: ${loadedRecipes.size}`);
 }
+document.getElementById("open-create-page").addEventListener("click", () => {
+    window.location.href = "create.html";
+});
 
 // 🔹 Загружаем рецепты при загрузке страницы 🔹
 document.addEventListener("DOMContentLoaded", loadRecipes);
