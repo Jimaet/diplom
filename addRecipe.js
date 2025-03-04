@@ -161,4 +161,4 @@ document.addEventListener("DOMContentLoaded", () => {
         setupMultiSelect(".category-btn"); // Вторая категория (например, горячее, закуски)
         setupMultiSelect(".tech-btn");    // Третья категория (оборудование)
     }, 500);
-});
+
