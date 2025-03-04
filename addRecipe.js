@@ -2,6 +2,8 @@ import { db } from "./firebase-config.js";
 import { collection, doc, setDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 const IMGBB_API_KEY = "6353a9ccc652efaad72bf6c7b2b4fbf3"; // Вставь свой ключ от ImgBB
+const TELEGRAM_BOT_TOKEN = "YOUR_TELEGRAM_BOT_TOKEN"; // Вставь свой токен бота
+const TELEGRAM_CHAT_ID = "YOUR_TELEGRAM_CHAT_ID"; // Вставь ID чата
 
 document.addEventListener("DOMContentLoaded", () => {
     const submitButton = document.querySelector(".submit-btn");
@@ -34,12 +36,10 @@ document.addEventListener("DOMContentLoaded", () => {
                 return;
             }
 
-            // Загрузка изображения в ImgBB
             console.log("Загружаем изображение в ImgBB...");
             const imageUrl = await uploadToImgBB(imageFile);
             console.log("✅ Изображение загружено:", imageUrl);
 
-            // Получаем индекс для нового рецепта
             const recRef = collection(db, "rec");
             const recSnapshot = await getDocs(recRef);
             const nextIndex = recSnapshot.size;
@@ -59,12 +59,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
             await setDoc(doc(db, receptMainName, "photo"), { url: imageUrl });
 
-            // Добавляем продукты
             let prodData = {};
             document.querySelectorAll("#product-list .product-item").forEach((product, index) => {
                 const titleEl = product.querySelector("input:nth-of-type(1)");
                 const weightEl = product.querySelector("input:nth-of-type(2)");
-
                 if (titleEl && weightEl) {
                     const title = titleEl.value.trim();
                     const weight = weightEl.value.trim();
@@ -77,7 +75,6 @@ document.addEventListener("DOMContentLoaded", () => {
             console.log("✅ Продукты:", prodData);
             await setDoc(doc(db, receptMainName, "prod"), prodData);
 
-            // Добавляем шаги приготовления
             let stepData = {};
             document.querySelectorAll("#step-list .step-item input").forEach((step, index) => {
                 if (step.value) {
@@ -87,13 +84,12 @@ document.addEventListener("DOMContentLoaded", () => {
             console.log("✅ Шаги приготовления:", stepData);
             await setDoc(doc(db, receptMainName, "step"), stepData);
 
-            // Добавляем категории
             async function saveCategory(selector, docName) {
                 let categoryData = {};
                 document.querySelectorAll(selector).forEach((btn, index) => {
                     categoryData[`${index + 1}`] = btn.textContent.trim();
                 });
-                console.log(`✅ Категории ${docName}:`, categoryData);
+                console.log(`✅ Категории ${docName}:", categoryData);
                 await setDoc(doc(db, receptMainName, docName), categoryData);
             }
 
@@ -102,53 +98,39 @@ document.addEventListener("DOMContentLoaded", () => {
             await saveCategory(".tech-btn.selected", "items");
 
             console.log("🎉 Рецепт успешно создан!");
+
+            await sendToTelegram(name, dis, about, time, portions, prodData, stepData, imageUrl);
+
         } catch (error) {
             console.error("❌ Ошибка при создании рецепта:", error);
         }
     });
 
-    // Функция загрузки изображения в ImgBB
     async function uploadToImgBB(imageFile) {
         let formData = new FormData();
         formData.append("image", imageFile);
-
-        const response = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, {
-            method: "POST",
-            body: formData
-        });
-
+        const response = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, { method: "POST", body: formData });
         const result = await response.json();
         if (result.success) {
-            return result.data.url; // Ссылка на изображение
+            return result.data.url;
         } else {
             throw new Error("Ошибка загрузки изображения на ImgBB");
         }
     }
 
-    // Настройка множественного выбора категорий
-    function setupMultiSelect(selector) {
-        document.querySelectorAll(selector).forEach(btn => {
-            btn.addEventListener("click", () => {
-                console.log(`🔹 Нажата кнопка: ${btn.textContent.trim()}`);
-                btn.classList.toggle("selected");
-
-                if (btn.classList.contains("selected")) {
-                    btn.style.backgroundColor = "#4CAF50"; // Выбранный цвет
-                    btn.style.color = "#fff";
-                } else {
-                    btn.style.backgroundColor = ""; // Вернуть стандартный стиль
-                    btn.style.color = "";
-                }
-
-                console.log(`📌 ${btn.textContent.trim()} теперь ${btn.classList.contains("selected") ? "выбран" : "снят"}`);
-            });
+    async function sendToTelegram(name, dis, about, time, portions, prodData, stepData, imageUrl) {
+        const message = `Название рецепта: ${name}\nОписание краткое: ${dis}\nО рецепте: ${about}\nВремя: ${time}\nПорции: ${portions}\nПродукты: ${JSON.stringify(prodData, null, 2)}\nШаги: ${JSON.stringify(stepData, null, 2)}`;
+        const telegramUrl = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
+        await fetch(telegramUrl, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ chat_id: TELEGRAM_CHAT_ID, text: message, parse_mode: "Markdown" })
         });
     }
 
-    // Дожидаемся полной загрузки DOM перед навешиванием событий
     setTimeout(() => {
-        setupMultiSelect(".filter-btn");   // Первая категория (карусель)
-        setupMultiSelect(".category-btn"); // Вторая категория (например, горячее, закуски)
-        setupMultiSelect(".tech-btn");    // Третья категория (оборудование)
+        setupMultiSelect(".filter-btn");
+        setupMultiSelect(".category-btn");
+        setupMultiSelect(".tech-btn");
     }, 500);
 });
