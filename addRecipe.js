@@ -89,7 +89,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 document.querySelectorAll(selector).forEach((btn, index) => {
                     categoryData[`${index + 1}`] = btn.textContent.trim();
                 });
-                console.log(`✅ Категории ${docName}:", categoryData);
+                console.log(`✅ Категории ${docName}:`, categoryData);
+
                 await setDoc(doc(db, receptMainName, docName), categoryData);
             }
 
