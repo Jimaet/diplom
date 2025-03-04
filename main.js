@@ -16,8 +16,6 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-
-
 // 🔹 Функция загрузки рецептов 🔹
 async function loadRecipes() {
     const recipesContainer = document.getElementById("recipes-container");
@@ -27,17 +25,21 @@ async function loadRecipes() {
     }
 
     recipesContainer.innerHTML = ""; // Очистка перед загрузкой
-
-    console.log("🔹 Загрузка рецептов...");
+    console.log("🔹 Загрузка подтверждённых рецептов...");
 
     const recipesQuery = collection(db, "rec");
     const querySnapshot = await getDocs(recipesQuery);
-
     let loadedRecipes = new Set();
 
-    querySnapshot.forEach(async (doc) => {
+    const recipePromises = [];
+
+    querySnapshot.forEach((doc) => {
         const data = doc.data();
         const recipeId = doc.id;
+
+        // Проверяем статус модерации, загружаем только подтверждённые
+        if (data.status !== "approved") return;
+
         const imageUrl = data.image ? data.image : "placeholder.jpg";
 
         if (loadedRecipes.has(recipeId)) return;
@@ -60,19 +62,19 @@ async function loadRecipes() {
 
         const favButton = recipeCard.querySelector(".favorite-button");
 
-        // Проверяем, находится ли рецепт в избранном
-        await checkIfFavourite(recipeId, favButton);
-
-        // Добавляем обработчик клика на кнопку "Добавить в избранное"
-        favButton.addEventListener("click", toggleFavourite);
+        // Добавляем проверку избранного в массив промисов
+        recipePromises.push(
+            checkIfFavourite(recipeId, favButton).then(() => {
+                favButton.addEventListener("click", toggleFavourite);
+            })
+        );
 
         recipesContainer.appendChild(recipeCard);
     });
 
-    console.log(`✅ Загружено рецептов: ${loadedRecipes.size}`);
+    await Promise.all(recipePromises);
+    console.log(`✅ Загружено подтверждённых рецептов: ${loadedRecipes.size}`);
 }
 
 // 🔹 Загружаем рецепты при загрузке страницы 🔹
 document.addEventListener("DOMContentLoaded", loadRecipes);
-
-});
