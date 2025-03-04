@@ -1,7 +1,5 @@
-// 🔹 Импорт Firebase 🔹
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getFirestore, doc, setDoc, getDoc, updateDoc, arrayUnion, arrayRemove, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-import { collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 // 🔹 Конфигурация Firebase 🔹
 const firebaseConfig = {
@@ -92,8 +90,7 @@ async function loadRecipes() {
 
     console.log("🔹 Загрузка рецептов...");
 
-    // Фильтруем только одобренные рецепты
-    const recipesQuery = query(collection(db, "rec"), where("status", "==", "approved"));
+    const recipesQuery = collection(db, "rec");
     const querySnapshot = await getDocs(recipesQuery);
 
     let loadedRecipes = new Set();
@@ -147,6 +144,8 @@ if (favButton) {
 } else {
     console.error("❌ Ошибка: Кнопка 'Favourite' не найдена!");
 }
+
+// 🔹 Обработчик для кнопки аватара 🔹
 document.addEventListener("DOMContentLoaded", () => {
     const avatarButton = document.querySelector(".avatar");
 
@@ -162,6 +161,13 @@ document.addEventListener("DOMContentLoaded", () => {
         window.location.href = `profile.html?id=${userId}`;
     });
 });
-document.getElementById("my-recipes-btn").addEventListener("click", () => {
-    window.location.href = "create.html";
-});
+
+// 🔹 Обработчик кнопки "Мои рецепты" 🔹
+const myRecipesBtn = document.getElementById("my-recipes-btn");
+if (myRecipesBtn) {
+    myRecipesBtn.addEventListener("click", () => {
+        window.location.href = "create.html";
+    });
+} else {
+    console.error("❌ Ошибка: Кнопка 'Мои рецепты' не найдена!");
+}
