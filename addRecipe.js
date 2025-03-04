@@ -34,11 +34,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
             // Создаём документ в p_rec
             await setDoc(doc(db, "p_rec", recDocName), { name, dis, image: imageUrl, status: "pending" });
-            await setDoc(doc(db, "p_rec", receptMainName), { status: "pending" });
+
+
 
             // Создаём документ рецепта
-            await setDoc(doc(db, receptMainName, "main"), { dis: about, name, porcii: portions, timemin: time });
-            await setDoc(doc(db, receptMainName, "photo"), { url: imageUrl });
+            await setDoc(doc(db, "p_rec", receptMainName, "main"), { dis: about, name, porcii: portions, timemin: time });
+            await setDoc(doc(db, "p_rec", receptMainName, "photo"), { url: imageUrl });
 
             // 📌 Продукты
             let prodData = {};
@@ -51,7 +52,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
             });
             console.log("✅ Продукты:", prodData);
-            await setDoc(doc(db, receptMainName, "prod"), prodData);
+            await setDoc(doc(db, "p_rec", receptMainName, "prod"), prodData);
 
             // 📌 Шаги
             let stepData = {};
@@ -61,7 +62,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 }
             });
             console.log("✅ Шаги приготовления:", stepData);
-            await setDoc(doc(db, receptMainName, "step"), stepData);
+            await setDoc(doc(db, "p_rec", receptMainName, "step"), stepData);
 
             // 📌 Категории (type, type2, items)
             let type = [];
@@ -84,7 +85,7 @@ document.addEventListener("DOMContentLoaded", () => {
             console.log("✅ Техника (items):", items);
             
             // Сохраняем напрямую массив строк, а не объект с полем data
-            await setDoc(doc(db, receptMainName), { type, type2, items }, { merge: true });
+            await setDoc(doc(db, "p_rec", receptMainName), { type, type2, items }, { merge: true });
 
             console.log("✅ Категории (type):", type);
             console.log("✅ Подкатегории (type2):", type2);
