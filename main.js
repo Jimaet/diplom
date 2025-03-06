@@ -53,6 +53,7 @@ document.querySelectorAll(".category-btn").forEach((btn) => {
 });
 
 // 🔹 Функция загрузки рецептов с фильтрами 🔹
+// 🔹 Функция загрузки рецептов с фильтрами 🔹
 async function loadRecipes() {
     const recipesContainer = document.getElementById("recipes-container");
     if (!recipesContainer) {
@@ -77,7 +78,8 @@ async function loadRecipes() {
         let isMatch = false; // Флаг для проверки соответствия фильтрам
 
         for (let i = 0; i < 10; i++) { // Пройдем по коллекциям receptmainX
-            const receptmainDoc = await getDoc(doc(db, "receptmain" + i, recipeId));
+            const receptmainRef = doc(db, "receptmain" + i, recipeId);  // Используем правильный формат
+            const receptmainDoc = await getDoc(receptmainRef);
             if (!receptmainDoc.exists()) continue; // Пропустить если коллекция не существует
 
             const data = receptmainDoc.data();
