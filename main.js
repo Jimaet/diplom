@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, doc, collection, getDocs, getDoc, getCollections } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getFirestore, doc, collection, getDocs, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 // 🔹 Конфигурация Firebase 🔹
 const firebaseConfig = {
@@ -29,11 +29,8 @@ async function loadRecipes() {
 
     console.log("🔹 Загрузка рецептов...");
 
-    // Получаем список всех коллекций в Firestore
-    const allCollections = await getCollections(db);
-    
-    // Фильтруем только те коллекции, которые начинаются с "receptmain"
-    const recipeCollections = allCollections.filter(collection => collection.id.startsWith("receptmain"));
+    // Получаем коллекции, которые начинаются с "receptmain"
+    const recipeCollections = await getRecipeCollections();
 
     let loadedRecipes = new Set();
 
@@ -124,6 +121,13 @@ async function loadRecipes() {
     }
 
     console.log(`✅ Загружено рецептов: ${loadedRecipes.size}`);
+}
+
+// Получение всех коллекций, начинающихся с "receptmain"
+async function getRecipeCollections() {
+    const collectionsRef = collection(db, "receptmain");
+    const collectionsSnapshot = await getDocs(collectionsRef);
+    return collectionsSnapshot.docs;
 }
 
 // 🔹 Обработчик выбора фильтров 🔹
