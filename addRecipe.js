@@ -27,41 +27,45 @@ document.addEventListener("DOMContentLoaded", () => {
             console.log("✅ Изображение загружено:", imageUrl);
 
             const nextIndex = await getNextRecipeNumber();
-            const recDocName = `recept${nextIndex}`;
-            const receptMainName = `receptmain${nextIndex}`;
+            const recDocName = recept${nextIndex};
+            const receptMainName = receptmain${nextIndex};
 
             console.log("Создаём документы в Firestore...");
 
+            // Создаём документ в p_rec (только receptX)
             await setDoc(doc(db, "p_rec", recDocName), { name, dis, image: imageUrl, status: "pending" });
+
+            // Создаём основной документ рецепта
             await setDoc(doc(db, receptMainName, "main"), { dis: about, name, porcii: portions, timemin: time });
             await setDoc(doc(db, receptMainName, "photo"), { url: imageUrl });
 
+            // 📌 Продукты
             let prodData = {};
             document.querySelectorAll("#product-list .product-item").forEach((product, index) => {
                 const title = product.querySelector("input:nth-of-type(1)").value.trim();
                 const weight = product.querySelector("input:nth-of-type(2)").value.trim();
                 if (title && weight) {
-                    prodData[`${index + 1}`] = title;
-                    prodData[`${index + 1}-1`] = weight;
+                    prodData[${index + 1}] = title;
+                    prodData[${index + 1}-1] = weight;
                 }
             });
             console.log("✅ Продукты:", prodData);
             await setDoc(doc(db, receptMainName, "prod"), prodData);
 
+            // 📌 Шаги
             let stepData = {};
             document.querySelectorAll("#step-list .step-item input").forEach((step, index) => {
                 if (step.value) {
-                    stepData[`${index + 1}`] = step.value;
+                    stepData[${index + 1}] = step.value;
                 }
             });
             console.log("✅ Шаги приготовления:", stepData);
             await setDoc(doc(db, receptMainName, "step"), stepData);
 
-            console.log("📌 Сохраняем категории...");
-            await saveCategories(recDocName, "type", ".filter-btn");
-            await saveCategories(recDocName, "type2", ".category-btn");
+            // 📌 Категории (type, type2, items) → сохраняем как отдельные поля
+            await saveCategories(receptMainName, "type", ".filter-btn");
+            await saveCategories(receptMainName, "type2", ".category-btn");
             await saveCategories(receptMainName, "items", ".tech-btn");
-            console.log("✅ Категории сохранены!");
 
             console.log("🎉 Рецепт успешно сохранён!");
 
@@ -70,30 +74,33 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     });
 
-    async function saveCategories(docName, fieldName, selector) {
-        let selectedItems = Array.from(document.querySelectorAll(selector + ".selected"))
-            .map(btn => btn.textContent.trim());
-
-        let categoryData = {};
-        if (selectedItems.length > 0) {
-            categoryData[fieldName] = selectedItems;
+    // Функция для сохранения выбранных категорий в виде отдельных полей
+       async function saveCategories(docName, fieldName, selector) {
+        let selectedItems = Array.from(document.querySelectorAll(selector + ".selected")).map(btn => btn.textContent.trim());
+    
+        if (fieldName === "items") {
+            let categoryData = {};
+            selectedItems.forEach((item, index) => {
+                categoryData[`${fieldName}${index + 1}`] = item; // Генерируем ключи: items1, items2, ...
+            });
+            console.log(`✅ ${fieldName}:`, categoryData);
+            await setDoc(doc(db, "rec", docName), categoryData, { merge: true });
+        } else {
+            console.log(`✅ ${fieldName} (array):`, selectedItems);
+            await setDoc(doc(db, "p_rec", docName), { [fieldName]: selectedItems }, { merge: true });
         }
-
-        console.log(`✅ ${fieldName}:`, categoryData);
-        
-        const collectionName = fieldName === "items" ? "rec" : "p_rec";
-        await setDoc(doc(db, collectionName, docName), categoryData, { merge: true });
     }
-
     async function getNextRecipeNumber() {
         const usedNumbers = new Set();
 
+        // Проверяем рецепты в p_rec
         const pRecSnapshot = await getDocs(collection(db, "p_rec"));
         pRecSnapshot.forEach((doc) => {
             const match = doc.id.match(/^recept(\d+)$/);
             if (match) usedNumbers.add(parseInt(match[1]));
         });
 
+        // Проверяем рецепты в rec
         const recSnapshot = await getDocs(collection(db, "rec"));
         recSnapshot.forEach((doc) => {
             const match = doc.id.match(/^recept(\d+)$/);
@@ -111,7 +118,7 @@ document.addEventListener("DOMContentLoaded", () => {
     async function uploadToImgBB(imageFile) {
         let formData = new FormData();
         formData.append("image", imageFile);
-        const response = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, { method: "POST", body: formData });
+        const response = await fetch(https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}, { method: "POST", body: formData });
         const result = await response.json();
         if (result.success) {
             return result.data.url;
@@ -123,25 +130,26 @@ document.addEventListener("DOMContentLoaded", () => {
     function setupMultiSelect(selector) {
         document.querySelectorAll(selector).forEach(btn => {
             btn.addEventListener("click", () => {
-                console.log(`🔹 Нажата кнопка: ${btn.textContent.trim()}`);
+                console.log(🔹 Нажата кнопка: ${btn.textContent.trim()});
                 btn.classList.toggle("selected");
 
                 if (btn.classList.contains("selected")) {
-                    btn.style.backgroundColor = "#4CAF50";
+                    btn.style.backgroundColor = "#4CAF50"; // Выбранный цвет
                     btn.style.color = "#fff";
                 } else {
-                    btn.style.backgroundColor = "";
+                    btn.style.backgroundColor = ""; // Вернуть стандартный стиль
                     btn.style.color = "";
                 }
 
-                console.log(`📌 ${btn.textContent.trim()} теперь ${btn.classList.contains("selected") ? "выбран" : "снят"}`);
+                console.log(📌 ${btn.textContent.trim()} теперь ${btn.classList.contains("selected") ? "выбран" : "снят"});
             });
         });
     }
 
+    // Дожидаемся полной загрузки DOM перед навешиванием событий
     setTimeout(() => {
-        setupMultiSelect(".filter-btn");
-        setupMultiSelect(".category-btn");
-        setupMultiSelect(".tech-btn");
+        setupMultiSelect(".filter-btn");   // Первая категория (карусель)
+        setupMultiSelect(".category-btn"); // Вторая категория (например, горячее, закуски)
+        setupMultiSelect(".tech-btn");     // Третья категория (оборудование)
     }, 500);
 });
