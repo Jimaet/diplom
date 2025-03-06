@@ -29,66 +29,36 @@ async function loadRecipes() {
 
     console.log("🔹 Загрузка рецептов...");
 
-    // Получаем коллекции, которые начинаются с "receptmain"
-    const recipeCollections = await getRecipeCollections();
-
+    // Получаем все рецепты из коллекции rec (например, recept1, recept2, ...)
+    const recipesSnapshot = await getDocs(collection(db, "rec"));
+    
     let loadedRecipes = new Set();
 
-    // Пробегаем по каждой коллекции
-    for (const recipeCollection of recipeCollections) {
-        const recipeId = recipeCollection.id; // Получаем имя коллекции, например, receptmain1
+    // Проходим по каждому рецепту в коллекции rec
+    for (const recipeDoc of recipesSnapshot.docs) {
+        const recipeData = recipeDoc.data();
+        const recipeId = recipeDoc.id; // Получаем ID рецепта
 
         console.log(`🔹 Обработка рецепта ${recipeId}...`);
 
-        // Путь к данным карточки рецепта в коллекции rec
-        const recipeDataRef = doc(db, `rec`, recipeId);
-        const recipeDataSnap = await getDoc(recipeDataRef);
+        // Получаем коллекцию receptmainX для каждого рецепта
+        const recipeMainRef = doc(db, `receptmain${recipeId}`);
+        const recipeMainSnap = await getDoc(recipeMainRef);
 
-        if (recipeDataSnap.exists()) {
-            const recipeData = recipeDataSnap.data();
-            const imageUrl = recipeData.image ? recipeData.image : "placeholder.jpg";
+        if (recipeMainSnap.exists()) {
+            const recipeMainData = recipeMainSnap.data();
 
-            // Путь к коллекциям type и type2
-            const typeDocRef = doc(db, `receptmain${recipeId}`, "type");
-            const type2DocRef = doc(db, `receptmain${recipeId}`, "type2");
+            // Получаем фильтры из коллекции receptmainX
+            const filters = new Set([
+                ...(recipeMainData.type || []),
+                ...(recipeMainData.type2 || [])
+            ]);
 
-            // Логируем путь для проверки
-            console.log(`🔹 Пытаемся получить документы по пути: receptmain${recipeId}/type и receptmain${recipeId}/type2`);
+            console.log(`🔹 Фильтры рецепта ${recipeId}:`, filters);
 
-            // Получаем документы type и type2
-            const typeDocSnap = await getDoc(typeDocRef);
-            const type2DocSnap = await getDoc(type2DocRef);
-
-            // Если документы не существуют, логируем ошибку
-            if (!typeDocSnap.exists()) {
-                console.log(`❌ Документ type не существует для рецепта ${recipeId}`);
-            }
-            if (!type2DocSnap.exists()) {
-                console.log(`❌ Документ type2 не существует для рецепта ${recipeId}`);
-            }
-
-            // Сбор всех фильтров из документа type
-            const typeFilters = typeDocSnap.exists()
-                ? Object.values(typeDocSnap.data()).map(val => val.trim())
-                : [];
-            console.log(`🔹 Фильтры из type:`, typeFilters);
-
-            // Сбор всех фильтров из документа type2
-            const type2Filters = type2DocSnap.exists()
-                ? Object.values(type2DocSnap.data()).map(val => val.trim())
-                : [];
-            console.log(`🔹 Фильтры из type2:`, type2Filters);
-
-            // Объединяем оба фильтра
-            const allFilters = new Set([...typeFilters, ...type2Filters]);
-
-            // Логируем все фильтры
-            console.log(`🔹 Все фильтры рецепта ${recipeId}:`, allFilters);
-
-            // Если нет выбранных фильтров, показываем все рецепты
-            if (selectedFilters.size === 0) {
-                console.log(`🔹 Показаны все рецепты, так как фильтры не выбраны`);
-                // Проверка, если рецепт уже был загружен
+            // Если фильтры выбраны, проверяем соответствие
+            if (selectedFilters.size === 0 || [...selectedFilters].some(filter => filters.has(filter))) {
+                // Проверяем, если рецепт уже был загружен
                 if (loadedRecipes.has(recipeId)) continue;
                 loadedRecipes.add(recipeId);
 
@@ -97,7 +67,7 @@ async function loadRecipes() {
                 recipeCard.classList.add("recipe-card");
 
                 recipeCard.innerHTML = `
-                    <img src="${imageUrl}" class="recipe-img" alt="${recipeData.name}">
+                    <img src="${recipeData.image || "placeholder.jpg"}" class="recipe-img" alt="${recipeData.name}">
                     <div class="recipe-info">
                         <h3 class="recipe-title">${recipeData.name}</h3>
                         <p class="recipe-description">${recipeData.dis}</p>
@@ -108,52 +78,13 @@ async function loadRecipes() {
                 `;
 
                 recipesContainer.appendChild(recipeCard);
-                continue;
             }
-
-            // Фильтрация по выбранным категориям
-            if (selectedFilters.size > 0) {
-                console.log(`🔹 Выбранные фильтры:`, [...selectedFilters]);
-
-                const hasMatchingFilter = [...selectedFilters].some(filter => allFilters.has(filter));
-                console.log(`🔹 Рецепт ${recipeId} проходит фильтрацию:`, hasMatchingFilter);
-
-                if (!hasMatchingFilter) continue; // Пропустить рецепт, если не совпадает ни с одним из выбранных фильтров
-            }
-
-            // Проверка, если рецепт уже был загружен
-            if (loadedRecipes.has(recipeId)) continue;
-            loadedRecipes.add(recipeId);
-
-            // Создание карточки рецепта
-            const recipeCard = document.createElement("div");
-            recipeCard.classList.add("recipe-card");
-
-            recipeCard.innerHTML = `
-                <img src="${imageUrl}" class="recipe-img" alt="${recipeData.name}">
-                <div class="recipe-info">
-                    <h3 class="recipe-title">${recipeData.name}</h3>
-                    <p class="recipe-description">${recipeData.dis}</p>
-                </div>
-                <a href="recipe.html?id=${recipeId}" class="recipe-link">
-                    <button class="start-button">Начать!</button>
-                </a>
-            `;
-
-            recipesContainer.appendChild(recipeCard);
         } else {
-            console.log(`❌ Не найдено данных для рецепта ${recipeId}`);
+            console.log(`❌ Не найдено данных для коллекции receptmain${recipeId}`);
         }
     }
 
     console.log(`✅ Загружено рецептов: ${loadedRecipes.size}`);
-}
-
-// Получение всех коллекций, начинающихся с "receptmain"
-async function getRecipeCollections() {
-    const collectionsRef = collection(db, "receptmain");
-    const collectionsSnapshot = await getDocs(collectionsRef);
-    return collectionsSnapshot.docs;
 }
 
 // 🔹 Обработчик выбора фильтров 🔹
