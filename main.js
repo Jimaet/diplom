@@ -1,4 +1,4 @@
-// 🔹 Импорт Firebase 🔹
+м// 🔹 Импорт Firebase 🔹
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getFirestore, doc, collection, getDocs, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
@@ -30,7 +30,7 @@ async function loadRecipes() {
 
     console.log("🔹 Загрузка рецептов...");
 
-    const recipesQuery = collection(db, "receptmain"); // Запрос ко всем коллекциям рецептов
+    const recipesQuery = collection(db, "rec"); // Запрос ко всем рецептам в коллекции "rec"
     const querySnapshot = await getDocs(recipesQuery);
 
     let loadedRecipes = new Set();
@@ -38,24 +38,18 @@ async function loadRecipes() {
     for (const docSnap of querySnapshot.docs) {
         const recipeId = docSnap.id;
         
-        // Получаем ссылки на документы `type` и `type2` для текущего рецепта
-        const typeDocRef = doc(db, `receptmain/${recipeId}/filters`, "type");
-        const type2DocRef = doc(db, `receptmain/${recipeId}/filters`, "type2");
+        // Получаем ссылку на документ с фильтрами для этого рецепта в коллекции "receptmain"
+        const filterDocRef = doc(db, `receptmain/${recipeId}/filters`, "type");
 
-        // Загружаем данные этих документов
-        const typeDocSnap = await getDoc(typeDocRef);
-        const type2DocSnap = await getDoc(type2DocRef);
+        // Загружаем данные фильтров
+        const filterDocSnap = await getDoc(filterDocRef);
 
-        // Получаем фильтры из документов
-        const typeFilters = typeDocSnap.exists() ? typeDocSnap.data().value.split(",").map(val => val.trim()) : [];
-        const type2Filters = type2DocSnap.exists() ? type2DocSnap.data().value.split(",").map(val => val.trim()) : [];
-
-        // Объединяем оба фильтра
-        const allFilters = new Set([...typeFilters, ...type2Filters]);
+        // Получаем фильтры из документа
+        const filters = filterDocSnap.exists() ? filterDocSnap.data().value.split(",").map(val => val.trim()) : [];
 
         // Фильтрация по выбранным категориям
         if (selectedFilters.size > 0) {
-            const hasMatchingFilter = [...selectedFilters].some(filter => allFilters.has(filter));
+            const hasMatchingFilter = [...selectedFilters].some(filter => filters.includes(filter));
             if (!hasMatchingFilter) continue;
         }
 
