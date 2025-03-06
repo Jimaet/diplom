@@ -199,7 +199,7 @@ async function searchRecipes(event) {
 
     let loadedRecipes = new Set();
 
-    querySnapshot.forEach(async (doc) => {
+    for (const doc of querySnapshot.docs) {
         const data = doc.data();
         const recipeId = doc.id;
         const recipeName = data.name.toLowerCase(); // Приводим имя рецепта к нижнему регистру
@@ -207,7 +207,7 @@ async function searchRecipes(event) {
 
         // Если имя или описание содержит строку поиска, добавляем рецепт в контейнер
         if (recipeName.includes(searchTerm) || recipeDescription.includes(searchTerm)) {
-            if (loadedRecipes.has(recipeId)) return;
+            if (loadedRecipes.has(recipeId)) continue;
             loadedRecipes.add(recipeId);
 
             const imageUrl = data.image ? data.image : "placeholder.jpg";
@@ -237,11 +237,10 @@ async function searchRecipes(event) {
 
             recipesContainer.appendChild(recipeCard);
         }
-    });
+    }
 
     console.log(`✅ Загружено рецептов по запросу: ${loadedRecipes.size}`);
 }
-
 // 🔹 Слушатель для изменения текста в строке поиска 🔹
 const searchInput = document.querySelector(".search-bar input");
 if (searchInput) {
