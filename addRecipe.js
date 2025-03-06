@@ -78,18 +78,16 @@ document.addEventListener("DOMContentLoaded", () => {
        async function saveCategories(docName, fieldName, selector) {
         let selectedItems = Array.from(document.querySelectorAll(selector + ".selected")).map(btn => btn.textContent.trim());
     
-        if (fieldName === "items") {
-            let categoryData = {};
-            selectedItems.forEach((item, index) => {
-                categoryData[`${fieldName}${index + 1}`] = item; // Генерируем ключи: items1, items2, ...
-            });
-            console.log(`✅ ${fieldName}:`, categoryData);
-            await setDoc(doc(db, "rec", docName), categoryData, { merge: true });
-        } else {
-            console.log(`✅ ${fieldName} (array):`, selectedItems);
-            await setDoc(doc(db, "p_rec", docName), { [fieldName]: selectedItems }, { merge: true });
-        }
+        let categoryData = {};
+        selectedItems.forEach((item, index) => {
+            categoryData[${fieldName}${index + 1}] = item; // Генерируем ключи: type1, type2, type3...
+        });
+    
+        console.log(✅ ${fieldName}:, categoryData);
+        // Записываем категории в коллекцию rec внутри документа recept
+        await setDoc(doc(db, "rec", docName), categoryData, { merge: true });
     }
+
     async function getNextRecipeNumber() {
         const usedNumbers = new Set();
 
