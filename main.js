@@ -177,8 +177,8 @@ if (homeButton) {
         lastClickTime = currentTime;
     });
 }
-// 🔹 Функция для фильтрации рецептов по введенному тексту 🔹
-// 🔹 Функция для фильтрации рецептов по введенному тексту 🔹
+let searchTimeout;
+
 async function searchRecipes(event) {
     const searchTerm = event.target.value.toLowerCase();
     const recipesContainer = document.getElementById("recipes-container");
@@ -194,54 +194,69 @@ async function searchRecipes(event) {
 
     console.log("🔹 Поиск по запросу:", searchTerm);
 
-    // Запрос к базе данных для получения всех рецептов
-    const recipesQuery = collection(db, "rec");
-    const querySnapshot = await getDocs(recipesQuery);
+    // Отмена предыдущего таймера, если он был
+    clearTimeout(searchTimeout);
 
-    let loadedRecipes = new Set();
+    // Устанавливаем новый таймер на 1-2 секунды
+    searchTimeout = setTimeout(async () => {
+        // Запрос к базе данных для получения всех рецептов
+        const recipesQuery = collection(db, "rec");
+        const querySnapshot = await getDocs(recipesQuery);
 
-    for (const doc of querySnapshot.docs) {
-        const data = doc.data();
-        const recipeId = doc.id;
-        const recipeName = data.name.toLowerCase(); // Приводим имя рецепта к нижнему регистру
-        const recipeDescription = data.dis.toLowerCase(); // Приводим описание к нижнему регистру
+        let loadedRecipes = new Set();
 
-        // Если имя или описание содержит строку поиска, добавляем рецепт в контейнер
-        if (recipeName.includes(searchTerm) || recipeDescription.includes(searchTerm)) {
-            if (loadedRecipes.has(recipeId)) continue; // Проверяем, чтобы не добавлять один и тот же рецепт
-            loadedRecipes.add(recipeId);
+        for (const doc of querySnapshot.docs) {
+            const data = doc.data();
+            const recipeId = doc.id;
+            const recipeName = data.name.toLowerCase(); // Приводим имя рецепта к нижнему регистру
+            const recipeDescription = data.dis.toLowerCase(); // Приводим описание к нижнему регистру
 
-            const imageUrl = data.image ? data.image : "placeholder.jpg";
+            // Если имя или описание содержит строку поиска, добавляем рецепт в контейнер
+            if (recipeName.includes(searchTerm) || recipeDescription.includes(searchTerm)) {
+                if (loadedRecipes.has(recipeId)) continue; // Проверяем, чтобы не добавлять один и тот же рецепт
+                loadedRecipes.add(recipeId);
 
-            const recipeCard = document.createElement("div");
-            recipeCard.classList.add("recipe-card");
+                const imageUrl = data.image ? data.image : "placeholder.jpg";
 
-            recipeCard.innerHTML = `
-                <img src="${imageUrl}" class="recipe-img" alt="${data.name}">
-                <div class="recipe-info">
-                    <h3 class="recipe-title">${data.name}</h3>
-                    <p class="recipe-description">${data.dis}</p>
-                </div>
-                <button class="favorite-button" data-id="${recipeId}">❤️</button>
-                <a href="recipe.html?id=${recipeId}" class="recipe-link">
-                    <button class="start-button">Начать!</button>
-                </a>
-            `;
+                const recipeCard = document.createElement("div");
+                recipeCard.classList.add("recipe-card");
 
-            const favButton = recipeCard.querySelector(".favorite-button");
+                recipeCard.innerHTML = `
+                    <img src="${imageUrl}" class="recipe-img" alt="${data.name}">
+                    <div class="recipe-info">
+                        <h3 class="recipe-title">${data.name}</h3>
+                        <p class="recipe-description">${data.dis}</p>
+                    </div>
+                    <button class="favorite-button" data-id="${recipeId}">❤️</button>
+                    <a href="recipe.html?id=${recipeId}" class="recipe-link">
+                        <button class="start-button">Начать!</button>
+                    </a>
+                `;
 
-            // Проверяем, находится ли рецепт в избранном
-            await checkIfFavourite(recipeId, favButton);
+                const favButton = recipeCard.querySelector(".favorite-button");
 
-            // Добавляем обработчик клика на кнопку "Добавить в избранное"
-            favButton.addEventListener("click", toggleFavourite);
+                // Проверяем, находится ли рецепт в избранном
+                await checkIfFavourite(recipeId, favButton);
 
-            recipesContainer.appendChild(recipeCard);
+                // Добавляем обработчик клика на кнопку "Добавить в избранное"
+                favButton.addEventListener("click", toggleFavourite);
+
+                recipesContainer.appendChild(recipeCard);
+            }
         }
-    }
 
-    console.log(`✅ Загружено рецептов по запросу: ${loadedRecipes.size}`);
+        console.log(`✅ Загружено рецептов по запросу: ${loadedRecipes.size}`);
+    }, 1000); // Таймер на 1 секунду
 }
+
+// Слушатель для изменения текста в строке поиска
+const searchInput = document.querySelector(".search-bar input");
+if (searchInput) {
+    searchInput.addEventListener("input", searchRecipes);
+} else {
+    console.error("❌ Ошибка: Поле поиска не найдено!");
+}
+
 
 // 🔹 Слушатель для изменения текста в строке поиска 🔹
 const searchInput = document.querySelector(".search-bar input");
