@@ -41,8 +41,9 @@ async function loadRecipes() {
         const imageUrl = data.image ? data.image : "placeholder.jpg";
 
         // Получаем категории рецепта
-        const recipeMainRef = doc(db, "receptmain" + recipeId);
+        const recipeMainRef = doc(db, "receptmain", recipeId);
         const recipeMainSnap = await getDocs(collection(db, recipeMainRef.path));
+
 
         let recipeTypes = new Set();
         recipeMainSnap.forEach((doc) => {
