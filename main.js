@@ -1,6 +1,6 @@
 // 🔹 Импорт Firebase 🔹
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, doc, collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getFirestore, doc, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 // 🔹 Конфигурация Firebase 🔹
 const firebaseConfig = {
@@ -16,44 +16,45 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
+// 🔹 Фильтры 🔹
 let selectedType = null;
 let selectedType2 = null;
 
-// 🔹 Функция загрузки рецептов 🔹
+// 🔹 Функция загрузки рецептов с учетом фильтров 🔹
 async function loadRecipes() {
     const recipesContainer = document.getElementById("recipes-container");
     if (!recipesContainer) {
         console.error("❌ Ошибка: recipes-container не найден!");
         return;
     }
-    recipesContainer.innerHTML = ""; // Очистка перед загрузкой
 
+    recipesContainer.innerHTML = ""; // Очистка перед загрузкой
     console.log("🔹 Загрузка рецептов...");
 
     const recipesQuery = collection(db, "rec");
     const querySnapshot = await getDocs(recipesQuery);
-
     let loadedRecipes = new Set();
 
-    for (const docSnap of querySnapshot.docs) {
-        const data = docSnap.data();
-        const recipeId = docSnap.id;
-        const imageUrl = data.image ? data.image : "placeholder.jpg";
+    for (const recipeDoc of querySnapshot.docs) {
+        const recipeId = recipeDoc.id;
+        const recipeData = recipeDoc.data();
+        const imageUrl = recipeData.image ? recipeData.image : "placeholder.jpg";
 
-        // Получаем информацию о типах рецепта
-        const mainDocRef = doc(db, `receptmain${recipeId}`);
-        const mainDocSnap = await getDocs(collection(db, `receptmain${recipeId}`));
+        // Получаем данные о категориях
+        const categoryDocRef = doc(db, "receptmain", recipeId);
+        const categoryDocSnap = await getDocs(collection(db, "receptmain"));
+        let type = null;
+        let type2 = null;
 
-        let type = "";
-        let type2 = "";
-
-        mainDocSnap.forEach((doc) => {
-            if (doc.id === "type") type = doc.data().value;
-            if (doc.id === "type2") type2 = doc.data().value;
+        categoryDocSnap.forEach((doc) => {
+            if (doc.id === recipeId) {
+                type = doc.data().type || null;
+                type2 = doc.data().type2 || null;
+            }
         });
 
         // Фильтрация по выбранным категориям
-        if ((selectedType && type !== selectedType) || (selectedType2 && type2 !== selectedType2)) {
+        if ((selectedType && selectedType !== type) || (selectedType2 && selectedType2 !== type2)) {
             continue;
         }
 
@@ -62,12 +63,11 @@ async function loadRecipes() {
 
         const recipeCard = document.createElement("div");
         recipeCard.classList.add("recipe-card");
-
         recipeCard.innerHTML = `
-            <img src="${imageUrl}" class="recipe-img" alt="${data.name}">
+            <img src="${imageUrl}" class="recipe-img" alt="${recipeData.name}">
             <div class="recipe-info">
-                <h3 class="recipe-title">${data.name}</h3>
-                <p class="recipe-description">${data.dis}</p>
+                <h3 class="recipe-title">${recipeData.name}</h3>
+                <p class="recipe-description">${recipeData.dis}</p>
             </div>
             <a href="recipe.html?id=${recipeId}" class="recipe-link">
                 <button class="start-button">Начать!</button>
@@ -80,54 +80,37 @@ async function loadRecipes() {
     console.log(`✅ Загружено рецептов: ${loadedRecipes.size}`);
 }
 
-// 🔹 Обработчик для фильтров 🔹
-function setupFilters() {
-    document.querySelectorAll(".filter-btn").forEach((button) => {
-        button.addEventListener("click", () => {
-            selectedType = button.textContent;
-            loadRecipes();
-        });
-    });
+// 🔹 Обработчики фильтров 🔹
+const filterButtons = document.querySelectorAll(".filter-btn");
+const categoryButtons = document.querySelectorAll(".category-btn");
 
-    document.querySelectorAll(".category-btn").forEach((button) => {
-        button.addEventListener("click", () => {
-            selectedType2 = button.querySelector("span").textContent;
-            loadRecipes();
-        });
+filterButtons.forEach(button => {
+    button.addEventListener("click", () => {
+        selectedType = button.innerText === selectedType ? null : button.innerText;
+        loadRecipes();
     });
-}
-
-// 🔹 Загружаем рецепты при загрузке страницы 🔹
-document.addEventListener("DOMContentLoaded", () => {
-    loadRecipes();
-    setupFilters();
 });
 
-// 🔹 Обработчик для кнопки Home 🔹
-document.addEventListener("DOMContentLoaded", () => {
-    const homeButton = document.querySelector(".nav-btn:first-child"); // Кнопка Home
-    let clickCount = 0;
-    let clickTimer;
+categoryButtons.forEach(button => {
+    button.addEventListener("click", () => {
+        selectedType2 = button.querySelector("span").innerText === selectedType2 ? null : button.querySelector("span").innerText;
+        loadRecipes();
+    });
+});
 
-    if (homeButton) {
-        homeButton.addEventListener("click", () => {
-            clickCount++;
+// 🔹 Загружаем рецепты при загрузке страницы 🔹
+document.addEventListener("DOMContentLoaded", loadRecipes);
 
-            if (clickCount === 1) {
-                // Прокрутка вверх
-                window.scrollTo({ top: 0, behavior: "smooth" });
+// 🔹 Кнопка "Home" - скролл вверх или перезагрузка 🔹
+const homeButton = document.querySelector(".nav-btn:first-child");
+let lastClickTime = 0;
 
-                // Сбросить счетчик через 1 секунду
-                clickTimer = setTimeout(() => {
-                    clickCount = 0;
-                }, 1000);
-            } else if (clickCount === 2) {
-                // Двойной клик — перезагрузка страницы
-                clearTimeout(clickTimer);
-                location.reload();
-            }
-        });
+homeButton.addEventListener("click", () => {
+    const currentTime = new Date().getTime();
+    if (currentTime - lastClickTime < 1000) {
+        location.reload();
     } else {
-        console.error("❌ Ошибка: Кнопка 'Home' не найдена!");
+        window.scrollTo({ top: 0, behavior: "smooth" });
     }
+    lastClickTime = currentTime;
 });
