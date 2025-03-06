@@ -19,6 +19,7 @@ const db = getFirestore(app);
 let selectedFilters = new Set(); // Храним выбранные фильтры
 
 // 🔹 Функция загрузки рецептов 🔹
+// 🔹 Функция загрузки рецептов 🔹
 async function loadRecipes() {
     const recipesContainer = document.getElementById("recipes-container");
     if (!recipesContainer) {
@@ -30,8 +31,7 @@ async function loadRecipes() {
 
     console.log("🔹 Загрузка рецептов...");
 
-    // Пытаемся найти все рецепты. Коллекция рецептов теперь не rec, а рецепты, которые имеют уникальный id
-    // Пример: рецепты - recept0, recept1, recept2 и так далее
+    // Пытаемся найти все рецепты. Коллекция рецептов теперь из rec
     const recipeIds = ["recept0", "recept1", "recept2", "recept3", "recept5", "recept6", "recept7"];
 
     let loadedRecipes = new Set();
@@ -40,72 +40,73 @@ async function loadRecipes() {
     for (const recipeId of recipeIds) {
         console.log(`🔹 Обработка рецепта ${recipeId}...`);
 
-        // Путь к документам type и type2 в коллекции receptmain{recipeId}
-        const typeDocRef = doc(db, `receptmain${recipeId}`, "type");
-        const type2DocRef = doc(db, `receptmain${recipeId}`, "type2");
-
-        // Загружаем документы type и type2 для текущего рецепта
-        const typeDocSnap = await getDoc(typeDocRef);
-        const type2DocSnap = await getDoc(type2DocRef);
-
-        // Логируем путь для проверки
-        console.log(`🔹 Путь для рецепта ${recipeId}:`);
-
-        // Если документы не существуют, логируем ошибку
-        if (!typeDocSnap.exists()) {
-            console.log(`❌ Документ type не существует для рецепта ${recipeId}`);
-        }
-        if (!type2DocSnap.exists()) {
-            console.log(`❌ Документ type2 не существует для рецепта ${recipeId}`);
-        }
-
-        // Сбор всех фильтров из документа type
-        const typeFilters = typeDocSnap.exists()
-            ? Object.values(typeDocSnap.data()).map(val => val.trim())
-            : [];
-        console.log(`🔹 Фильтры из type:`, typeFilters);
-
-        // Сбор всех фильтров из документа type2
-        const type2Filters = type2DocSnap.exists()
-            ? Object.values(type2DocSnap.data()).map(val => val.trim())
-            : [];
-        console.log(`🔹 Фильтры из type2:`, type2Filters);
-
-        // Объединяем оба фильтра
-        const allFilters = new Set([...typeFilters, ...type2Filters]);
-
-        // Логируем все фильтры
-        console.log(`🔹 Все фильтры рецепта ${recipeId}:`, allFilters);
-
-        // Фильтрация по выбранным категориям
-        if (selectedFilters.size > 0) {
-            console.log(`🔹 Выбранные фильтры:`, [...selectedFilters]);
-
-            const hasMatchingFilter = [...selectedFilters].some(filter => allFilters.has(filter));
-            console.log(`🔹 Рецепт ${recipeId} проходит фильтрацию:`, hasMatchingFilter);
-
-            if (!hasMatchingFilter) continue; // Пропустить рецепт, если не совпадает ни с одним из выбранных фильтров
-        }
-
-        // Проверка, если рецепт уже был загружен
-        if (loadedRecipes.has(recipeId)) continue;
-        loadedRecipes.add(recipeId);
-
-        // Пример загрузки данных рецепта (предполагаю, что ты имеешь свою коллекцию рецептов)
+        // Путь к данным карточки рецепта в коллекции rec
         const recipeDataRef = doc(db, `rec`, recipeId);
         const recipeDataSnap = await getDoc(recipeDataRef);
-        if (recipeDataSnap.exists()) {
-            const data = recipeDataSnap.data();
-            const imageUrl = data.image ? data.image : "placeholder.jpg";
 
+        if (recipeDataSnap.exists()) {
+            const recipeData = recipeDataSnap.data();
+            const imageUrl = recipeData.image ? recipeData.image : "placeholder.jpg";
+
+            // Проверка фильтров в соответствующей коллекции receptmainX
+            const typeDocRef = doc(db, `receptmain${recipeId}`, "type");
+            const type2DocRef = doc(db, `receptmain${recipeId}`, "type2");
+
+            const typeDocSnap = await getDoc(typeDocRef);
+            const type2DocSnap = await getDoc(type2DocRef);
+
+            // Логируем путь для проверки
+            console.log(`🔹 Путь для рецепта ${recipeId}:`);
+
+            // Если документы не существуют, логируем ошибку
+            if (!typeDocSnap.exists()) {
+                console.log(`❌ Документ type не существует для рецепта ${recipeId}`);
+            }
+            if (!type2DocSnap.exists()) {
+                console.log(`❌ Документ type2 не существует для рецепта ${recipeId}`);
+            }
+
+            // Сбор всех фильтров из документа type
+            const typeFilters = typeDocSnap.exists()
+                ? Object.values(typeDocSnap.data()).map(val => val.trim())
+                : [];
+            console.log(`🔹 Фильтры из type:`, typeFilters);
+
+            // Сбор всех фильтров из документа type2
+            const type2Filters = type2DocSnap.exists()
+                ? Object.values(type2DocSnap.data()).map(val => val.trim())
+                : [];
+            console.log(`🔹 Фильтры из type2:`, type2Filters);
+
+            // Объединяем оба фильтра
+            const allFilters = new Set([...typeFilters, ...type2Filters]);
+
+            // Логируем все фильтры
+            console.log(`🔹 Все фильтры рецепта ${recipeId}:`, allFilters);
+
+            // Фильтрация по выбранным категориям
+            if (selectedFilters.size > 0) {
+                console.log(`🔹 Выбранные фильтры:`, [...selectedFilters]);
+
+                const hasMatchingFilter = [...selectedFilters].some(filter => allFilters.has(filter));
+                console.log(`🔹 Рецепт ${recipeId} проходит фильтрацию:`, hasMatchingFilter);
+
+                if (!hasMatchingFilter) continue; // Пропустить рецепт, если не совпадает ни с одним из выбранных фильтров
+            }
+
+            // Проверка, если рецепт уже был загружен
+            if (loadedRecipes.has(recipeId)) continue;
+            loadedRecipes.add(recipeId);
+
+            // Создание карточки рецепта
             const recipeCard = document.createElement("div");
             recipeCard.classList.add("recipe-card");
 
             recipeCard.innerHTML = `
-                <img src="${imageUrl}" class="recipe-img" alt="${data.name}">
+                <img src="${imageUrl}" class="recipe-img" alt="${recipeData.name}">
                 <div class="recipe-info">
-                    <h3 class="recipe-title">${data.name}</h3>
-                    <p class="recipe-description">${data.dis}</p>
+                    <h3 class="recipe-title">${recipeData.name}</h3>
+                    <p class="recipe-description">${recipeData.dis}</p>
                 </div>
                 <a href="recipe.html?id=${recipeId}" class="recipe-link">
                     <button class="start-button">Начать!</button>
