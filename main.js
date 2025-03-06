@@ -30,7 +30,7 @@ async function loadRecipes() {
 
     console.log("🔹 Загрузка рецептов...");
 
-    const recipesQuery = collection(db, "rec");
+    const recipesQuery = collection(db, "receptmain"); // Получаем коллекцию receptmain
     const querySnapshot = await getDocs(recipesQuery);
 
     let loadedRecipes = new Set();
@@ -40,23 +40,16 @@ async function loadRecipes() {
         const recipeId = docSnap.id;
         const imageUrl = data.image ? data.image : "placeholder.jpg";
 
-        // Получаем категории рецепта
-        const recipeTypesRef = collection(db, "receptmain", recipeId, "types");
-        const recipeTypesSnap = await getDocs(recipeTypesRef);
-        
-        // Извлекаем типы рецепта из подколлекции
-        let recipeTypes = new Set();
-        recipeTypesSnap.forEach(doc => {
-            const docData = doc.data();
-            if (docData.type) recipeTypes.add(docData.type);
-            if (docData.type2) {
-                docData.type2.split(',').forEach(type => recipeTypes.add(type.trim()));
-            }
-        });
+        // Получаем значения полей type и type2
+        const types = new Set();
+        if (data.type) types.add(data.type);
+        if (data.type2) {
+            data.type2.split(',').forEach(type => types.add(type.trim()));
+        }
 
         // Фильтрация по выбранным категориям
         if (selectedFilters.size > 0) {
-            const hasMatchingFilter = [...selectedFilters].some(filter => recipeTypes.has(filter));
+            const hasMatchingFilter = [...selectedFilters].some(filter => types.has(filter));
             if (!hasMatchingFilter) continue;
         }
 
