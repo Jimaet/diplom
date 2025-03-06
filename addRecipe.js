@@ -27,8 +27,8 @@ document.addEventListener("DOMContentLoaded", () => {
             console.log("✅ Изображение загружено:", imageUrl);
 
             const nextIndex = await getNextRecipeNumber();
-            const recDocName = recept${nextIndex};
-            const receptMainName = receptmain${nextIndex};
+            const recDocName = `recept${nextIndex}`;
+            const receptMainName = `receptmain${nextIndex}`;
 
             console.log("Создаём документы в Firestore...");
 
@@ -45,8 +45,8 @@ document.addEventListener("DOMContentLoaded", () => {
                 const title = product.querySelector("input:nth-of-type(1)").value.trim();
                 const weight = product.querySelector("input:nth-of-type(2)").value.trim();
                 if (title && weight) {
-                    prodData[${index + 1}] = title;
-                    prodData[${index + 1}-1] = weight;
+                    prodData[`${index + 1}`] = title;
+                    prodData[`${index + 1}-1`] = weight;
                 }
             });
             console.log("✅ Продукты:", prodData);
@@ -56,7 +56,7 @@ document.addEventListener("DOMContentLoaded", () => {
             let stepData = {};
             document.querySelectorAll("#step-list .step-item input").forEach((step, index) => {
                 if (step.value) {
-                    stepData[${index + 1}] = step.value;
+                    stepData[`${index + 1}`] = step.value;
                 }
             });
             console.log("✅ Шаги приготовления:", stepData);
@@ -75,17 +75,16 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     // Функция для сохранения выбранных категорий в виде отдельных полей
-       async function saveCategories(docName, fieldName, selector) {
+    async function saveCategories(docName, fieldName, selector) {
         let selectedItems = Array.from(document.querySelectorAll(selector + ".selected")).map(btn => btn.textContent.trim());
-    
+
         let categoryData = {};
         selectedItems.forEach((item, index) => {
-            categoryData[${fieldName}${index + 1}] = item; // Генерируем ключи: type1, type2, type3...
+            categoryData[`${fieldName}${index + 1}`] = item; // Генерируем ключи: type1, type2, type3...
         });
-    
-        console.log(✅ ${fieldName}:, categoryData);
-        // Записываем категории в коллекцию rec внутри документа recept
-        await setDoc(doc(db, "rec", docName), categoryData, { merge: true });
+
+        console.log(`✅ ${fieldName}:`, categoryData);
+        await setDoc(doc(db, docName, fieldName), categoryData);
     }
 
     async function getNextRecipeNumber() {
@@ -116,7 +115,7 @@ document.addEventListener("DOMContentLoaded", () => {
     async function uploadToImgBB(imageFile) {
         let formData = new FormData();
         formData.append("image", imageFile);
-        const response = await fetch(https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}, { method: "POST", body: formData });
+        const response = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, { method: "POST", body: formData });
         const result = await response.json();
         if (result.success) {
             return result.data.url;
@@ -128,7 +127,7 @@ document.addEventListener("DOMContentLoaded", () => {
     function setupMultiSelect(selector) {
         document.querySelectorAll(selector).forEach(btn => {
             btn.addEventListener("click", () => {
-                console.log(🔹 Нажата кнопка: ${btn.textContent.trim()});
+                console.log(`🔹 Нажата кнопка: ${btn.textContent.trim()}`);
                 btn.classList.toggle("selected");
 
                 if (btn.classList.contains("selected")) {
@@ -139,7 +138,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     btn.style.color = "";
                 }
 
-                console.log(📌 ${btn.textContent.trim()} теперь ${btn.classList.contains("selected") ? "выбран" : "снят"});
+                console.log(`📌 ${btn.textContent.trim()} теперь ${btn.classList.contains("selected") ? "выбран" : "снят"}`);
             });
         });
     }
