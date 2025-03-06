@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, doc, collection, getDocs, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getFirestore, doc, collection, getDocs, getDoc, getCollections } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 // 🔹 Конфигурация Firebase 🔹
 const firebaseConfig = {
@@ -29,13 +29,18 @@ async function loadRecipes() {
 
     console.log("🔹 Загрузка рецептов...");
 
-    // Пытаемся найти все рецепты. Коллекция рецептов теперь из rec
-    const recipeIds = ["recept0", "recept1", "recept2", "recept3", "recept5", "recept6", "recept7"];
+    // Получаем список всех коллекций в Firestore
+    const allCollections = await getCollections(db);
+    
+    // Фильтруем только те коллекции, которые начинаются с "receptmain"
+    const recipeCollections = allCollections.filter(collection => collection.id.startsWith("receptmain"));
 
     let loadedRecipes = new Set();
 
-    // Пробегаем по каждому рецепту
-    for (const recipeId of recipeIds) {
+    // Пробегаем по каждой коллекции
+    for (const recipeCollection of recipeCollections) {
+        const recipeId = recipeCollection.id; // Получаем имя коллекции, например, receptmain1
+
         console.log(`🔹 Обработка рецепта ${recipeId}...`);
 
         // Путь к данным карточки рецепта в коллекции rec
@@ -46,7 +51,7 @@ async function loadRecipes() {
             const recipeData = recipeDataSnap.data();
             const imageUrl = recipeData.image ? recipeData.image : "placeholder.jpg";
 
-            // Используем правильный путь к коллекции receptmainX
+            // Путь к коллекциям type и type2
             const typeDocRef = doc(db, `receptmain${recipeId}`, "type");
             const type2DocRef = doc(db, `receptmain${recipeId}`, "type2");
 
@@ -129,8 +134,6 @@ async function loadRecipes() {
     console.log(`✅ Загружено рецептов: ${loadedRecipes.size}`);
 }
 
-
-
 // 🔹 Обработчик выбора фильтров 🔹
 function toggleFilter(event) {
     const button = event.target;
@@ -153,19 +156,3 @@ filterButtons.forEach(button => button.addEventListener("click", toggleFilter));
 
 // 🔹 Загружаем рецепты при загрузке страницы 🔹
 document.addEventListener("DOMContentLoaded", loadRecipes);
-
-// 🔹 Логика кнопки "Home" 🔹
-let homeButton = document.querySelector(".nav-btn:first-child");
-let lastClickTime = 0;
-
-if (homeButton) {
-    homeButton.addEventListener("click", () => {
-        let currentTime = new Date().getTime();
-        if (currentTime - lastClickTime < 1000) {
-            location.reload();
-        } else {
-            window.scrollTo({ top: 0, behavior: "smooth" });
-        }
-        lastClickTime = currentTime;
-    });
-}
