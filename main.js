@@ -177,3 +177,75 @@ if (homeButton) {
         lastClickTime = currentTime;
     });
 }
+// 🔹 Функция для фильтрации рецептов по введенному тексту 🔹
+async function searchRecipes(event) {
+    const searchTerm = event.target.value.toLowerCase();
+    const recipesContainer = document.getElementById("recipes-container");
+
+    // Очистка контейнера перед загрузкой результатов
+    recipesContainer.innerHTML = "";
+
+    // Если строка поиска пустая, загрузить все рецепты
+    if (!searchTerm) {
+        loadRecipes();
+        return;
+    }
+
+    console.log("🔹 Поиск по запросу:", searchTerm);
+
+    // Запрос к базе данных для получения всех рецептов
+    const recipesQuery = collection(db, "rec");
+    const querySnapshot = await getDocs(recipesQuery);
+
+    let loadedRecipes = new Set();
+
+    querySnapshot.forEach(async (doc) => {
+        const data = doc.data();
+        const recipeId = doc.id;
+        const recipeName = data.name.toLowerCase(); // Приводим имя рецепта к нижнему регистру
+        const recipeDescription = data.dis.toLowerCase(); // Приводим описание к нижнему регистру
+
+        // Если имя или описание содержит строку поиска, добавляем рецепт в контейнер
+        if (recipeName.includes(searchTerm) || recipeDescription.includes(searchTerm)) {
+            if (loadedRecipes.has(recipeId)) return;
+            loadedRecipes.add(recipeId);
+
+            const imageUrl = data.image ? data.image : "placeholder.jpg";
+
+            const recipeCard = document.createElement("div");
+            recipeCard.classList.add("recipe-card");
+
+            recipeCard.innerHTML = `
+                <img src="${imageUrl}" class="recipe-img" alt="${data.name}">
+                <div class="recipe-info">
+                    <h3 class="recipe-title">${data.name}</h3>
+                    <p class="recipe-description">${data.dis}</p>
+                </div>
+                <button class="favorite-button" data-id="${recipeId}">❤️</button>
+                <a href="recipe.html?id=${recipeId}" class="recipe-link">
+                    <button class="start-button">Начать!</button>
+                </a>
+            `;
+
+            const favButton = recipeCard.querySelector(".favorite-button");
+
+            // Проверяем, находится ли рецепт в избранном
+            await checkIfFavourite(recipeId, favButton);
+
+            // Добавляем обработчик клика на кнопку "Добавить в избранное"
+            favButton.addEventListener("click", toggleFavourite);
+
+            recipesContainer.appendChild(recipeCard);
+        }
+    });
+
+    console.log(`✅ Загружено рецептов по запросу: ${loadedRecipes.size}`);
+}
+
+// 🔹 Слушатель для изменения текста в строке поиска 🔹
+const searchInput = document.querySelector(".search-bar input");
+if (searchInput) {
+    searchInput.addEventListener("input", searchRecipes);
+} else {
+    console.error("❌ Ошибка: Поле поиска не найдено!");
+}
