@@ -45,49 +45,21 @@ async function loadRecipes() {
         recipeCard.classList.add("recipe-card");
 
         recipeCard.innerHTML = `
-    <img src="${imageUrl}" class="recipe-img" alt="${data.name}">
-    <div class="recipe-info">
-        <h3 class="recipe-title">${data.name}</h3>
-        <p class="recipe-description">${data.dis}</p>
-    </div>
-    <a href="recipe.html?id=${recipeId}" class="recipe-link">
-        <button class="start-button">Начать!</button>
-    </a>
-`;
+            <img src="${imageUrl}" class="recipe-img" alt="${data.name}">
+            <div class="recipe-info">
+                <h3 class="recipe-title">${data.name}</h3>
+                <p class="recipe-description">${data.dis}</p>
+            </div>
+            <a href="recipe.html?id=${recipeId}" class="recipe-link">
+                <button class="start-button">Начать!</button>
+            </a>
+        `;
+
         recipesContainer.appendChild(recipeCard);
     });
 
-    console.log(✅ Загружено рецептов: ${loadedRecipes.size});
+    console.log(`✅ Загружено рецептов: ${loadedRecipes.size}`);
 }
 
 // 🔹 Загружаем рецепты при загрузке страницы 🔹
 document.addEventListener("DOMContentLoaded", loadRecipes);
-
-// 🔹 Обработчик для кнопки Home 🔹
-document.addEventListener("DOMContentLoaded", () => {
-    const homeButton = document.querySelector(".nav-btn:first-child"); // Кнопка Home
-    let clickCount = 0;
-    let clickTimer;
-
-    if (homeButton) {
-        homeButton.addEventListener("click", () => {
-            clickCount++;
-
-            if (clickCount === 1) {
-                // Прокрутка вверх
-                window.scrollTo({ top: 0, behavior: "smooth" });
-
-                // Сбросить счетчик через 1 секунду
-                clickTimer = setTimeout(() => {
-                    clickCount = 0;
-                }, 1000);
-            } else if (clickCount === 2) {
-                // Двойной клик — перезагрузка страницы
-                clearTimeout(clickTimer);
-                location.reload();
-            }
-        });
-    } else {
-        console.error("❌ Ошибка: Кнопка 'Home' не найдена!");
-    }
-});
