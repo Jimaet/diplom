@@ -63,3 +63,32 @@ async function loadRecipes() {
 
 // 🔹 Загружаем рецепты при загрузке страницы 🔹
 document.addEventListener("DOMContentLoaded", loadRecipes);
+
+// 🔹 Обработчик для кнопки Home 🔹
+document.addEventListener("DOMContentLoaded", () => {
+    const homeButton = document.querySelector(".nav-btn:first-child"); // Кнопка Home
+    let clickCount = 0;
+    let clickTimer;
+
+    if (homeButton) {
+        homeButton.addEventListener("click", () => {
+            clickCount++;
+
+            if (clickCount === 1) {
+                // Прокрутка вверх
+                window.scrollTo({ top: 0, behavior: "smooth" });
+
+                // Сбросить счетчик через 1 секунду
+                clickTimer = setTimeout(() => {
+                    clickCount = 0;
+                }, 1000);
+            } else if (clickCount === 2) {
+                // Двойной клик — перезагрузка страницы
+                clearTimeout(clickTimer);
+                location.reload();
+            }
+        });
+    } else {
+        console.error("❌ Ошибка: Кнопка 'Home' не найдена!");
+    }
+});
