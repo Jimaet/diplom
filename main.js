@@ -19,7 +19,6 @@ const db = getFirestore(app);
 let selectedFilters = new Set(); // Храним выбранные фильтры
 
 // 🔹 Функция загрузки рецептов 🔹
-// 🔹 Функция загрузки рецептов 🔹
 async function loadRecipes() {
     const recipesContainer = document.getElementById("recipes-container");
     if (!recipesContainer) {
@@ -31,24 +30,15 @@ async function loadRecipes() {
 
     console.log("🔹 Загрузка рецептов...");
 
-    // Запрос к коллекции 'rec', а не 'recept'
-    const recipesQuery = collection(db, "rec"); // Коллекция рецептов
-    const querySnapshot = await getDocs(recipesQuery);
-
-    // Если нет рецептов, выводим сообщение
-    if (querySnapshot.empty) {
-        console.log("❌ Нет рецептов в коллекции 'rec'");
-        return;
-    }
+    // Пытаемся найти все рецепты. Коллекция рецептов теперь не rec, а рецепты, которые имеют уникальный id
+    // Пример: рецепты - recept0, recept1, recept2 и так далее
+    const recipeIds = ["recept0", "recept1", "recept2", "recept3", "recept5", "recept6", "recept7"];
 
     let loadedRecipes = new Set();
 
-    for (const docSnap of querySnapshot.docs) {
-        const recipeId = docSnap.id;
+    // Пробегаем по каждому рецепту
+    for (const recipeId of recipeIds) {
         console.log(`🔹 Обработка рецепта ${recipeId}...`);
-
-        // Логируем путь для проверки
-        console.log(`🔹 Путь для рецепта ${recipeId}:`);
 
         // Путь к документам type и type2 в коллекции receptmain{recipeId}
         const typeDocRef = doc(db, `receptmain${recipeId}`, "type");
@@ -57,6 +47,9 @@ async function loadRecipes() {
         // Загружаем документы type и type2 для текущего рецепта
         const typeDocSnap = await getDoc(typeDocRef);
         const type2DocSnap = await getDoc(type2DocRef);
+
+        // Логируем путь для проверки
+        console.log(`🔹 Путь для рецепта ${recipeId}:`);
 
         // Если документы не существуют, логируем ошибку
         if (!typeDocSnap.exists()) {
@@ -98,24 +91,31 @@ async function loadRecipes() {
         if (loadedRecipes.has(recipeId)) continue;
         loadedRecipes.add(recipeId);
 
-        const data = docSnap.data();
-        const imageUrl = data.image ? data.image : "placeholder.jpg";
+        // Пример загрузки данных рецепта (предполагаю, что ты имеешь свою коллекцию рецептов)
+        const recipeDataRef = doc(db, `rec`, recipeId);
+        const recipeDataSnap = await getDoc(recipeDataRef);
+        if (recipeDataSnap.exists()) {
+            const data = recipeDataSnap.data();
+            const imageUrl = data.image ? data.image : "placeholder.jpg";
 
-        const recipeCard = document.createElement("div");
-        recipeCard.classList.add("recipe-card");
+            const recipeCard = document.createElement("div");
+            recipeCard.classList.add("recipe-card");
 
-        recipeCard.innerHTML = `
-            <img src="${imageUrl}" class="recipe-img" alt="${data.name}">
-            <div class="recipe-info">
-                <h3 class="recipe-title">${data.name}</h3>
-                <p class="recipe-description">${data.dis}</p>
-            </div>
-            <a href="recipe.html?id=${recipeId}" class="recipe-link">
-                <button class="start-button">Начать!</button>
-            </a>
-        `;
+            recipeCard.innerHTML = `
+                <img src="${imageUrl}" class="recipe-img" alt="${data.name}">
+                <div class="recipe-info">
+                    <h3 class="recipe-title">${data.name}</h3>
+                    <p class="recipe-description">${data.dis}</p>
+                </div>
+                <a href="recipe.html?id=${recipeId}" class="recipe-link">
+                    <button class="start-button">Начать!</button>
+                </a>
+            `;
 
-        recipesContainer.appendChild(recipeCard);
+            recipesContainer.appendChild(recipeCard);
+        } else {
+            console.log(`❌ Не найдено данных для рецепта ${recipeId}`);
+        }
     }
 
     console.log(`✅ Загружено рецептов: ${loadedRecipes.size}`);
