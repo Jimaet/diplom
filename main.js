@@ -1,5 +1,6 @@
+// 🔹 Импорт Firebase 🔹
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, doc, collection, getDocs, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getFirestore, doc, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 // 🔹 Конфигурация Firebase 🔹
 const firebaseConfig = {
@@ -15,8 +16,6 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-let selectedFilters = new Set(); // Храним выбранные фильтры
-
 // 🔹 Функция загрузки рецептов 🔹
 async function loadRecipes() {
     const recipesContainer = document.getElementById("recipes-container");
@@ -29,83 +28,67 @@ async function loadRecipes() {
 
     console.log("🔹 Загрузка рецептов...");
 
-    // Получаем все рецепты из коллекции rec (например, recept1, recept2, ...)
-    const recipesSnapshot = await getDocs(collection(db, "rec"));
-    
+    const recipesQuery = collection(db, "rec");
+    const querySnapshot = await getDocs(recipesQuery);
+
     let loadedRecipes = new Set();
 
-    // Проходим по каждому рецепту в коллекции rec
-    for (const recipeDoc of recipesSnapshot.docs) {
-        const recipeData = recipeDoc.data();
-        const recipeId = recipeDoc.id; // Получаем ID рецепта
+    querySnapshot.forEach((doc) => {
+        const data = doc.data();
+        const recipeId = doc.id;
+        const imageUrl = data.image ? data.image : "placeholder.jpg";
 
-        console.log(`🔹 Обработка рецепта ${recipeId}...`);
+        if (loadedRecipes.has(recipeId)) return;
+        loadedRecipes.add(recipeId);
 
-        // Получаем коллекцию receptmainX для каждого рецепта
-        const recipeMainRef = doc(db, `receptmain${recipeId}`);
-        const recipeMainSnap = await getDoc(recipeMainRef);
+        const recipeCard = document.createElement("div");
+        recipeCard.classList.add("recipe-card");
 
-        if (recipeMainSnap.exists()) {
-            const recipeMainData = recipeMainSnap.data();
+        recipeCard.innerHTML = `
+            <img src="${imageUrl}" class="recipe-img" alt="${data.name}">
+            <div class="recipe-info">
+                <h3 class="recipe-title">${data.name}</h3>
+                <p class="recipe-description">${data.dis}</p>
+            </div>
+            <a href="recipe.html?id=${recipeId}" class="recipe-link">
+                <button class="start-button">Начать!</button>
+            </a>
+        `;
 
-            // Получаем фильтры из коллекции receptmainX
-            const filters = new Set([
-                ...(recipeMainData.type || []),
-                ...(recipeMainData.type2 || [])
-            ]);
-
-            console.log(`🔹 Фильтры рецепта ${recipeId}:`, filters);
-
-            // Если фильтры выбраны, проверяем соответствие
-            if (selectedFilters.size === 0 || [...selectedFilters].some(filter => filters.has(filter))) {
-                // Проверяем, если рецепт уже был загружен
-                if (loadedRecipes.has(recipeId)) continue;
-                loadedRecipes.add(recipeId);
-
-                // Создание карточки рецепта
-                const recipeCard = document.createElement("div");
-                recipeCard.classList.add("recipe-card");
-
-                recipeCard.innerHTML = `
-                    <img src="${recipeData.image || "placeholder.jpg"}" class="recipe-img" alt="${recipeData.name}">
-                    <div class="recipe-info">
-                        <h3 class="recipe-title">${recipeData.name}</h3>
-                        <p class="recipe-description">${recipeData.dis}</p>
-                    </div>
-                    <a href="recipe.html?id=${recipeId}" class="recipe-link">
-                        <button class="start-button">Начать!</button>
-                    </a>
-                `;
-
-                recipesContainer.appendChild(recipeCard);
-            }
-        } else {
-            console.log(`❌ Не найдено данных для коллекции receptmain${recipeId}`);
-        }
-    }
+        recipesContainer.appendChild(recipeCard);
+    });
 
     console.log(`✅ Загружено рецептов: ${loadedRecipes.size}`);
 }
 
-// 🔹 Обработчик выбора фильтров 🔹
-function toggleFilter(event) {
-    const button = event.target;
-    const filterValue = button.textContent.trim();
-
-    if (selectedFilters.has(filterValue)) {
-        selectedFilters.delete(filterValue);
-        button.classList.remove("active");
-    } else {
-        selectedFilters.add(filterValue);
-        button.classList.add("active");
-    }
-
-    loadRecipes();
-}
-
-// Добавляем обработчики для кнопок фильтров
-const filterButtons = document.querySelectorAll(".filter-btn, .category-btn");
-filterButtons.forEach(button => button.addEventListener("click", toggleFilter));
-
 // 🔹 Загружаем рецепты при загрузке страницы 🔹
 document.addEventListener("DOMContentLoaded", loadRecipes);
+
+// 🔹 Обработчик для кнопки Home 🔹
+document.addEventListener("DOMContentLoaded", () => {
+    const homeButton = document.querySelector(".nav-btn:first-child"); // Кнопка Home
+    let clickCount = 0;
+    let clickTimer;
+
+    if (homeButton) {
+        homeButton.addEventListener("click", () => {
+            clickCount++;
+
+            if (clickCount === 1) {
+                // Прокрутка вверх
+                window.scrollTo({ top: 0, behavior: "smooth" });
+
+                // Сбросить счетчик через 1 секунду
+                clickTimer = setTimeout(() => {
+                    clickCount = 0;
+                }, 1000);
+            } else if (clickCount === 2) {
+                // Двойной клик — перезагрузка страницы
+                clearTimeout(clickTimer);
+                location.reload();
+            }
+        });
+    } else {
+        console.error("❌ Ошибка: Кнопка 'Home' не найдена!");
+    }
+});
