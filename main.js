@@ -176,3 +176,4 @@ if (homeButton) {
         }
         lastClickTime = currentTime;
     });
+}
