@@ -19,7 +19,6 @@ const db = getFirestore(app);
 let selectedFilters = new Set(); // Храним выбранные фильтры
 
 // 🔹 Функция загрузки рецептов 🔹
-// 🔹 Функция загрузки рецептов 🔹
 async function loadRecipes() {
     const recipesContainer = document.getElementById("recipes-container");
     if (!recipesContainer) {
@@ -31,18 +30,20 @@ async function loadRecipes() {
 
     console.log("🔹 Загрузка рецептов...");
 
-    const recipesQuery = collection(db, "rec"); // Запрос ко всем рецептам в коллекции "rec"
+    const recipesQuery = collection(db, "recept"); // Запрос ко всем рецептам в коллекции "recept"
     const querySnapshot = await getDocs(recipesQuery);
 
     let loadedRecipes = new Set();
 
     for (const docSnap of querySnapshot.docs) {
         const recipeId = docSnap.id;
-        
+
         // Логируем путь для проверки
         console.log(`🔹 Путь для рецепта ${recipeId}:`);
-        const typeDocRef = doc(db, `receptmain${recipeId}/type`);
-        const type2DocRef = doc(db, `receptmain${recipeId}/type2`);
+
+        // Правильные пути для документов type и type2 внутри коллекции receptmainX
+        const typeDocRef = doc(db, `receptmain${recipeId}/filters`, "type");
+        const type2DocRef = doc(db, `receptmain${recipeId}/filters`, "type2");
 
         // Проверяем, существует ли документ
         const typeDocSnap = await getDoc(typeDocRef);
