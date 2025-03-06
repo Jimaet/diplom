@@ -19,6 +19,7 @@ const db = getFirestore(app);
 let selectedFilters = new Set(); // Храним выбранные фильтры
 
 // 🔹 Функция загрузки рецептов 🔹
+// 🔹 Функция загрузки рецептов 🔹
 async function loadRecipes() {
     const recipesContainer = document.getElementById("recipes-container");
     if (!recipesContainer) {
@@ -38,13 +39,21 @@ async function loadRecipes() {
     for (const docSnap of querySnapshot.docs) {
         const recipeId = docSnap.id;
         
-        // Получаем ссылки на документы `type` и `type2` для текущего рецепта
+        // Логируем путь для проверки
+        console.log(`🔹 Путь для рецепта ${recipeId}:`);
         const typeDocRef = doc(db, `receptmain${recipeId}/type`);
         const type2DocRef = doc(db, `receptmain${recipeId}/type2`);
 
-        // Загружаем данные этих документов
+        // Проверяем, существует ли документ
         const typeDocSnap = await getDoc(typeDocRef);
         const type2DocSnap = await getDoc(type2DocRef);
+
+        if (!typeDocSnap.exists()) {
+            console.log(`❌ Документ type не существует для рецепта ${recipeId}`);
+        }
+        if (!type2DocSnap.exists()) {
+            console.log(`❌ Документ type2 не существует для рецепта ${recipeId}`);
+        }
 
         // Сбор всех фильтров из документа type
         const typeFilters = typeDocSnap.exists()
@@ -56,11 +65,11 @@ async function loadRecipes() {
             ? Object.values(type2DocSnap.data()).map(val => val.trim())
             : [];
 
+        // Логируем фильтры
+        console.log(`🔹 Рецепт ${recipeId} фильтры:`, typeFilters, type2Filters);
+
         // Объединяем оба фильтра
         const allFilters = new Set([...typeFilters, ...type2Filters]);
-
-        // Выводим фильтры рецепта в консоль для отладки
-        console.log(`🔹 Рецепт ${recipeId} фильтры:`, [...allFilters]);
 
         // Фильтрация по выбранным категориям
         if (selectedFilters.size > 0) {
