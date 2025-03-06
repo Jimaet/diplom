@@ -75,16 +75,17 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
     // Функция для сохранения выбранных категорий в виде отдельных полей
-    async function saveCategories(docName, fieldName, selector) {
+       async function saveCategories(docName, fieldName, selector) {
         let selectedItems = Array.from(document.querySelectorAll(selector + ".selected")).map(btn => btn.textContent.trim());
-
+    
         let categoryData = {};
         selectedItems.forEach((item, index) => {
             categoryData[`${fieldName}${index + 1}`] = item; // Генерируем ключи: type1, type2, type3...
         });
-
+    
         console.log(`✅ ${fieldName}:`, categoryData);
-        await setDoc(doc(db, docName, fieldName), categoryData);
+        // Записываем категории в коллекцию rec внутри документа recept
+        await setDoc(doc(db, "rec", docName), categoryData, { merge: true });
     }
 
     async function getNextRecipeNumber() {
