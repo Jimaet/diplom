@@ -85,6 +85,32 @@ async function loadRecipes() {
             // Логируем все фильтры
             console.log(`🔹 Все фильтры рецепта ${recipeId}:`, allFilters);
 
+            // Если нет выбранных фильтров, показываем все рецепты
+            if (selectedFilters.size === 0) {
+                console.log(`🔹 Показаны все рецепты, так как фильтры не выбраны`);
+                // Проверка, если рецепт уже был загружен
+                if (loadedRecipes.has(recipeId)) continue;
+                loadedRecipes.add(recipeId);
+
+                // Создание карточки рецепта
+                const recipeCard = document.createElement("div");
+                recipeCard.classList.add("recipe-card");
+
+                recipeCard.innerHTML = `
+                    <img src="${imageUrl}" class="recipe-img" alt="${recipeData.name}">
+                    <div class="recipe-info">
+                        <h3 class="recipe-title">${recipeData.name}</h3>
+                        <p class="recipe-description">${recipeData.dis}</p>
+                    </div>
+                    <a href="recipe.html?id=${recipeId}" class="recipe-link">
+                        <button class="start-button">Начать!</button>
+                    </a>
+                `;
+
+                recipesContainer.appendChild(recipeCard);
+                continue;
+            }
+
             // Фильтрация по выбранным категориям
             if (selectedFilters.size > 0) {
                 console.log(`🔹 Выбранные фильтры:`, [...selectedFilters]);
