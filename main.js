@@ -19,6 +19,7 @@ const db = getFirestore(app);
 let selectedFilters = new Set(); // Храним выбранные фильтры
 
 // 🔹 Функция загрузки рецептов 🔹
+// 🔹 Функция загрузки рецептов 🔹
 async function loadRecipes() {
     const recipesContainer = document.getElementById("recipes-container");
     if (!recipesContainer) {
@@ -30,31 +31,41 @@ async function loadRecipes() {
 
     console.log("🔹 Загрузка рецептов...");
 
-    const recipesQuery = collection(db, "receptmain"); // Получаем коллекцию receptmain
+    const recipesQuery = collection(db, "receptmain"); // Запрос ко всем коллекциям рецептов
     const querySnapshot = await getDocs(recipesQuery);
 
     let loadedRecipes = new Set();
 
     for (const docSnap of querySnapshot.docs) {
-        const data = docSnap.data();
         const recipeId = docSnap.id;
-        const imageUrl = data.image ? data.image : "placeholder.jpg";
+        
+        // Получаем ссылки на документы `type` и `type2` для текущего рецепта
+        const typeDocRef = doc(db, `receptmain/${recipeId}/filters`, "type");
+        const type2DocRef = doc(db, `receptmain/${recipeId}/filters`, "type2");
 
-        // Получаем значения полей type и type2
-        const types = new Set();
-        if (data.type) types.add(data.type);
-        if (data.type2) {
-            data.type2.split(',').forEach(type => types.add(type.trim()));
-        }
+        // Загружаем данные этих документов
+        const typeDocSnap = await getDoc(typeDocRef);
+        const type2DocSnap = await getDoc(type2DocRef);
+
+        // Получаем фильтры из документов
+        const typeFilters = typeDocSnap.exists() ? typeDocSnap.data().value.split(",").map(val => val.trim()) : [];
+        const type2Filters = type2DocSnap.exists() ? type2DocSnap.data().value.split(",").map(val => val.trim()) : [];
+
+        // Объединяем оба фильтра
+        const allFilters = new Set([...typeFilters, ...type2Filters]);
 
         // Фильтрация по выбранным категориям
         if (selectedFilters.size > 0) {
-            const hasMatchingFilter = [...selectedFilters].some(filter => types.has(filter));
+            const hasMatchingFilter = [...selectedFilters].some(filter => allFilters.has(filter));
             if (!hasMatchingFilter) continue;
         }
 
+        // Проверка, если рецепт уже был загружен
         if (loadedRecipes.has(recipeId)) continue;
         loadedRecipes.add(recipeId);
+
+        const data = docSnap.data();
+        const imageUrl = data.image ? data.image : "placeholder.jpg";
 
         const recipeCard = document.createElement("div");
         recipeCard.classList.add("recipe-card");
