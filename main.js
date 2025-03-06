@@ -20,6 +20,7 @@ let selectedFilters = new Set(); // Храним выбранные фильтр
 
 // 🔹 Функция загрузки рецептов 🔹
 // 🔹 Функция загрузки рецептов 🔹
+// 🔹 Функция загрузки рецептов 🔹
 async function loadRecipes() {
     const recipesContainer = document.getElementById("recipes-container");
     if (!recipesContainer) {
@@ -34,10 +35,17 @@ async function loadRecipes() {
     const recipesQuery = collection(db, "recept"); // Запрос ко всем рецептам в коллекции "recept"
     const querySnapshot = await getDocs(recipesQuery);
 
+    // Если нет рецептов, выводим сообщение
+    if (querySnapshot.empty) {
+        console.log("❌ Нет рецептов в коллекции 'recept'");
+        return;
+    }
+
     let loadedRecipes = new Set();
 
     for (const docSnap of querySnapshot.docs) {
         const recipeId = docSnap.id;
+        console.log(`🔹 Обработка рецепта ${recipeId}...`);
 
         // Логируем путь для проверки
         console.log(`🔹 Путь для рецепта ${recipeId}:`);
@@ -50,6 +58,7 @@ async function loadRecipes() {
         const typeDocSnap = await getDoc(typeDocRef);
         const type2DocSnap = await getDoc(type2DocRef);
 
+        // Если документы не существуют, логируем ошибку
         if (!typeDocSnap.exists()) {
             console.log(`❌ Документ type не существует для рецепта ${recipeId}`);
         }
@@ -61,17 +70,19 @@ async function loadRecipes() {
         const typeFilters = typeDocSnap.exists()
             ? Object.values(typeDocSnap.data()).map(val => val.trim())
             : [];
+        console.log(`🔹 Фильтры из type:`, typeFilters);
 
         // Сбор всех фильтров из документа type2
         const type2Filters = type2DocSnap.exists()
             ? Object.values(type2DocSnap.data()).map(val => val.trim())
             : [];
-
-        // Логируем фильтры
-        console.log(`🔹 Рецепт ${recipeId} фильтры:`, typeFilters, type2Filters);
+        console.log(`🔹 Фильтры из type2:`, type2Filters);
 
         // Объединяем оба фильтра
         const allFilters = new Set([...typeFilters, ...type2Filters]);
+
+        // Логируем все фильтры
+        console.log(`🔹 Все фильтры рецепта ${recipeId}:`, allFilters);
 
         // Фильтрация по выбранным категориям
         if (selectedFilters.size > 0) {
@@ -109,6 +120,7 @@ async function loadRecipes() {
 
     console.log(`✅ Загружено рецептов: ${loadedRecipes.size}`);
 }
+
 
 // 🔹 Обработчик выбора фильтров 🔹
 function toggleFilter(event) {
