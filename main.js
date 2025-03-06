@@ -178,6 +178,7 @@ if (homeButton) {
     });
 }
 // 🔹 Функция для фильтрации рецептов по введенному тексту 🔹
+// 🔹 Функция для фильтрации рецептов по введенному тексту 🔹
 async function searchRecipes(event) {
     const searchTerm = event.target.value.toLowerCase();
     const recipesContainer = document.getElementById("recipes-container");
@@ -187,7 +188,7 @@ async function searchRecipes(event) {
 
     // Если строка поиска пустая, загрузить все рецепты
     if (!searchTerm) {
-        loadRecipes();
+        loadRecipes(); // Загружаем все рецепты, если строка поиска пуста
         return;
     }
 
@@ -207,7 +208,7 @@ async function searchRecipes(event) {
 
         // Если имя или описание содержит строку поиска, добавляем рецепт в контейнер
         if (recipeName.includes(searchTerm) || recipeDescription.includes(searchTerm)) {
-            if (loadedRecipes.has(recipeId)) continue;
+            if (loadedRecipes.has(recipeId)) continue; // Проверяем, чтобы не добавлять один и тот же рецепт
             loadedRecipes.add(recipeId);
 
             const imageUrl = data.image ? data.image : "placeholder.jpg";
@@ -241,6 +242,7 @@ async function searchRecipes(event) {
 
     console.log(`✅ Загружено рецептов по запросу: ${loadedRecipes.size}`);
 }
+
 // 🔹 Слушатель для изменения текста в строке поиска 🔹
 const searchInput = document.querySelector(".search-bar input");
 if (searchInput) {
