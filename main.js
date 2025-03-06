@@ -1,4 +1,3 @@
-// 🔹 Импорт Firebase 🔹
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getFirestore, doc, collection, getDocs, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
@@ -78,7 +77,7 @@ async function loadRecipes() {
         let isMatch = false; // Флаг для проверки соответствия фильтрам
 
         for (let i = 0; i < 10; i++) { // Пройдем по коллекциям receptmainX
-            const receptmainRef = doc(db, "receptmain" + i, recipeId);  // Используем правильный формат
+            const receptmainRef = doc(db, "receptmain" + i, recipeId);
             const receptmainDoc = await getDoc(receptmainRef);
             if (!receptmainDoc.exists()) continue; // Пропустить если коллекция не существует
 
