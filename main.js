@@ -44,17 +44,16 @@ async function loadRecipes() {
         const recipeCard = document.createElement("div");
         recipeCard.classList.add("recipe-card");
 
-        recipeCard.innerHTML = 
-            <img src="${imageUrl}" class="recipe-img" alt="${data.name}">
-            <div class="recipe-info">
-                <h3 class="recipe-title">${data.name}</h3>
-                <p class="recipe-description">${data.dis}</p>
-            </div>
-            <a href="recipe.html?id=${recipeId}" class="recipe-link">
-                <button class="start-button">Начать!</button>
-            </a>
-        ;
-
+        recipeCard.innerHTML = `
+    <img src="${imageUrl}" class="recipe-img" alt="${data.name}">
+    <div class="recipe-info">
+        <h3 class="recipe-title">${data.name}</h3>
+        <p class="recipe-description">${data.dis}</p>
+    </div>
+    <a href="recipe.html?id=${recipeId}" class="recipe-link">
+        <button class="start-button">Начать!</button>
+    </a>
+`;
         recipesContainer.appendChild(recipeCard);
     });
 
