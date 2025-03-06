@@ -1,5 +1,6 @@
+// 🔹 Импорт Firebase 🔹
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, doc, collection, getDocs, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getFirestore, doc, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 // 🔹 Конфигурация Firebase 🔹
 const firebaseConfig = {
@@ -15,44 +16,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// 🔹 Объект для хранения выбранных фильтров 🔹
-const selectedFilters = {
-    type: new Set(),
-    type2: new Set(),
-};
-
-// 🔹 Обработчик для фильтров 🔹
-document.querySelectorAll(".filter-btn").forEach((btn) => {
-    btn.addEventListener("click", () => {
-        const filterValue = btn.textContent.trim();
-
-        if (selectedFilters.type.has(filterValue)) {
-            selectedFilters.type.delete(filterValue); // Убираем фильтр
-        } else {
-            selectedFilters.type.add(filterValue); // Добавляем фильтр
-        }
-
-        loadRecipes(); // Перезагружаем рецепты с учетом фильтров
-    });
-});
-
-// 🔹 Обработчик для фильтров по категориям 🔹
-document.querySelectorAll(".category-btn").forEach((btn) => {
-    btn.addEventListener("click", () => {
-        const filterValue = btn.querySelector("span").textContent.trim();
-
-        if (selectedFilters.type2.has(filterValue)) {
-            selectedFilters.type2.delete(filterValue);
-        } else {
-            selectedFilters.type2.add(filterValue);
-        }
-
-        loadRecipes(); // Перезагружаем рецепты с учетом фильтров
-    });
-});
-
-// 🔹 Функция загрузки рецептов с фильтрами 🔹
-// 🔹 Функция загрузки рецептов с фильтрами 🔹
+// 🔹 Функция загрузки рецептов 🔹
 async function loadRecipes() {
     const recipesContainer = document.getElementById("recipes-container");
     if (!recipesContainer) {
@@ -69,52 +33,32 @@ async function loadRecipes() {
 
     let loadedRecipes = new Set();
 
-    // Загружаем рецепты и проверяем фильтры
-    querySnapshot.forEach(async (doc) => {
+    querySnapshot.forEach((doc) => {
+        const data = doc.data();
         const recipeId = doc.id;
-        const recipeData = doc.data();
+        const imageUrl = data.image ? data.image : "placeholder.jpg";
 
-        let isMatch = false; // Флаг для проверки соответствия фильтрам
+        if (loadedRecipes.has(recipeId)) return;
+        loadedRecipes.add(recipeId);
 
-        for (let i = 0; i < 10; i++) { // Пройдем по коллекциям receptmainX
-            const receptmainRef = doc(db, `receptmain${i}`, recipeId);
+        const recipeCard = document.createElement("div");
+        recipeCard.classList.add("recipe-card");
 
-            const receptmainDoc = await getDoc(receptmainRef);
-            if (!receptmainDoc.exists()) continue; // Пропустить если коллекция не существует
+        recipeCard.innerHTML = 
+            <img src="${imageUrl}" class="recipe-img" alt="${data.name}">
+            <div class="recipe-info">
+                <h3 class="recipe-title">${data.name}</h3>
+                <p class="recipe-description">${data.dis}</p>
+            </div>
+            <a href="recipe.html?id=${recipeId}" class="recipe-link">
+                <button class="start-button">Начать!</button>
+            </a>
+        ;
 
-            const data = receptmainDoc.data();
-            const typeMatches = selectedFilters.type.size === 0 || selectedFilters.type.has(data.type);
-            const type2Matches = selectedFilters.type2.size === 0 || selectedFilters.type2.has(data.type2);
-
-            if (typeMatches && type2Matches) {
-                isMatch = true;
-                break;
-            }
-        }
-
-        if (isMatch) {
-            const imageUrl = recipeData.image || "placeholder.jpg";
-
-            const recipeCard = document.createElement("div");
-            recipeCard.classList.add("recipe-card");
-
-            recipeCard.innerHTML = `
-                <img src="${imageUrl}" class="recipe-img" alt="${recipeData.name}">
-                <div class="recipe-info">
-                    <h3 class="recipe-title">${recipeData.name}</h3>
-                    <p class="recipe-description">${recipeData.dis}</p>
-                </div>
-                <a href="recipe.html?id=${recipeId}" class="recipe-link">
-                    <button class="start-button">Начать!</button>
-                </a>
-            `;
-
-            recipesContainer.appendChild(recipeCard);
-            loadedRecipes.add(recipeId);
-        }
+        recipesContainer.appendChild(recipeCard);
     });
 
-    console.log(`✅ Загружено рецептов: ${loadedRecipes.size}`);
+    console.log(✅ Загружено рецептов: ${loadedRecipes.size});
 }
 
 // 🔹 Загружаем рецепты при загрузке страницы 🔹
