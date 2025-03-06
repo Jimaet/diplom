@@ -163,3 +163,16 @@ document.addEventListener("DOMContentLoaded", () => {
 document.getElementById("my-recipes-btn").addEventListener("click", () => {
     window.location.href = "create.html";
 });
+let homeButton = document.querySelector(".nav-btn:first-child");
+let lastClickTime = 0;
+
+if (homeButton) {
+    homeButton.addEventListener("click", () => {
+        let currentTime = new Date().getTime();
+        if (currentTime - lastClickTime < 1000) {
+            location.reload();
+        } else {
+            window.scrollTo({ top: 0, behavior: "smooth" });
+        }
+        lastClickTime = currentTime;
+    });
