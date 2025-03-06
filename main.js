@@ -38,25 +38,37 @@ async function loadRecipes() {
     for (const docSnap of querySnapshot.docs) {
         const recipeId = docSnap.id;
         
-        // Получаем ссылку на документ с фильтрами для этого рецепта в коллекции "receptmain"
-        const filterDocRef = doc(db, `receptmain/${recipeId}/filters`, "type");
+        // Получаем ссылки на документы `type` и `type2` для текущего рецепта
+        const typeDocRef = doc(db, `receptmain${recipeId}/type`);
+        const type2DocRef = doc(db, `receptmain${recipeId}/type2`);
 
-        // Загружаем данные фильтров
-        const filterDocSnap = await getDoc(filterDocRef);
+        // Загружаем данные этих документов
+        const typeDocSnap = await getDoc(typeDocRef);
+        const type2DocSnap = await getDoc(type2DocRef);
 
-        // Получаем фильтры из документа
-        const filters = filterDocSnap.exists() ? filterDocSnap.data().value.split(",").map(val => val.trim()) : [];
+        // Сбор всех фильтров из документа type
+        const typeFilters = typeDocSnap.exists()
+            ? Object.values(typeDocSnap.data()).map(val => val.trim())
+            : [];
+
+        // Сбор всех фильтров из документа type2
+        const type2Filters = type2DocSnap.exists()
+            ? Object.values(type2DocSnap.data()).map(val => val.trim())
+            : [];
+
+        // Объединяем оба фильтра
+        const allFilters = new Set([...typeFilters, ...type2Filters]);
 
         // Выводим фильтры рецепта в консоль для отладки
-        console.log(`🔹 Рецепт ${recipeId} фильтры:`, filters);
+        console.log(`🔹 Рецепт ${recipeId} фильтры:`, [...allFilters]);
 
         // Фильтрация по выбранным категориям
         if (selectedFilters.size > 0) {
             console.log(`🔹 Выбранные фильтры:`, [...selectedFilters]);
 
-            const hasMatchingFilter = [...selectedFilters].some(filter => filters.includes(filter));
+            const hasMatchingFilter = [...selectedFilters].some(filter => allFilters.has(filter));
             console.log(`🔹 Рецепт ${recipeId} проходит фильтрацию:`, hasMatchingFilter);
-            
+
             if (!hasMatchingFilter) continue; // Пропустить рецепт, если не совпадает ни с одним из выбранных фильтров
         }
 
