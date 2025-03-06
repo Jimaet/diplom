@@ -18,6 +18,7 @@ const db = getFirestore(app);
 let selectedFilters = new Set(); // Храним выбранные фильтры
 
 // 🔹 Функция загрузки рецептов 🔹
+// 🔹 Функция загрузки рецептов 🔹
 async function loadRecipes() {
     const recipesContainer = document.getElementById("recipes-container");
     if (!recipesContainer) {
@@ -46,7 +47,7 @@ async function loadRecipes() {
             const recipeData = recipeDataSnap.data();
             const imageUrl = recipeData.image ? recipeData.image : "placeholder.jpg";
 
-            // Проверка фильтров в соответствующей коллекции receptmainX
+            // Используем правильный путь к коллекции receptmainX
             const typeDocRef = doc(db, `receptmain${recipeId}`, "type");
             const type2DocRef = doc(db, `receptmain${recipeId}`, "type2");
 
