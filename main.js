@@ -249,13 +249,7 @@ async function searchRecipes(event) {
     }, 1000); // Таймер на 1 секунду
 }
 
-// Слушатель для изменения текста в строке поиска
-const searchInput = document.querySelector(".search-bar input");
-if (searchInput) {
-    searchInput.addEventListener("input", searchRecipes);
-} else {
-    console.error("❌ Ошибка: Поле поиска не найдено!");
-}
+
 
 
 // 🔹 Слушатель для изменения текста в строке поиска 🔹
