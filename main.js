@@ -58,14 +58,6 @@ async function loadRecipes() {
             // Логируем путь для проверки
             console.log(`🔹 Пытаемся получить документы по пути: receptmain${recipeId}/type и receptmain${recipeId}/type2`);
 
-            // Проверяем существование коллекции
-            const recipeCollectionRef = collection(db, `receptmain${recipeId}`);
-            const recipeCollectionSnap = await getDocs(recipeCollectionRef);
-            if (recipeCollectionSnap.empty) {
-                console.log(`❌ Коллекция receptmain${recipeId} не существует`);
-                continue;
-            }
-
             // Получаем документы type и type2
             const typeDocSnap = await getDoc(typeDocRef);
             const type2DocSnap = await getDoc(type2DocRef);
