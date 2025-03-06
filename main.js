@@ -19,8 +19,6 @@ const db = getFirestore(app);
 let selectedFilters = new Set(); // Храним выбранные фильтры
 
 // 🔹 Функция загрузки рецептов 🔹
-// 🔹 Функция загрузки рецептов 🔹
-// 🔹 Функция загрузки рецептов 🔹
 async function loadRecipes() {
     const recipesContainer = document.getElementById("recipes-container");
     if (!recipesContainer) {
