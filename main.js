@@ -32,7 +32,7 @@ async function loadRecipes() {
 
     console.log("🔹 Загрузка рецептов...");
 
-    const recipesQuery = collection(db, "recept"); // Запрос ко всем рецептам в коллекции "recept"
+    const recipesQuery = collection(db, "rec"); // Запрос ко всем рецептам в коллекции "recept"
     const querySnapshot = await getDocs(recipesQuery);
 
     // Если нет рецептов, выводим сообщение
