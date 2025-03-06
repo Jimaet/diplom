@@ -16,11 +16,9 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// 🔹 Фильтры 🔹
-let selectedType = null;
-let selectedType2 = null;
+let selectedFilters = new Set(); // Храним выбранные фильтры
 
-// 🔹 Функция загрузки рецептов с учетом фильтров 🔹
+// 🔹 Функция загрузки рецептов 🔹
 async function loadRecipes() {
     const recipesContainer = document.getElementById("recipes-container");
     if (!recipesContainer) {
@@ -29,33 +27,36 @@ async function loadRecipes() {
     }
 
     recipesContainer.innerHTML = ""; // Очистка перед загрузкой
+
     console.log("🔹 Загрузка рецептов...");
 
     const recipesQuery = collection(db, "rec");
     const querySnapshot = await getDocs(recipesQuery);
+
     let loadedRecipes = new Set();
 
-    for (const recipeDoc of querySnapshot.docs) {
-        const recipeId = recipeDoc.id;
-        const recipeData = recipeDoc.data();
-        const imageUrl = recipeData.image ? recipeData.image : "placeholder.jpg";
+    for (const docSnap of querySnapshot.docs) {
+        const data = docSnap.data();
+        const recipeId = docSnap.id;
+        const imageUrl = data.image ? data.image : "placeholder.jpg";
 
-        // Получаем данные о категориях
-        const categoryDocRef = doc(db, "receptmain", recipeId);
-        const categoryDocSnap = await getDocs(collection(db, "receptmain"));
-        let type = null;
-        let type2 = null;
+        // Получаем категории рецепта
+        const recipeMainRef = doc(db, "receptmain" + recipeId);
+        const recipeMainSnap = await getDocs(collection(db, recipeMainRef.path));
 
-        categoryDocSnap.forEach((doc) => {
-            if (doc.id === recipeId) {
-                type = doc.data().type || null;
-                type2 = doc.data().type2 || null;
+        let recipeTypes = new Set();
+        recipeMainSnap.forEach((doc) => {
+            const docData = doc.data();
+            if (docData.type) recipeTypes.add(docData.type);
+            if (docData.type2) {
+                docData.type2.split(',').forEach(type => recipeTypes.add(type.trim()));
             }
         });
 
         // Фильтрация по выбранным категориям
-        if ((selectedType && selectedType !== type) || (selectedType2 && selectedType2 !== type2)) {
-            continue;
+        if (selectedFilters.size > 0) {
+            const hasMatchingFilter = [...selectedFilters].some(filter => recipeTypes.has(filter));
+            if (!hasMatchingFilter) continue;
         }
 
         if (loadedRecipes.has(recipeId)) continue;
@@ -63,11 +64,12 @@ async function loadRecipes() {
 
         const recipeCard = document.createElement("div");
         recipeCard.classList.add("recipe-card");
+
         recipeCard.innerHTML = `
-            <img src="${imageUrl}" class="recipe-img" alt="${recipeData.name}">
+            <img src="${imageUrl}" class="recipe-img" alt="${data.name}">
             <div class="recipe-info">
-                <h3 class="recipe-title">${recipeData.name}</h3>
-                <p class="recipe-description">${recipeData.dis}</p>
+                <h3 class="recipe-title">${data.name}</h3>
+                <p class="recipe-description">${data.dis}</p>
             </div>
             <a href="recipe.html?id=${recipeId}" class="recipe-link">
                 <button class="start-button">Начать!</button>
@@ -80,37 +82,41 @@ async function loadRecipes() {
     console.log(`✅ Загружено рецептов: ${loadedRecipes.size}`);
 }
 
-// 🔹 Обработчики фильтров 🔹
-const filterButtons = document.querySelectorAll(".filter-btn");
-const categoryButtons = document.querySelectorAll(".category-btn");
+// 🔹 Обработчик выбора фильтров 🔹
+function toggleFilter(event) {
+    const button = event.target;
+    const filterValue = button.textContent.trim();
 
-filterButtons.forEach(button => {
-    button.addEventListener("click", () => {
-        selectedType = button.innerText === selectedType ? null : button.innerText;
-        loadRecipes();
-    });
-});
+    if (selectedFilters.has(filterValue)) {
+        selectedFilters.delete(filterValue);
+        button.classList.remove("active");
+    } else {
+        selectedFilters.add(filterValue);
+        button.classList.add("active");
+    }
 
-categoryButtons.forEach(button => {
-    button.addEventListener("click", () => {
-        selectedType2 = button.querySelector("span").innerText === selectedType2 ? null : button.querySelector("span").innerText;
-        loadRecipes();
-    });
-});
+    loadRecipes();
+}
+
+// Добавляем обработчики для кнопок фильтров
+const filterButtons = document.querySelectorAll(".filter-btn, .category-btn");
+filterButtons.forEach(button => button.addEventListener("click", toggleFilter));
 
 // 🔹 Загружаем рецепты при загрузке страницы 🔹
 document.addEventListener("DOMContentLoaded", loadRecipes);
 
-// 🔹 Кнопка "Home" - скролл вверх или перезагрузка 🔹
-const homeButton = document.querySelector(".nav-btn:first-child");
+// 🔹 Логика кнопки "Home" 🔹
+let homeButton = document.querySelector(".nav-btn:first-child");
 let lastClickTime = 0;
 
-homeButton.addEventListener("click", () => {
-    const currentTime = new Date().getTime();
-    if (currentTime - lastClickTime < 1000) {
-        location.reload();
-    } else {
-        window.scrollTo({ top: 0, behavior: "smooth" });
-    }
-    lastClickTime = currentTime;
-});
+if (homeButton) {
+    homeButton.addEventListener("click", () => {
+        let currentTime = new Date().getTime();
+        if (currentTime - lastClickTime < 1000) {
+            location.reload();
+        } else {
+            window.scrollTo({ top: 0, behavior: "smooth" });
+        }
+        lastClickTime = currentTime;
+    });
+}
