@@ -47,10 +47,17 @@ async function loadRecipes() {
         // Получаем фильтры из документа
         const filters = filterDocSnap.exists() ? filterDocSnap.data().value.split(",").map(val => val.trim()) : [];
 
+        // Выводим фильтры рецепта в консоль для отладки
+        console.log(`🔹 Рецепт ${recipeId} фильтры:`, filters);
+
         // Фильтрация по выбранным категориям
         if (selectedFilters.size > 0) {
+            console.log(`🔹 Выбранные фильтры:`, [...selectedFilters]);
+
             const hasMatchingFilter = [...selectedFilters].some(filter => filters.includes(filter));
-            if (!hasMatchingFilter) continue;
+            console.log(`🔹 Рецепт ${recipeId} проходит фильтрацию:`, hasMatchingFilter);
+            
+            if (!hasMatchingFilter) continue; // Пропустить рецепт, если не совпадает ни с одним из выбранных фильтров
         }
 
         // Проверка, если рецепт уже был загружен
