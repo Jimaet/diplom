@@ -1,6 +1,6 @@
 // 🔹 Импорт Firebase 🔹
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, doc, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { getFirestore, doc, collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 // 🔹 Конфигурация Firebase 🔹
 const firebaseConfig = {
@@ -16,6 +16,9 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
+let selectedType = null;
+let selectedType2 = null;
+
 // 🔹 Функция загрузки рецептов 🔹
 async function loadRecipes() {
     const recipesContainer = document.getElementById("recipes-container");
@@ -23,7 +26,6 @@ async function loadRecipes() {
         console.error("❌ Ошибка: recipes-container не найден!");
         return;
     }
-
     recipesContainer.innerHTML = ""; // Очистка перед загрузкой
 
     console.log("🔹 Загрузка рецептов...");
@@ -33,12 +35,29 @@ async function loadRecipes() {
 
     let loadedRecipes = new Set();
 
-    querySnapshot.forEach((doc) => {
-        const data = doc.data();
-        const recipeId = doc.id;
+    for (const docSnap of querySnapshot.docs) {
+        const data = docSnap.data();
+        const recipeId = docSnap.id;
         const imageUrl = data.image ? data.image : "placeholder.jpg";
 
-        if (loadedRecipes.has(recipeId)) return;
+        // Получаем информацию о типах рецепта
+        const mainDocRef = doc(db, `receptmain${recipeId}`);
+        const mainDocSnap = await getDocs(collection(db, `receptmain${recipeId}`));
+
+        let type = "";
+        let type2 = "";
+
+        mainDocSnap.forEach((doc) => {
+            if (doc.id === "type") type = doc.data().value;
+            if (doc.id === "type2") type2 = doc.data().value;
+        });
+
+        // Фильтрация по выбранным категориям
+        if ((selectedType && type !== selectedType) || (selectedType2 && type2 !== selectedType2)) {
+            continue;
+        }
+
+        if (loadedRecipes.has(recipeId)) continue;
         loadedRecipes.add(recipeId);
 
         const recipeCard = document.createElement("div");
@@ -56,13 +75,33 @@ async function loadRecipes() {
         `;
 
         recipesContainer.appendChild(recipeCard);
-    });
+    }
 
     console.log(`✅ Загружено рецептов: ${loadedRecipes.size}`);
 }
 
+// 🔹 Обработчик для фильтров 🔹
+function setupFilters() {
+    document.querySelectorAll(".filter-btn").forEach((button) => {
+        button.addEventListener("click", () => {
+            selectedType = button.textContent;
+            loadRecipes();
+        });
+    });
+
+    document.querySelectorAll(".category-btn").forEach((button) => {
+        button.addEventListener("click", () => {
+            selectedType2 = button.querySelector("span").textContent;
+            loadRecipes();
+        });
+    });
+}
+
 // 🔹 Загружаем рецепты при загрузке страницы 🔹
-document.addEventListener("DOMContentLoaded", loadRecipes);
+document.addEventListener("DOMContentLoaded", () => {
+    loadRecipes();
+    setupFilters();
+});
 
 // 🔹 Обработчик для кнопки Home 🔹
 document.addEventListener("DOMContentLoaded", () => {
