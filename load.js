@@ -2,7 +2,7 @@
 const images = [
     "loadingphoto/1.png",
     "loadingphoto/2.png",
-    "loadingphoto/3.png",
+    "loadingphoto/3.jpeg",
     "loadingphoto/4.png"
 ];
 
