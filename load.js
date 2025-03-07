@@ -1,12 +1,10 @@
 // Список изображений
 const images = [
-    "loadingphoto/1.jpg",
-    "loadingphoto/2.jpg",
-    "loadingphoto/3.jpg",
-    "loadingphoto/4.jpg",
-    "loadingphoto/5.jpg",
-    "loadingphoto/6.jpg",
-    "loadingphoto/7.jpg"
+    "loadingphoto/1.png",
+    "loadingphoto/2.png",
+    "loadingphoto/3.png",
+    "loadingphoto/4.png",
+    "loadingphoto/5.png"
 ];
 
 // Выбираем случайное изображение
@@ -17,4 +15,4 @@ document.getElementById("loading-screen").style.backgroundImage = `url(${randomI
 setTimeout(() => {
     document.getElementById("loading-screen").style.display = "none";
     document.getElementById("main-content").style.display = "block";
-}, 3000);
+}, 4000);
