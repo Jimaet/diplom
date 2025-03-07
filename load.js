@@ -14,4 +14,4 @@ document.getElementById("loading-screen").style.backgroundImage = `url(${randomI
 setTimeout(() => {
     document.getElementById("loading-screen").style.display = "none";
     document.getElementById("main-content").style.display = "block";
-}, 4000);
+}, 5000);
