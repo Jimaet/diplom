@@ -3,8 +3,7 @@ const images = [
     "loadingphoto/1.png",
     "loadingphoto/2.png",
     "loadingphoto/3.png",
-    "loadingphoto/4.png",
-    "loadingphoto/5.png"
+    "loadingphoto/4.png"
 ];
 
 // Выбираем случайное изображение
