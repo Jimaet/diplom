@@ -151,4 +151,18 @@ if (searchInput) {
     searchInput.addEventListener("input", searchRecipes);
 } else {
     console.error("❌ Ошибка: Поле поиска не найдено!");
+    // Обработчик кликов на фильтры
+document.querySelectorAll(".filter-btn").forEach(button => {
+    button.addEventListener("click", () => {
+        console.log(`Выбран фильтр: ${button.textContent}`);
+    });
+});
+
+// Обработчик кликов на категории
+document.querySelectorAll(".category-btn").forEach(button => {
+    button.addEventListener("click", () => {
+        const categoryName = button.querySelector("span").textContent;
+        console.log(`Выбрана категория: ${categoryName}`);
+    });
+});
 }
