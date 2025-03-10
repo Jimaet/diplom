@@ -44,8 +44,16 @@
 
         <!-- Блок для продуктов -->
         <p class="section-title">Продукты:</p>
-        <div id="product-list"></div>
-        <button id="add-product" class="add-btn">Добавить продукт</button>
+
+<!-- Вставьте сюда блок для ввода продукта -->
+<div class="product-section">
+    <label for="product-input" class="label">Введите продукт:</label>
+    <input type="text" id="product-input" class="input-field" placeholder="Введите название продукта...">
+    <div id="suggestions-list" class="suggestions-list"></div> <!-- Блок для предложений -->
+</div>
+
+<div id="product-list"></div>
+<button id="add-product" class="add-btn">Добавить продукт</button>
 
         <!-- Блок для шагов рецепта -->
         <p class="section-title">Шаги рецепта:</p>
