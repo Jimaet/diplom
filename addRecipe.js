@@ -43,12 +43,17 @@ document.addEventListener("DOMContentLoaded", () => {
             let prodData = {};
             document.querySelectorAll("#product-list .product-item").forEach((product, index) => {
                 const title = product.querySelector("input:nth-of-type(1)").value.trim();
-                const weight = product.querySelector("input:nth-of-type(2)").value.trim();
-                if (title && weight) {
+                const amount = product.querySelector("input:nth-of-type(2)").value.trim();
+                const unit = product.querySelector("select").value; // Получаем выбранную единицу измерения
+            
+                if (title && amount) {
+                    const formattedUnit = unit === "грамм" ? "г." : "шт."; // Преобразуем "грамм" в "г."
                     prodData[`${index + 1}`] = title;
-                    prodData[`${index + 1}-1`] = weight;
+                    prodData[`${index + 1}-1`] = `${amount} ${formattedUnit}`;
                 }
             });
+            console.log("✅ Продукты:", prodData);
+            await setDoc(doc(db, receptMainName, "prod"), prodData);
             console.log("✅ Продукты:", prodData);
             await setDoc(doc(db, receptMainName, "prod"), prodData);
 
