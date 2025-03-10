@@ -1,5 +1,5 @@
 import { db } from "./firebase-config.js";
-import { doc, getDoc, updateDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { collection, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 document.addEventListener("DOMContentLoaded", () => {
     const productList = document.getElementById("product-list");
@@ -51,20 +51,26 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 
-    // Функция для получения продуктов из базы данных (например, Firebase)
+    // Функция для получения продуктов из всех документов коллекции "products"
     function fetchProducts(query) {
         return new Promise((resolve, reject) => {
-            // Получаем ссылку на коллекцию продуктов в Firebase
-            const productsRef = doc(db, "products", "produser");
-            
-            // Запрос к документу для поиска продуктов, содержащих query в имени
-            getDoc(productsRef).then((docSnap) => {
-                if (docSnap.exists()) {
+            const productsRef = collection(db, "products");  // Коллекция "products"
+
+            getDocs(productsRef).then((querySnapshot) => {
+                const allProducts = [];
+                querySnapshot.forEach((docSnap) => {
                     const products = docSnap.data().products || [];
-                    const filteredProducts = products.filter(product => product.toLowerCase().includes(query.toLowerCase()));
+                    allProducts.push(...products);  // Добавляем продукты из каждого документа
+                });
+
+                const filteredProducts = allProducts.filter(product => 
+                    product.toLowerCase().includes(query.toLowerCase())
+                );
+
+                if (filteredProducts.length > 0) {
                     resolve(filteredProducts);
                 } else {
-                    reject("Нет данных в коллекции");
+                    reject("Нет продуктов, которые соответствуют запросу");
                 }
             }).catch((error) => {
                 reject("Ошибка при загрузке данных: " + error);
