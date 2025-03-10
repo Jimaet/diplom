@@ -169,9 +169,8 @@ body {
     }
 }
 .items-container {
-    display: flex;
-    flex-direction: column; /* Размещает элементы в столбец */
-    gap: 5px; /* Добавляет промежуток между строками */
+    margin-top: 20px;
+    padding: 10px;
 }
 
 .items-container h3 {
@@ -180,14 +179,13 @@ body {
 }
 
 .item-box {
-    display: block; /* Вместо inline-block */
+    display: inline-block;
     background-color: #5D7B76;
     color: white;
     font-size: 16px;
     border-radius: 40px;
     padding: 10px 20px;
-    margin: 5px 0; /* Чтобы был отступ между строками */
-    width: 100%; /* Занимает всю ширину */
+    margin: 5px;
+    width: 190px;
     text-align: center;
 }
-
