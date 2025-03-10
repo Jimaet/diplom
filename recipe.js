@@ -1,4 +1,4 @@
-"https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
 import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
 
 // 🔹 Данные Firebase
@@ -15,7 +15,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// Получаем id рецепта из URL
+// Получаем `id` рецепта из URL
 const params = new URLSearchParams(window.location.search);
 const receptId = params.get("id");
 
@@ -29,7 +29,7 @@ if (!receptId) {
 
 async function loadRecipe(receptId) {
     try {
-        const receptMainId = receptmain${receptId.replace("recept", "")};
+        const receptMainId = `receptmain${receptId.replace("recept", "")}`;
 
         const mainRef = doc(db, receptMainId, "main");
         const prodRef = doc(db, receptMainId, "prod");
@@ -60,7 +60,7 @@ async function loadRecipe(receptId) {
 
         document.getElementById("recipe-title").textContent = mainData.name || "Без названия";
         document.getElementById("recipe-description").textContent = mainData.dis || "Описание отсутствует";
-        document.getElementById("recipe-info").textContent = Порции: ${mainData.porcii} | Время: ${mainData.timemin} мин;
+        document.getElementById("recipe-info").textContent = `Порции: ${mainData.porcii} | Время: ${mainData.timemin} мин`;
         document.getElementById("recipe-image").src = photoData.url || "placeholder.jpg";
 
         // 🔹 Добавляем посуду и технику
@@ -98,20 +98,14 @@ async function loadRecipe(receptId) {
             if (!ingredientsMap[baseKey]) {
                 ingredientsMap[baseKey] = prodData[key];
             } else {
-                ingredientsMap[baseKey] +=  - ${prodData[key]};
+                ingredientsMap[baseKey] += ` - ${prodData[key]}`;
             }
         });
 
-        // Очищаем список перед добавлением новых элементов
-        ingredientsList.innerHTML = "";
-        
-        Object.values(ingredientsMap).forEach((ingredient) => {
-            const li = document.createElement("li");
-            li.textContent = ingredient;
-            li.classList.add("ingredient-item"); // Можно стилизовать через CSS
-            ingredientsList.appendChild(li);
-        });
-
+        let ingredientsText = Object.values(ingredientsMap).join(". ") + "."; 
+        const p = document.createElement("p");
+        p.textContent = ingredientsText;
+        ingredientsList.appendChild(p);
 
         // ✅ Шаги приготовления
         const stepsContainer = document.getElementById("recipe-steps");
@@ -119,10 +113,10 @@ async function loadRecipe(receptId) {
         Object.entries(stepData).forEach(([stepNum, stepText]) => {
             const stepDiv = document.createElement("div");
             stepDiv.classList.add("step");
-            stepDiv.innerHTML = 
+            stepDiv.innerHTML = `
                 <p class="step-title">Шаг ${stepNum}:</p>
                 <p class="step-description">${stepText}</p>
-            ;
+            `;
             stepsContainer.appendChild(stepDiv);
         });
 
@@ -158,7 +152,7 @@ function createRecipeCard(recipe, recipeId) {
     const card = document.createElement("div");
     card.classList.add("recipe-card");
 
-    card.innerHTML = 
+    card.innerHTML = `
         <img src="${recipe.url || 'placeholder.jpg'}" class="recipe-photo">
         <div class="recipe-info">
             <h3 class="recipe-title">${recipe.name}</h3>
@@ -167,10 +161,10 @@ function createRecipeCard(recipe, recipeId) {
                 <button class="fav-btn" data-id="${recipeId}">❤️</button>
             </div>
         </div>
-    ;
+    `;
 
     card.addEventListener("click", () => {
-        window.location.href = recipe.html?id=${recipeId};
+        window.location.href = `recipe.html?id=${recipeId}`;
     });
 
     return card;
