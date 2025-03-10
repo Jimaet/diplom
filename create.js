@@ -15,7 +15,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const productItem = document.createElement("div");
         productItem.classList.add("product-item");
 
-        productItem.innerHTML = 
+        productItem.innerHTML = `
             <input type="text" placeholder="Название продукта">
             <input type="number" placeholder="Количество">
             <select>
@@ -23,7 +23,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 <option value="шт">Шт.</option>
             </select>
             <button class="delete-btn">✖</button>
-        ;
+        `;
 
         productList.appendChild(productItem);
 
@@ -38,11 +38,11 @@ document.addEventListener("DOMContentLoaded", () => {
         const stepItem = document.createElement("div");
         stepItem.classList.add("step-item");
 
-        stepItem.innerHTML = 
+        stepItem.innerHTML = `
             <span>Шаг ${stepCount}</span>
             <input type="text" placeholder="Описание шага">
             <button class="delete-btn">✖</button>
-        ;
+        `;
 
         stepList.appendChild(stepItem);
 
@@ -56,7 +56,7 @@ document.addEventListener("DOMContentLoaded", () => {
     function updateStepNumbers() {
         const steps = document.querySelectorAll(".step-item span");
         steps.forEach((step, index) => {
-            step.textContent = Шаг ${index + 1};
+            step.textContent = `Шаг ${index + 1}`;
         });
         stepCount = steps.length; // Теперь stepCount соответствует фактическому количеству шагов
     }
