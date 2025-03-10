@@ -1,3 +1,5 @@
+import { db } from "./firebase-config.js";
+import { collection, doc, setDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 document.addEventListener("DOMContentLoaded", () => {
     const productList = document.getElementById("product-list");
     const addProductBtn = document.getElementById("add-product");
