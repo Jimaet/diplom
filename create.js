@@ -8,9 +8,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const loadingScreen = document.querySelector(".loading-screen");
     const successMessage = document.querySelector(".success-message");
 
-    const productInput = document.getElementById("product-input");
-    const suggestionsList = document.getElementById("suggestions-list");
-
     let stepCount = 0;
 
     // === Добавление продукта ===
@@ -18,7 +15,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const productItem = document.createElement("div");
         productItem.classList.add("product-item");
 
-        productItem.innerHTML = `
+        productItem.innerHTML = 
             <input type="text" placeholder="Название продукта">
             <input type="number" placeholder="Количество">
             <select>
@@ -26,7 +23,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 <option value="шт">Шт.</option>
             </select>
             <button class="delete-btn">✖</button>
-        `;
+        ;
 
         productList.appendChild(productItem);
 
@@ -41,11 +38,11 @@ document.addEventListener("DOMContentLoaded", () => {
         const stepItem = document.createElement("div");
         stepItem.classList.add("step-item");
 
-        stepItem.innerHTML = `
+        stepItem.innerHTML = 
             <span>Шаг ${stepCount}</span>
             <input type="text" placeholder="Описание шага">
             <button class="delete-btn">✖</button>
-        `;
+        ;
 
         stepList.appendChild(stepItem);
 
@@ -59,7 +56,7 @@ document.addEventListener("DOMContentLoaded", () => {
     function updateStepNumbers() {
         const steps = document.querySelectorAll(".step-item span");
         steps.forEach((step, index) => {
-            step.textContent = `Шаг ${index + 1}`;
+            step.textContent = Шаг ${index + 1};
         });
         stepCount = steps.length; // Теперь stepCount соответствует фактическому количеству шагов
     }
@@ -83,27 +80,5 @@ document.addEventListener("DOMContentLoaded", () => {
                 window.location.href = "index.html";
             }, 3000); // Переход через 3 секунды после показа сообщения
         }, 2000); // 2 секунды анимации загрузки
-    });
-
-    // === Логика для динамических предложений продуктов ===
-    productInput?.addEventListener("input", function () {
-        const query = productInput.value.toLowerCase();
-        suggestionsList.innerHTML = ''; // Очищаем список предложений
-
-        if (query) {
-            const products = ["Яблоко", "Помидор", "Картофель", "Морковь", "Молоко", "Яйца", "Мука"]; // Пример списка продуктов
-            const filteredProducts = products.filter(product => product.toLowerCase().includes(query));
-
-            filteredProducts.forEach(product => {
-                const suggestionItem = document.createElement("div");
-                suggestionItem.classList.add("suggestion-item");
-                suggestionItem.textContent = product;
-                suggestionItem.addEventListener("click", () => {
-                    productInput.value = product;
-                    suggestionsList.innerHTML = ''; // Скрыть список предложений после выбора
-                });
-                suggestionsList.appendChild(suggestionItem);
-            });
-        }
     });
 });
