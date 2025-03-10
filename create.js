@@ -8,6 +8,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const loadingScreen = document.querySelector(".loading-screen");
     const successMessage = document.querySelector(".success-message");
 
+    const productInput = document.getElementById("product-input");
+    const suggestionsList = document.getElementById("suggestions-list");
+
     let stepCount = 0;
 
     // === Добавление продукта ===
@@ -80,5 +83,27 @@ document.addEventListener("DOMContentLoaded", () => {
                 window.location.href = "index.html";
             }, 3000); // Переход через 3 секунды после показа сообщения
         }, 2000); // 2 секунды анимации загрузки
+    });
+
+    // === Логика для динамических предложений продуктов ===
+    productInput?.addEventListener("input", function () {
+        const query = productInput.value.toLowerCase();
+        suggestionsList.innerHTML = ''; // Очищаем список предложений
+
+        if (query) {
+            const products = ["Яблоко", "Помидор", "Картофель", "Морковь", "Молоко", "Яйца", "Мука"]; // Пример списка продуктов
+            const filteredProducts = products.filter(product => product.toLowerCase().includes(query));
+
+            filteredProducts.forEach(product => {
+                const suggestionItem = document.createElement("div");
+                suggestionItem.classList.add("suggestion-item");
+                suggestionItem.textContent = product;
+                suggestionItem.addEventListener("click", () => {
+                    productInput.value = product;
+                    suggestionsList.innerHTML = ''; // Скрыть список предложений после выбора
+                });
+                suggestionsList.appendChild(suggestionItem);
+            });
+        }
     });
 });
