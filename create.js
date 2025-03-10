@@ -47,24 +47,25 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Функция для получения продуктов из базы данных (например, Firebase)
     function fetchProducts(query) {
-        return new Promise((resolve, reject) => {
-            // Получаем ссылку на коллекцию продуктов в Firebase
-            const productsRef = db.collection("products").doc("produser");
-            
-            // Запрос к коллекции для поиска продуктов, содержащих query в имени
-            productsRef.get().then((doc) => {
-                if (doc.exists) {
-                    const products = doc.data().products || [];
-                    const filteredProducts = products.filter(product => product.toLowerCase().includes(query.toLowerCase()));
-                    resolve(filteredProducts);
-                } else {
-                    reject("Нет данных в коллекции");
-                }
-            }).catch((error) => {
-                reject("Ошибка при загрузке данных: " + error);
-            });
+    return new Promise((resolve, reject) => {
+        // Получаем ссылку на коллекцию продуктов в Firebase
+        const productsRef = db.collection("products").doc("produser");
+        
+        // Запрос к коллекции для поиска продуктов, содержащих query в имени
+        productsRef.get().then((doc) => {
+            if (doc.exists) {
+                const products = doc.data().products || [];
+                const filteredProducts = products.filter(product => product.toLowerCase().includes(query.toLowerCase()));
+                resolve(filteredProducts);
+            } else {
+                reject("Нет данных в коллекции");
+            }
+        }).catch((error) => {
+            reject("Ошибка при загрузке данных: " + error);
         });
-    }
+    });
+}
+
 
     // Функция для отображения предложений
     function displaySuggestions(products, suggestionsBox, inputElement) {
