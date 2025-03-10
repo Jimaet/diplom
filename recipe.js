@@ -112,7 +112,6 @@ async function loadRecipe(receptId) {
             ingredientsList.appendChild(li);
         });
 
-
         // ✅ Шаги приготовления
         const stepsContainer = document.getElementById("recipe-steps");
         stepsContainer.innerHTML = "";
@@ -153,25 +152,44 @@ function setupShowMoreButton() {
     });
 }
 
-// ✅ Улучшенная карточка рецепта
-function createRecipeCard(recipe, recipeId) {
-    const card = document.createElement("div");
-    card.classList.add("recipe-card");
+// ✅ Добавление продукта
+const productInput = document.getElementById("product-input");
+const suggestionsList = document.getElementById("suggestions-list");
 
-    card.innerHTML = `
-        <img src="${recipe.url || 'placeholder.jpg'}" class="recipe-photo">
-        <div class="recipe-info">
-            <h3 class="recipe-title">${recipe.name}</h3>
-            <p class="recipe-description">${recipe.dis}</p>
-            <div class="recipe-actions">
-                <button class="fav-btn" data-id="${recipeId}">❤️</button>
-            </div>
-        </div>
-    `;
+// Массив с продуктами (вы можете заменить на получение данных из Firebase)
+const allProducts = ["Яблоко", "Помидор", "Огурец", "Картофель", "Морковь", "Лук", "Чеснок"];
 
-    card.addEventListener("click", () => {
-        window.location.href = `recipe.html?id=${recipeId}`;
+// Функция для фильтрации предложений
+productInput.addEventListener("input", () => {
+    const query = productInput.value.toLowerCase();
+    const filteredProducts = allProducts.filter((product) => product.toLowerCase().includes(query));
+
+    // Очищаем старые предложения
+    suggestionsList.innerHTML = "";
+
+    filteredProducts.forEach((product) => {
+        const suggestion = document.createElement("div");
+        suggestion.classList.add("suggestion-item");
+        suggestion.textContent = product;
+
+        // Добавляем продукт при клике
+        suggestion.addEventListener("click", () => {
+            addProductToList(product);
+        });
+
+        suggestionsList.appendChild(suggestion);
     });
+});
 
-    return card;
+// Функция для добавления продукта в список
+function addProductToList(product) {
+    const productList = document.getElementById("product-list");
+    const productItem = document.createElement("div");
+    productItem.classList.add("product-item");
+    productItem.textContent = product;
+    productList.appendChild(productItem);
+
+    // Очищаем поле ввода и список предложений
+    productInput.value = "";
+    suggestionsList.innerHTML = "";
 }
