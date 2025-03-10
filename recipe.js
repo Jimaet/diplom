@@ -102,10 +102,16 @@ async function loadRecipe(receptId) {
             }
         });
 
-        let ingredientsText = Object.values(ingredientsMap).join(". ") + "."; 
-        const p = document.createElement("p");
-        p.textContent = ingredientsText;
-        ingredientsList.appendChild(p);
+        // Очищаем список перед добавлением новых элементов
+        ingredientsList.innerHTML = "";
+        
+        Object.values(ingredientsMap).forEach((ingredient) => {
+            const li = document.createElement("li");
+            li.textContent = ingredient;
+            li.classList.add("ingredient-item"); // Можно стилизовать через CSS
+            ingredientsList.appendChild(li);
+        });
+
 
         // ✅ Шаги приготовления
         const stepsContainer = document.getElementById("recipe-steps");
