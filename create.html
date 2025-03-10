@@ -31,12 +31,14 @@
                 <img id="preview-image" class="photo-placeholder" src="" alt="Предпросмотр фото">
             </div>
 
-            <div class="additional-info">
-                <label for="portions" class="label">Кол-во порций:</label>
-                <input type="number" id="portions" class="small-input">
 
-                <label for="time" class="label">Примерное время приготовления (мин):</label>
-                <input type="number" id="time" class="small-input">
+                <div class="additional-info">
+                    <label for="portions" class="label">Кол-во порций:</label>
+                    <input type="number" id="portions" class="small-input">
+
+                    <label for="time" class="label">Примерное время приготовления (мин):</label>
+                    <input type="number" id="time" class="small-input">
+                </div>
             </div>
         </div>
 
@@ -45,102 +47,96 @@
         <div id="product-list"></div>
         <button id="add-product" class="add-btn">Добавить продукт</button>
 
-        <!-- Ввод названия продукта с автоподсказками -->
-        <label for="product-name" class="label">Название продукта:</label>
-        <input type="text" id="product-name" class="product-name" placeholder="Название продукта" autocomplete="off">
-
         <!-- Блок для шагов рецепта -->
         <p class="section-title">Шаги рецепта:</p>
         <div id="step-list"></div>
         <button id="add-step" class="add-btn">Добавить шаг</button>
     </div>
+<p>Выберите категории, к которым относится Ваш рецепт:</p>
+<div class="filter-buttons">
+    <button class="filter-btn">Простые</button>
+    <button class="filter-btn">В духовке</button>
+    <button class="filter-btn">На гриле</button>
+    <button class="filter-btn">Завтрак</button>
+    <button class="filter-btn">Обед</button>
+    <button class="filter-btn">Ужин</button>
+</div>
 
-    <p>Выберите категории, к которым относится Ваш рецепт:</p>
-    <div class="filter-buttons">
-        <button class="filter-btn">Простые</button>
-        <button class="filter-btn">В духовке</button>
-        <button class="filter-btn">На гриле</button>
-        <button class="filter-btn">Завтрак</button>
-        <button class="filter-btn">Обед</button>
-        <button class="filter-btn">Ужин</button>
-    </div>
+<!-- Вторая секция с категориями -->
+<p>Выберите категории, к которым относится Ваш рецепт:</p>
+<div class="carousel">
+    <button class="category-btn">
+        <img src="k2/zakyski.jpg" alt="Закуски">
+        <span>Закуски</span>
+    </button>
+    <button class="category-btn">
+        <img src="k2/salat.jpg" alt="Салаты">
+        <span>Салаты</span>
+    </button>
+    <button class="category-btn">
+        <img src="k2/desert.jpg" alt="Десерты">
+        <span>Десерты</span>
+    </button>
+    <button class="category-btn">
+        <img src="k2/vipechka.jpg" alt="Выпечка">
+        <span>Выпечка</span>
+    </button>
+    <button class="category-btn">
+        <img src="k2/napitki.jpg" alt="Напитки">
+        <span>Напитки</span>
+    </button>
+    <button class="category-btn">
+        <img src="k2/fastfod.jpg" alt="Фастфуд">
+        <span>Фастфуд</span>
+    </button>
+    <button class="category-btn">
+        <img src="k2/garnir.jpg" alt="Гарнир">
+        <span>Гарнир</span>
+    </button>
+    <button class="category-btn">
+        <img src="k2/goryachee.jpg" alt="Горячее">
+        <span>Горячее</span>
+    </button>
+    <button class="category-btn">
+        <img src="k2/sousi.jpg" alt="Соусы">
+        <span>Соусы</span>
+    </button>
 
-    <!-- Вторая секция с категориями -->
-    <p>Выберите категории, к которым относится Ваш рецепт:</p>
-    <div class="carousel">
-        <button class="category-btn">
-            <img src="k2/zakyski.jpg" alt="Закуски">
-            <span>Закуски</span>
-        </button>
-        <button class="category-btn">
-            <img src="k2/salat.jpg" alt="Салаты">
-            <span>Салаты</span>
-        </button>
-        <button class="category-btn">
-            <img src="k2/desert.jpg" alt="Десерты">
-            <span>Десерты</span>
-        </button>
-        <button class="category-btn">
-            <img src="k2/vipechka.jpg" alt="Выпечка">
-            <span>Выпечка</span>
-        </button>
-        <button class="category-btn">
-            <img src="k2/napitki.jpg" alt="Напитки">
-            <span>Напитки</span>
-        </button>
-        <button class="category-btn">
-            <img src="k2/fastfod.jpg" alt="Фастфуд">
-            <span>Фастфуд</span>
-        </button>
-        <button class="category-btn">
-            <img src="k2/garnir.jpg" alt="Гарнир">
-            <span>Гарнир</span>
-        </button>
-        <button class="category-btn">
-            <img src="k2/goryachee.jpg" alt="Горячее">
-            <span>Горячее</span>
-        </button>
-        <button class="category-btn">
-            <img src="k2/sousi.jpg" alt="Соусы">
-            <span>Соусы</span>
-        </button>
-    </div>
-
+</div>
     <div class="multi-select">
-        <p>Выберите рекомендуемую посуду и технику:</p>
-        <button class="tech-btn">Плита</button>
-        <button class="tech-btn">Духовка</button>
-        <button class="tech-btn">Микроволновка</button>
-        <button class="tech-btn">Мультиварка</button>
-        <button class="tech-btn">Аэрогриль</button>
-        <button class="tech-btn">Фритюрница</button>
-        <button class="tech-btn">Пароварка</button>
-        <button class="tech-btn">Блендер</button>
-        <button class="tech-btn">Миксер</button>
-        <button class="tech-btn">Сковорода</button>
-        <button class="tech-btn">Кастрюля</button>
-        <button class="tech-btn">Форма для выпечки</button>
-        <button class="tech-btn">Разделочная доска</button>
-        <button class="tech-btn">Ножи</button>
-        <button class="tech-btn">Коптильня</button>
-        <button class="tech-btn">Мангал</button>
-        <button class="tech-btn">Пароварка</button>
-        <button class="tech-btn">Мультиварка</button>
-        <button class="tech-btn">Казан</button>
-        <button class="tech-btn">Сито</button>
-        <button class="tech-btn">Кондитерский мешок</button>
-    </div>
+<p>Выберите рекомендуемую посуду и технику:</p>
+    <button class="tech-btn">Плита</button>
+    <button class="tech-btn">Духовка</button>
+    <button class="tech-btn">Микроволновка</button>
+    <button class="tech-btn">Мультиварка</button>
+    <button class="tech-btn">Аэрогриль</button>
+    <button class="tech-btn">Фритюрница</button>
+    <button class="tech-btn">Пароварка</button>
+    <button class="tech-btn">Блендер</button>
+    <button class="tech-btn">Миксер</button>
+    <button class="tech-btn">Сковорода</button>
+    <button class="tech-btn">Кастрюля</button>
+    <button class="tech-btn">Форма для выпечки</button>
+    <button class="tech-btn">Разделочная доска</button>
+    <button class="tech-btn">Ножи</button>
+    <button class="tech-btn">Коптильня</button>
+    <button class="tech-btn">Мангал</button>
+    <button class="tech-btn">Пароварка</button>
+    <button class="tech-btn">Мультиварка</button>
+    <button class="tech-btn">Казан</button>
+    <button class="tech-btn">Сито</button>
+    <button class="tech-btn">Кондитерский мешок</button>
+</div>
 
-    <button class="submit-btn">Отправить рецепт на проверку</button>
+<button class="submit-btn">Отправить рецепт на проверку</button>
 
-    <div class="loading-screen">
-        <div class="loading-animation"></div>
-        <p class="loading-text">Отправляем рецепт...</p>
-    </div>
+<div class="loading-screen">
+    <div class="loading-animation"></div>
+    <p class="loading-text">Отправляем рецепт...</p>
+</div>
 
-    <p class="success-message">Ваш рецепт отправили на проверку, скоро он появится в ленте рецептов!  
-    Спасибо за то, что Вы с нами!</p>
-    
+<p class="success-message">Ваш рецепт отправили на проверку, скоро он появится в ленте рецептов!  
+Спасибо за то, что Вы с нами!</p>
     <script src="create.js"></script>
     <script type="module" src="addRecipe.js"></script>
 </body>
