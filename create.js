@@ -1,5 +1,5 @@
 import { db } from "./firebase-config.js";
-import { collection, doc, getDoc, updateDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { doc, getDoc, updateDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 document.addEventListener("DOMContentLoaded", () => {
     const productList = document.getElementById("product-list");
@@ -31,9 +31,14 @@ document.addEventListener("DOMContentLoaded", () => {
         // Обработчик ввода для автозаполнения
         productNameInput.addEventListener("input", (event) => {
             const query = event.target.value;
+            console.log("Запрос: " + query);  // Добавляем лог для проверки запроса
+
             if (query.length > 1) {
                 fetchProducts(query).then((products) => {
+                    console.log("Найденные продукты: ", products);  // Лог найденных продуктов
                     displaySuggestions(products, suggestionsBox, productNameInput);
+                }).catch(error => {
+                    console.error("Ошибка при поиске продуктов: ", error);
                 });
             } else {
                 suggestionsBox.innerHTML = ''; // Если строка пустая, очищаем предложения
@@ -112,6 +117,10 @@ document.addEventListener("DOMContentLoaded", () => {
         const userProductsRef = doc(db, "products", "produser");
         updateDoc(userProductsRef, {
             products: arrayUnion(productName)
+        }).then(() => {
+            console.log("Продукт успешно добавлен: " + productName);
+        }).catch((error) => {
+            console.error("Ошибка при добавлении продукта: " + error);
         });
     }
 });
