@@ -1,12 +1,14 @@
-import { db } from "./firebase-config.js";
-import { collection, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
-
 document.addEventListener("DOMContentLoaded", () => {
     const productList = document.getElementById("product-list");
+    const stepList = document.getElementById("step-list");
     const addProductBtn = document.getElementById("add-product");
+    const addStepBtn = document.getElementById("add-step");
+    const multiButtons = document.querySelectorAll(".multi-btn");
     const submitButton = document.querySelector(".submit-btn");
     const loadingScreen = document.querySelector(".loading-screen");
     const successMessage = document.querySelector(".success-message");
+
+    let stepCount = 0;
 
     // === Добавление продукта ===
     addProductBtn?.addEventListener("click", () => {
@@ -14,119 +16,69 @@ document.addEventListener("DOMContentLoaded", () => {
         productItem.classList.add("product-item");
 
         productItem.innerHTML = 
-            `<input type="text" class="product-name" placeholder="Название продукта" autocomplete="off">
-            <div class="suggestions"></div>
+            <input type="text" placeholder="Название продукта">
             <input type="number" placeholder="Количество">
             <select>
                 <option value="грамм">Грамм</option>
                 <option value="шт">Шт.</option>
             </select>
-            <button class="delete-btn">✖</button>`;
-
-        const productNameInput = productItem.querySelector(".product-name");
-        const suggestionsBox = productItem.querySelector(".suggestions");
+            <button class="delete-btn">✖</button>
+        ;
 
         productList.appendChild(productItem);
 
-        // Обработчик ввода для автозаполнения
-        productNameInput.addEventListener("input", (event) => {
-            const query = event.target.value;
-            console.log("Запрос: " + query);  // Добавляем лог для проверки запроса
-
-            if (query.length > 1) {
-                fetchProducts(query).then((products) => {
-                    console.log("Найденные продукты: ", products);  // Лог найденных продуктов
-                    displaySuggestions(products, suggestionsBox, productNameInput);
-                }).catch(error => {
-                    console.error("Ошибка при поиске продуктов: ", error);
-                });
-            } else {
-                suggestionsBox.innerHTML = ''; // Если строка пустая, очищаем предложения
-            }
-        });
-
-        // Удаление продукта
         productItem.querySelector(".delete-btn").addEventListener("click", () => {
             productItem.remove();
         });
     });
 
-    // Функция для получения продуктов из всех документов коллекции "products"
-    function fetchProducts(query) {
-        return new Promise((resolve, reject) => {
-            const productsRef = collection(db, "products");  // Коллекция "products"
+    // === Добавление шага ===
+    addStepBtn?.addEventListener("click", () => {
+        stepCount++;
+        const stepItem = document.createElement("div");
+        stepItem.classList.add("step-item");
 
-            getDocs(productsRef).then((querySnapshot) => {
-                const allProducts = [];
-                querySnapshot.forEach((docSnap) => {
-                    const products = docSnap.data().products || [];
-                    allProducts.push(...products);  // Добавляем продукты из каждого документа
-                });
+        stepItem.innerHTML = 
+            <span>Шаг ${stepCount}</span>
+            <input type="text" placeholder="Описание шага">
+            <button class="delete-btn">✖</button>
+        ;
 
-                const filteredProducts = allProducts.filter(product => 
-                    product.toLowerCase().includes(query.toLowerCase())
-                );
+        stepList.appendChild(stepItem);
 
-                if (filteredProducts.length > 0) {
-                    resolve(filteredProducts);
-                } else {
-                    reject("Нет продуктов, которые соответствуют запросу");
-                }
-            }).catch((error) => {
-                reject("Ошибка при загрузке данных: " + error);
-            });
+        stepItem.querySelector(".delete-btn").addEventListener("click", () => {
+            stepItem.remove();
+            updateStepNumbers();
         });
+    });
+
+    // === Обновление нумерации шагов ===
+    function updateStepNumbers() {
+        const steps = document.querySelectorAll(".step-item span");
+        steps.forEach((step, index) => {
+            step.textContent = Шаг ${index + 1};
+        });
+        stepCount = steps.length; // Теперь stepCount соответствует фактическому количеству шагов
     }
 
-    // Функция для отображения предложений
-    function displaySuggestions(products, suggestionsBox, inputElement) {
-        suggestionsBox.innerHTML = ''; // Очищаем старые предложения
-        products.forEach(product => {
-            const suggestionItem = document.createElement("div");
-            suggestionItem.classList.add("suggestion-item");
-            suggestionItem.textContent = product;
-
-            suggestionItem.addEventListener("click", () => {
-                inputElement.value = product;
-                suggestionsBox.innerHTML = ''; // Очистить предложения после выбора
-            });
-
-            suggestionsBox.appendChild(suggestionItem);
+    // === Обработка множественного выбора ===
+    multiButtons.forEach(button => {
+        button.addEventListener("click", function () {
+            this.classList.toggle("selected");
         });
-    }
+    });
 
-    // === Обработка отправки и сохранение нового продукта в коллекцию ===
+    // === Обработка кнопки отправки ===
     submitButton?.addEventListener("click", function () {
-        const allProductNames = document.querySelectorAll(".product-name");
-        
-        allProductNames.forEach(input => {
-            const productName = input.value;
-            if (productName && !input.classList.contains("selected")) {
-                saveNewProduct(productName); // Сохраняем новый продукт
-            }
-        });
-
-        // Показать экран загрузки и успешное сообщение
         loadingScreen.style.display = "flex";
+
         setTimeout(() => {
             loadingScreen.style.display = "none";
             successMessage.style.display = "block";
+
             setTimeout(() => {
                 window.location.href = "index.html";
             }, 3000); // Переход через 3 секунды после показа сообщения
         }, 2000); // 2 секунды анимации загрузки
     });
-
-    // Функция для сохранения нового продукта в коллекции
-    function saveNewProduct(productName) {
-        // Здесь код для добавления нового продукта в коллекцию Firebase
-        const userProductsRef = doc(db, "products", "produser");
-        updateDoc(userProductsRef, {
-            products: arrayUnion(productName)
-        }).then(() => {
-            console.log("Продукт успешно добавлен: " + productName);
-        }).catch((error) => {
-            console.error("Ошибка при добавлении продукта: " + error);
-        });
-    }
 });
