@@ -1,5 +1,6 @@
 import { db } from "./firebase-config.js";
-import { collection, doc, setDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { collection, doc, getDoc, updateDoc, arrayUnion } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
 document.addEventListener("DOMContentLoaded", () => {
     const productList = document.getElementById("product-list");
     const addProductBtn = document.getElementById("add-product");
@@ -47,25 +48,24 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Функция для получения продуктов из базы данных (например, Firebase)
     function fetchProducts(query) {
-    return new Promise((resolve, reject) => {
-        // Получаем ссылку на коллекцию продуктов в Firebase
-        const productsRef = db.collection("products").doc("produser");
-        
-        // Запрос к коллекции для поиска продуктов, содержащих query в имени
-        productsRef.get().then((doc) => {
-            if (doc.exists) {
-                const products = doc.data().products || [];
-                const filteredProducts = products.filter(product => product.toLowerCase().includes(query.toLowerCase()));
-                resolve(filteredProducts);
-            } else {
-                reject("Нет данных в коллекции");
-            }
-        }).catch((error) => {
-            reject("Ошибка при загрузке данных: " + error);
+        return new Promise((resolve, reject) => {
+            // Получаем ссылку на коллекцию продуктов в Firebase
+            const productsRef = doc(db, "products", "produser");
+            
+            // Запрос к документу для поиска продуктов, содержащих query в имени
+            getDoc(productsRef).then((docSnap) => {
+                if (docSnap.exists()) {
+                    const products = docSnap.data().products || [];
+                    const filteredProducts = products.filter(product => product.toLowerCase().includes(query.toLowerCase()));
+                    resolve(filteredProducts);
+                } else {
+                    reject("Нет данных в коллекции");
+                }
+            }).catch((error) => {
+                reject("Ошибка при загрузке данных: " + error);
+            });
         });
-    });
-}
-
+    }
 
     // Функция для отображения предложений
     function displaySuggestions(products, suggestionsBox, inputElement) {
@@ -108,10 +108,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Функция для сохранения нового продукта в коллекции
     function saveNewProduct(productName) {
-        // Здесь код для добавления нового продукта в коллекцию Firebase, например:
-        const userProductsRef = db.collection("products").doc("produser");
-        userProductsRef.update({
-            products: firebase.firestore.FieldValue.arrayUnion(productName)
+        // Здесь код для добавления нового продукта в коллекцию Firebase
+        const userProductsRef = doc(db, "products", "produser");
+        updateDoc(userProductsRef, {
+            products: arrayUnion(productName)
         });
     }
 });
