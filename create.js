@@ -17,7 +17,11 @@ document.addEventListener("DOMContentLoaded", () => {
 
         productItem.innerHTML = `
             <input type="text" placeholder="Название продукта">
-            <input type="number" placeholder="Граммовка">
+            <input type="number" placeholder="Количество">
+            <select>
+                <option value="грамм">Грамм</option>
+                <option value="шт">Шт.</option>
+            </select>
             <button class="delete-btn">✖</button>
         `;
 
