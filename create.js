@@ -1,7 +1,9 @@
 document.addEventListener("DOMContentLoaded", () => {
     const productList = document.getElementById("product-list");
     const addProductBtn = document.getElementById("add-product");
-    const suggestionsBox = document.getElementById("suggestions");
+    const submitButton = document.querySelector(".submit-btn");
+    const loadingScreen = document.querySelector(".loading-screen");
+    const successMessage = document.querySelector(".success-message");
 
     // === Добавление продукта ===
     addProductBtn?.addEventListener("click", () => {
