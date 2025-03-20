@@ -145,37 +145,54 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function setupAutocomplete(inputField) {
-        const suggestionBox = document.createElement("div");
-        suggestionBox.classList.add("suggestions");
-        inputField.parentNode.appendChild(suggestionBox);
+    const suggestionBox = document.createElement("div");
+    suggestionBox.classList.add("suggestions");
+    inputField.parentNode.appendChild(suggestionBox);
     
-        inputField.addEventListener("input", async () => {
-            const query = inputField.value.trim();
-            suggestionBox.innerHTML = "";
-    
-            if (query.length < 2) return;
-    
-            const results = await searchProducts(query);
-            console.log(`📋 Подсказки для ${query}:`, results);
-    
-            results.forEach(product => {
-                const item = document.createElement("div");
-                item.classList.add("suggestion-item");
-                item.textContent = product;
-                item.addEventListener("click", () => {
-                    inputField.value = product;
-                    suggestionBox.innerHTML = "";
-                });
-                suggestionBox.appendChild(item);
+    inputField.addEventListener("input", async () => {
+        const query = inputField.value.trim();
+        suggestionBox.innerHTML = "";
+
+        if (query.length < 2) {
+            suggestionBox.style.display = "none";
+            return;
+        }
+
+        const results = await searchProducts(query);
+        console.log(`📋 Подсказки для ${query}:`, results);
+
+        if (results.length === 0) {
+            suggestionBox.style.display = "none";
+            return;
+        }
+
+        results.forEach(product => {
+            const item = document.createElement("div");
+            item.classList.add("suggestion-item");
+            item.textContent = product;
+            
+            // Добавляем обработчик клика
+            item.addEventListener("click", () => {
+                inputField.value = product; // Записываем выбранный продукт в поле ввода
+                suggestionBox.innerHTML = ""; // Очищаем подсказки
+                suggestionBox.style.display = "none"; // Скрываем блок подсказок
             });
+
+            suggestionBox.appendChild(item);
         });
 
-        document.addEventListener("click", (e) => {
-            if (!suggestionBox.contains(e.target) && e.target !== inputField) {
-                suggestionBox.innerHTML = "";
-            }
-        });
-    }
+        // Показываем блок с подсказками
+        suggestionBox.style.display = "block";
+    });
+
+    // Закрываем подсказки при клике вне них
+    document.addEventListener("click", (e) => {
+        if (!suggestionBox.contains(e.target) && e.target !== inputField) {
+            suggestionBox.innerHTML = "";
+            suggestionBox.style.display = "none";
+        }
+    });
+}
 
     document.getElementById("add-product").addEventListener("click", () => {
         setTimeout(() => {
