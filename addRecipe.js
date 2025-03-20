@@ -27,8 +27,8 @@ document.addEventListener("DOMContentLoaded", () => {
             console.log("✅ Изображение загружено:", imageUrl);
 
             const nextIndex = await getNextRecipeNumber();
-            const recDocName = `recept${nextIndex}`;
-            const receptMainName = `receptmain${nextIndex}`;
+            const recDocName = recept${nextIndex};
+            const receptMainName = receptmain${nextIndex};
 
             console.log("Создаём документы в Firestore...");
 
@@ -44,8 +44,8 @@ document.addEventListener("DOMContentLoaded", () => {
             
                 if (title && amount) {
                     const formattedUnit = unit === "грамм" ? "г." : "шт.";
-                    prodData[`${index + 1}`] = title;
-                    prodData[`${index + 1}-1`] = `${amount} ${formattedUnit}`;
+                    prodData[${index + 1}] = title;
+                    prodData[${index + 1}-1] = ${amount} ${formattedUnit};
                 }
             });
             console.log("✅ Продукты:", prodData);
@@ -54,7 +54,7 @@ document.addEventListener("DOMContentLoaded", () => {
             let stepData = {};
             document.querySelectorAll("#step-list .step-item input").forEach((step, index) => {
                 if (step.value) {
-                    stepData[`${index + 1}`] = step.value;
+                    stepData[${index + 1}] = step.value;
                 }
             });
             console.log("✅ Шаги приготовления:", stepData);
@@ -76,10 +76,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
         let categoryData = {};
         selectedItems.forEach((item, index) => {
-            categoryData[`${fieldName}${index + 1}`] = item; 
+            categoryData[${fieldName}${index + 1}] = item; 
         });
 
-        console.log(`✅ ${fieldName}:`, categoryData);
+        console.log(✅ ${fieldName}:, categoryData);
         await setDoc(doc(db, docName, fieldName), categoryData);
     }
 
@@ -109,7 +109,7 @@ document.addEventListener("DOMContentLoaded", () => {
     async function uploadToImgBB(imageFile) {
         let formData = new FormData();
         formData.append("image", imageFile);
-        const response = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}`, { method: "POST", body: formData });
+        const response = await fetch(https://api.imgbb.com/1/upload?key=${IMGBB_API_KEY}, { method: "POST", body: formData });
         const result = await response.json();
         if (result.success) {
             return result.data.url;
@@ -118,102 +118,90 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    let cache = {}; // Кэш для ускорения поиска
-
     async function searchProducts(query) {
         if (query.length < 2) return [];
-        query = query.toLowerCase();
-
-        if (cache[query]) return cache[query]; // Используем кэш
-
         let products = [];
-        console.log(`🔍 Ищем продукты по запросу: ${query}`);
-
-        const promises = [];
+    
+        console.log(🔍 Ищем продукты по запросу: ${query});
+    
         for (let i = 1; i <= 17; i++) {
-            const docRef = doc(db, "products", `${i}`);
-            promises.push(getDoc(docRef));
-        }
-
-        const snapshots = await Promise.all(promises);
-        snapshots.forEach((docSnap) => {
+            const docRef = doc(db, "products", ${i});
+            const docSnap = await getDoc(docRef);
+    
             if (docSnap.exists()) {
                 const productData = docSnap.data();
                 Object.values(productData).forEach(name => {
-                    if (name.toLowerCase().startsWith(query)) {
+                    const lowerName = name.toLowerCase();
+                    if (lowerName.startsWith(query.toLowerCase())) {
+                        console.log(📌 Найден продукт: ${lowerName});
                         products.push(name);
                     }
                 });
             }
-        });
-
-        products = products.slice(0, 15); // Ограничиваем до 15 результатов
-        cache[query] = products; // Сохраняем в кэше
-        console.log(`✅ Итоговый список подсказок:`, products);
+        }
+    
+        console.log(✅ Итоговый список подсказок:, products);
         return products;
     }
 
-    function debounce(func, delay) {
-        let timer;
-        return function (...args) {
-            clearTimeout(timer);
-            timer = setTimeout(() => func.apply(this, args), delay);
-        };
-    }
-
     function setupAutocomplete(inputField) {
-        const suggestionBox = document.createElement("div");
-        suggestionBox.classList.add("suggestions");
-        inputField.parentNode.appendChild(suggestionBox);
+    const suggestionBox = document.createElement("div");
+    suggestionBox.classList.add("suggestions");
+    inputField.parentNode.appendChild(suggestionBox);
+    
+    inputField.addEventListener("input", async () => {
+        const query = inputField.value.trim();
+        suggestionBox.innerHTML = "";
 
-        inputField.addEventListener("input", debounce(async () => {
-            const query = inputField.value.trim();
-            suggestionBox.innerHTML = "";
+        if (query.length < 2) {
+            suggestionBox.style.display = "none";
+            return;
+        }
 
-            if (query.length < 2) {
-                suggestionBox.style.display = "none";
-                return;
-            }
+        const results = await searchProducts(query);
+        console.log(📋 Подсказки для ${query}:, results);
 
-            const results = await searchProducts(query);
-            console.log(`📋 Подсказки для ${query}:`, results);
+        if (results.length === 0) {
+            suggestionBox.style.display = "none";
+            return;
+        }
 
-            if (results.length === 0) {
-                suggestionBox.style.display = "none";
-                return;
-            }
-
-            results.forEach(product => {
-                const item = document.createElement("div");
-                item.classList.add("suggestion-item");
-                item.textContent = product;
-                item.addEventListener("click", () => {
-                    inputField.value = product;
-                    suggestionBox.innerHTML = "";
-                    suggestionBox.style.display = "none";
-                });
-
-                suggestionBox.appendChild(item);
+        results.forEach(product => {
+            const item = document.createElement("div");
+            item.classList.add("suggestion-item");
+            item.textContent = product;
+            
+            // Добавляем обработчик клика
+            item.addEventListener("click", () => {
+                inputField.value = product; // Записываем выбранный продукт в поле ввода
+                suggestionBox.innerHTML = ""; // Очищаем подсказки
+                suggestionBox.style.display = "none"; // Скрываем блок подсказок
             });
 
-            suggestionBox.style.display = "block";
-        }, 300));
-
-        document.addEventListener("click", (e) => {
-            if (!suggestionBox.contains(e.target) && e.target !== inputField) {
-                suggestionBox.innerHTML = "";
-                suggestionBox.style.display = "none";
-            }
+            suggestionBox.appendChild(item);
         });
-    }
+
+        // Показываем блок с подсказками
+        suggestionBox.style.display = "block";
+    });
+
+    // Закрываем подсказки при клике вне них
+    document.addEventListener("click", (e) => {
+        if (!suggestionBox.contains(e.target) && e.target !== inputField) {
+            suggestionBox.innerHTML = "";
+            suggestionBox.style.display = "none";
+        }
+    });
+}
 
     document.getElementById("add-product").addEventListener("click", () => {
         setTimeout(() => {
             const newInput = document.querySelector("#product-list .product-item:last-child input[type='text']");
             if (newInput) {
+                console.log("🆕 Добавлено новое поле, подключаем автодополнение...");
                 setupAutocomplete(newInput);
             }
         }, 100);
     });
 
-});
+}); // ✅ Закрытие DOMContentLoaded
