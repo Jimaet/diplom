@@ -205,13 +205,14 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    document.addEventListener("DOMContentLoaded", () => {
-        document.getElementById("add-product").addEventListener("click", () => {
-            setTimeout(() => {
-                const newInput = document.querySelector("#product-list .product-item:last-child input[type='text']");
-                if (newInput) {
-                    console.log("🆕 Добавлено новое поле, подключаем автодополнение...");
-                    setupAutocomplete(newInput);
-                }
-            }, 100);
-        });
+document.addEventListener("DOMContentLoaded", () => {
+    document.getElementById("add-product").addEventListener("click", () => {
+        setTimeout(() => {
+            const newInput = document.querySelector("#product-list .product-item:last-child input[type='text']");
+            if (newInput) {
+                console.log("🆕 Добавлено новое поле, подключаем автодополнение...");
+                setupAutocomplete(newInput);
+            }
+        }, 100);
+    });
+});
