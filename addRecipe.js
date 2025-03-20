@@ -143,21 +143,23 @@ document.addEventListener("DOMContentLoaded", () => {
     async function searchProducts(query) {
         if (query.length < 2) return [];
         let products = [];
-        
+    
         console.log(`🔍 Ищем продукты по запросу: ${query}`);
     
         for (let i = 1; i <= 17; i++) {
-            const docRef = collection(db, `products/${i}/items`);
-            const querySnapshot = await getDocs(docRef);
+            const docRef = doc(db, "products", `${i}`);
+            const docSnap = await getDoc(docRef);
     
-            querySnapshot.forEach(doc => {
-                const name = doc.data().name.toLowerCase();
-                console.log(`📌 Найден продукт: ${name}`);
-    
-                if (name.startsWith(query.toLowerCase())) {
-                    products.push(name);
-                }
-            });
+            if (docSnap.exists()) {
+                const productData = docSnap.data();
+                Object.values(productData).forEach(name => {
+                    const lowerName = name.toLowerCase();
+                    if (lowerName.startsWith(query.toLowerCase())) {
+                        console.log(`📌 Найден продукт: ${lowerName}`);
+                        products.push(name);
+                    }
+                });
+            }
         }
     
         console.log(`✅ Итоговый список подсказок:`, products);
