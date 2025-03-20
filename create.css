@@ -107,6 +107,7 @@ body {
 .product-item {
     display: flex;
     align-items: center;
+    position: relative;
     gap: 8px;  /* Было 10px */
     margin-bottom: 8px; /* Было 10px */
 }
@@ -380,13 +381,13 @@ p {
 }
 .suggestions {
     position: absolute;
+    top: 100%;
+    left: 0;
     background: white;
     border: 1px solid #ccc;
+    z-index: 10;
     max-height: 200px;
     overflow-y: auto;
-    width: calc(100% - 2px);
-    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-    z-index: 1000;
 }
 
 .suggestion-item {
@@ -395,7 +396,10 @@ p {
     border-bottom: 1px solid #eee;
 }
 
-.suggestion-item:hover,
+
 .suggestion-item.active {
     background: #f0f0f0;
+}
+.suggestion-item:hover {
+    background: #eee;
 }
