@@ -3,7 +3,7 @@ import { collection, doc, setDoc, getDocs, getDoc } from "https://www.gstatic.co
 
 const IMGBB_API_KEY = "6353a9ccc652efaad72bf6c7b2b4fbf3"; // Вставь свой ключ от ImgBB
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
     const submitButton = document.querySelector(".submit-btn");
 
     submitButton?.addEventListener("click", async function () {
@@ -118,46 +118,42 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    async function searchProducts(query) {
-        if (query.length < 2) return [];
-        let products = [];
-    
-        console.log(`🔍 Ищем продукты по запросу: ${query}`);
-    
+    // ✅ Новый код с кэшированием продуктов
+    let cachedProducts = [];
+
+    async function loadProducts() {
+        console.log("📥 Загружаем продукты в кэш...");
         for (let i = 1; i <= 17; i++) {
             const docRef = doc(db, "products", `${i}`);
             const docSnap = await getDoc(docRef);
-    
             if (docSnap.exists()) {
-                const productData = docSnap.data();
-                Object.values(productData).forEach(name => {
-                    const lowerName = name.toLowerCase();
-                    if (lowerName.startsWith(query.toLowerCase())) {
-                        console.log(`📌 Найден продукт: ${lowerName}`);
-                        products.push(name);
-                    }
-                });
+                cachedProducts.push(...Object.values(docSnap.data()));
             }
         }
-    
-        console.log(`✅ Итоговый список подсказок:`, products);
-        return products;
+        console.log("✅ Продукты загружены в кэш:", cachedProducts);
+    }
+
+    await loadProducts();
+
+    function searchProducts(query) {
+        if (query.length < 2) return [];
+        return cachedProducts.filter(name => name.toLowerCase().startsWith(query.toLowerCase()));
     }
 
     function setupAutocomplete(inputField) {
         const suggestionBox = document.createElement("div");
         suggestionBox.classList.add("suggestions");
         inputField.parentNode.appendChild(suggestionBox);
-    
-        inputField.addEventListener("input", async () => {
+
+        inputField.addEventListener("input", () => {
             const query = inputField.value.trim();
             suggestionBox.innerHTML = "";
-    
+
             if (query.length < 2) return;
-    
-            const results = await searchProducts(query);
+
+            const results = searchProducts(query);
             console.log(`📋 Подсказки для ${query}:`, results);
-    
+
             results.forEach(product => {
                 const item = document.createElement("div");
                 item.classList.add("suggestion-item");
@@ -188,3 +184,4 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
 }); // ✅ Закрытие DOMContentLoaded
+
