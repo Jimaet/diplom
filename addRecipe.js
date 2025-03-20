@@ -118,90 +118,102 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
+    let cache = {}; // Кэш для ускорения поиска
+
     async function searchProducts(query) {
         if (query.length < 2) return [];
+        query = query.toLowerCase();
+
+        if (cache[query]) return cache[query]; // Используем кэш
+
         let products = [];
-    
         console.log(`🔍 Ищем продукты по запросу: ${query}`);
-    
+
+        const promises = [];
         for (let i = 1; i <= 17; i++) {
             const docRef = doc(db, "products", `${i}`);
-            const docSnap = await getDoc(docRef);
-    
+            promises.push(getDoc(docRef));
+        }
+
+        const snapshots = await Promise.all(promises);
+        snapshots.forEach((docSnap) => {
             if (docSnap.exists()) {
                 const productData = docSnap.data();
                 Object.values(productData).forEach(name => {
-                    const lowerName = name.toLowerCase();
-                    if (lowerName.startsWith(query.toLowerCase())) {
-                        console.log(`📌 Найден продукт: ${lowerName}`);
+                    if (name.toLowerCase().startsWith(query)) {
                         products.push(name);
                     }
                 });
             }
-        }
-    
+        });
+
+        products = products.slice(0, 15); // Ограничиваем до 15 результатов
+        cache[query] = products; // Сохраняем в кэше
         console.log(`✅ Итоговый список подсказок:`, products);
         return products;
     }
 
+    function debounce(func, delay) {
+        let timer;
+        return function (...args) {
+            clearTimeout(timer);
+            timer = setTimeout(() => func.apply(this, args), delay);
+        };
+    }
+
     function setupAutocomplete(inputField) {
-    const suggestionBox = document.createElement("div");
-    suggestionBox.classList.add("suggestions");
-    inputField.parentNode.appendChild(suggestionBox);
-    
-    inputField.addEventListener("input", async () => {
-        const query = inputField.value.trim();
-        suggestionBox.innerHTML = "";
+        const suggestionBox = document.createElement("div");
+        suggestionBox.classList.add("suggestions");
+        inputField.parentNode.appendChild(suggestionBox);
 
-        if (query.length < 2) {
-            suggestionBox.style.display = "none";
-            return;
-        }
+        inputField.addEventListener("input", debounce(async () => {
+            const query = inputField.value.trim();
+            suggestionBox.innerHTML = "";
 
-        const results = await searchProducts(query);
-        console.log(`📋 Подсказки для ${query}:`, results);
+            if (query.length < 2) {
+                suggestionBox.style.display = "none";
+                return;
+            }
 
-        if (results.length === 0) {
-            suggestionBox.style.display = "none";
-            return;
-        }
+            const results = await searchProducts(query);
+            console.log(`📋 Подсказки для ${query}:`, results);
 
-        results.forEach(product => {
-            const item = document.createElement("div");
-            item.classList.add("suggestion-item");
-            item.textContent = product;
-            
-            // Добавляем обработчик клика
-            item.addEventListener("click", () => {
-                inputField.value = product; // Записываем выбранный продукт в поле ввода
-                suggestionBox.innerHTML = ""; // Очищаем подсказки
-                suggestionBox.style.display = "none"; // Скрываем блок подсказок
+            if (results.length === 0) {
+                suggestionBox.style.display = "none";
+                return;
+            }
+
+            results.forEach(product => {
+                const item = document.createElement("div");
+                item.classList.add("suggestion-item");
+                item.textContent = product;
+                item.addEventListener("click", () => {
+                    inputField.value = product;
+                    suggestionBox.innerHTML = "";
+                    suggestionBox.style.display = "none";
+                });
+
+                suggestionBox.appendChild(item);
             });
 
-            suggestionBox.appendChild(item);
+            suggestionBox.style.display = "block";
+        }, 300));
+
+        document.addEventListener("click", (e) => {
+            if (!suggestionBox.contains(e.target) && e.target !== inputField) {
+                suggestionBox.innerHTML = "";
+                suggestionBox.style.display = "none";
+            }
         });
-
-        // Показываем блок с подсказками
-        suggestionBox.style.display = "block";
-    });
-
-    // Закрываем подсказки при клике вне них
-    document.addEventListener("click", (e) => {
-        if (!suggestionBox.contains(e.target) && e.target !== inputField) {
-            suggestionBox.innerHTML = "";
-            suggestionBox.style.display = "none";
-        }
-    });
-}
+    }
 
     document.getElementById("add-product").addEventListener("click", () => {
         setTimeout(() => {
             const newInput = document.querySelector("#product-list .product-item:last-child input[type='text']");
             if (newInput) {
-                console.log("🆕 Добавлено новое поле, подключаем автодополнение...");
                 setupAutocomplete(newInput);
             }
         }, 100);
     });
 
-}); // ✅ Закрытие DOMContentLoaded
+});
