@@ -164,7 +164,7 @@ document.addEventListener("DOMContentLoaded", () => {
         return products;
     }
 
-    function setupAutocomplete(inputField) {
+     function setupAutocomplete(inputField) {
         const suggestionBox = document.createElement("div");
         suggestionBox.classList.add("suggestions");
         inputField.parentNode.appendChild(suggestionBox);
@@ -189,24 +189,22 @@ document.addEventListener("DOMContentLoaded", () => {
                 suggestionBox.appendChild(item);
             });
         });
-    
-
 
         document.addEventListener("click", (e) => {
-        if (!suggestionBox.contains(e.target) && e.target !== inputField) {
-            suggestionBox.innerHTML = "";
-        }
-    });
-
-
-document.addEventListener("DOMContentLoaded", () => {
-    document.getElementById("add-product").addEventListener("click", () => {
-        setTimeout(() => {
-            const newInput = document.querySelector("#product-list .product-item:last-child input[type='text']");
-            if (newInput) {
-                console.log("🆕 Добавлено новое поле, подключаем автодополнение...");
-                setupAutocomplete(newInput);
+            if (!suggestionBox.contains(e.target) && e.target !== inputField) {
+                suggestionBox.innerHTML = "";
             }
-        }, 100);
+        });
+    } // ← Закрыл setupAutocomplete()
+
+    document.addEventListener("DOMContentLoaded", () => {
+        document.getElementById("add-product").addEventListener("click", () => {
+            setTimeout(() => {
+                const newInput = document.querySelector("#product-list .product-item:last-child input[type='text']");
+                if (newInput) {
+                    console.log("🆕 Добавлено новое поле, подключаем автодополнение...");
+                    setupAutocomplete(newInput);
+                }
+            }, 100);
+        });
     });
-});
