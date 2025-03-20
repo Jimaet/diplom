@@ -383,11 +383,10 @@ p {
     position: absolute;
     background: white;
     border: 1px solid #ccc;
-    width: calc(100% - 2px);
-    max-height: 150px;
+    width: 100%;
+    max-height: 200px;
     overflow-y: auto;
-    z-index: 10;
-    display: none;
+    z-index: 1000;
 }
 
 .suggestion-item {
@@ -398,4 +397,3 @@ p {
 .suggestion-item:hover {
     background: #f0f0f0;
 }
-
