@@ -71,12 +71,12 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     });
 
-    async function saveCategories(docName, fieldName, selector) {
+   async function saveCategories(docName, fieldName, selector) {
         let selectedItems = Array.from(document.querySelectorAll(selector + ".selected")).map(btn => btn.textContent.trim());
 
         let categoryData = {};
         selectedItems.forEach((item, index) => {
-            categoryData[`${fieldName}${index + 1}`] = item; 
+            categoryData[`${fieldName}${index + 1}`] = item; // Генерируем ключи: type1, type2, type3...
         });
 
         console.log(`✅ ${fieldName}:`, categoryData);
@@ -181,7 +181,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 setupAutocomplete(newInput);
             }
         }, 100);
-        function setupMultiSelect(selector) {
+function setupMultiSelect(selector) {
         document.querySelectorAll(selector).forEach(btn => {
             btn.addEventListener("click", () => {
                 console.log(`🔹 Нажата кнопка: ${btn.textContent.trim()}`);
@@ -206,7 +206,5 @@ document.addEventListener("DOMContentLoaded", async () => {
         setupMultiSelect(".category-btn"); // Вторая категория (например, горячее, закуски)
         setupMultiSelect(".tech-btn");     // Третья категория (оборудование)
     }, 500);
-    });
-
-}); // ✅ Закрытие DOMContentLoaded
+});
 
