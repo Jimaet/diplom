@@ -181,6 +181,31 @@ document.addEventListener("DOMContentLoaded", async () => {
                 setupAutocomplete(newInput);
             }
         }, 100);
+        function setupMultiSelect(selector) {
+        document.querySelectorAll(selector).forEach(btn => {
+            btn.addEventListener("click", () => {
+                console.log(`🔹 Нажата кнопка: ${btn.textContent.trim()}`);
+                btn.classList.toggle("selected");
+
+                if (btn.classList.contains("selected")) {
+                    btn.style.backgroundColor = "#4CAF50"; // Выбранный цвет
+                    btn.style.color = "#fff";
+                } else {
+                    btn.style.backgroundColor = ""; // Вернуть стандартный стиль
+                    btn.style.color = "";
+                }
+
+                console.log(`📌 ${btn.textContent.trim()} теперь ${btn.classList.contains("selected") ? "выбран" : "снят"}`);
+            });
+        });
+    }
+
+    // Дожидаемся полной загрузки DOM перед навешиванием событий
+    setTimeout(() => {
+        setupMultiSelect(".filter-btn");   // Первая категория (карусель)
+        setupMultiSelect(".category-btn"); // Вторая категория (например, горячее, закуски)
+        setupMultiSelect(".tech-btn");     // Третья категория (оборудование)
+    }, 500);
     });
 
 }); // ✅ Закрытие DOMContentLoaded
