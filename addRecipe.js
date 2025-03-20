@@ -3,7 +3,7 @@ import { collection, doc, setDoc, getDocs, getDoc } from "https://www.gstatic.co
 
 const IMGBB_API_KEY = "6353a9ccc652efaad72bf6c7b2b4fbf3"; // Вставь свой ключ от ImgBB
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
     const submitButton = document.querySelector(".submit-btn");
 
     submitButton?.addEventListener("click", async function () {
@@ -105,28 +105,28 @@ document.addEventListener("DOMContentLoaded", () => {
 
         return newNumber;
     }
-let allProducts = [];
 
-async function loadAllProducts() {
-    const db = firebase.firestore();
-    allProducts = [];
+    let allProducts = [];
 
-    for (let i = 1; i <= 17; i++) {
-        const docRef = db.collection("products").doc(i.toString());
-        const docSnap = await docRef.get();
-        
-        if (docSnap.exists) {
-            const data = docSnap.data();
-            if (data && data.list) {
-                allProducts = allProducts.concat(data.list);
+    async function loadAllProducts() {
+        allProducts = [];
+
+        for (let i = 1; i <= 17; i++) {
+            const docRef = doc(db, "products", i.toString());
+            const docSnap = await getDoc(docRef);
+            
+            if (docSnap.exists()) {
+                const data = docSnap.data();
+                if (data && Array.isArray(data.list)) {
+                    allProducts = allProducts.concat(data.list);
+                }
             }
         }
+        console.log("✅ Все продукты загружены:", allProducts);
     }
-    console.log("✅ Все продукты загружены:", allProducts);
-}
 
-// Загружаем продукты при открытии страницы
-document.addEventListener("DOMContentLoaded", loadAllProducts);
+    await loadAllProducts();
+
     async function uploadToImgBB(imageFile) {
         let formData = new FormData();
         formData.append("image", imageFile);
@@ -155,96 +155,62 @@ document.addEventListener("DOMContentLoaded", loadAllProducts);
         });
     }
 
-    setTimeout(() => {
-        setupMultiSelect(".filter-btn");
-        setupMultiSelect(".category-btn");
-        setupMultiSelect(".tech-btn");
-    }, 500);
+    setupMultiSelect(".filter-btn");
+    setupMultiSelect(".category-btn");
+    setupMultiSelect(".tech-btn");
 
     async function searchProducts(query) {
         if (query.length < 2) return [];
-        let products = [];
-    
-        console.log(`🔍 Ищем продукты по запросу: ${query}`);
-    
-        for (let i = 1; i <= 17; i++) {
-            const docRef = doc(db, "products", `${i}`);
-            const docSnap = await getDoc(docRef);
-    
-            if (docSnap.exists()) {
-                const productData = docSnap.data();
-                Object.values(productData).forEach(name => {
-                    const lowerName = name.toLowerCase();
-                    if (lowerName.startsWith(query.toLowerCase())) {
-                        console.log(`📌 Найден продукт: ${lowerName}`);
-                        products.push(name);
-                    }
-                });
-            }
-        }
-    
-        console.log(`✅ Итоговый список подсказок:`, products);
-        return products;
+        return allProducts.filter(product => product.toLowerCase().includes(query.toLowerCase()));
     }
 
-function setupAutocomplete(inputField) {
-    const suggestionBox = document.createElement("div");
-    suggestionBox.classList.add("suggestions");
-    inputField.parentNode.appendChild(suggestionBox);
+    function setupAutocomplete(inputField) {
+        const suggestionBox = document.createElement("div");
+        suggestionBox.classList.add("suggestions");
+        inputField.parentNode.appendChild(suggestionBox);
 
-    inputField.addEventListener("input", () => {
-        const query = inputField.value.trim().toLowerCase();
-        suggestionBox.innerHTML = "";
+        inputField.addEventListener("input", async () => {
+            const query = inputField.value.trim().toLowerCase();
+            suggestionBox.innerHTML = "";
 
-        if (query.length < 2) return;
+            if (query.length < 2) return;
 
-        const filteredProducts = allProducts.filter(product => 
-            product.toLowerCase().includes(query)
-        );
+            const filteredProducts = await searchProducts(query);
 
-        console.log(`📋 Подсказки для "${query}":`, filteredProducts);
+            if (filteredProducts.length === 0) {
+                suggestionBox.style.display = "none";
+                return;
+            }
 
-        if (filteredProducts.length === 0) {
-            suggestionBox.style.display = "none";
-            return;
-        }
+            suggestionBox.style.display = "block";
+            filteredProducts.forEach(product => {
+                const item = document.createElement("div");
+                item.classList.add("suggestion-item");
+                item.textContent = product;
+                item.addEventListener("click", () => {
+                    inputField.value = product;
+                    suggestionBox.innerHTML = "";
+                    suggestionBox.style.display = "none";
+                });
+                suggestionBox.appendChild(item);
+            });
+        });
 
-        suggestionBox.style.display = "block";
-        filteredProducts.forEach(product => {
-            const item = document.createElement("div");
-            item.classList.add("suggestion-item");
-            item.textContent = product;
-            item.addEventListener("click", () => {
-                inputField.value = product;
+        document.addEventListener("click", (e) => {
+            if (!suggestionBox.contains(e.target) && e.target !== inputField) {
                 suggestionBox.innerHTML = "";
                 suggestionBox.style.display = "none";
-            });
-            suggestionBox.appendChild(item);
+            }
         });
-    });
+    }
 
-    document.addEventListener("click", (e) => {
-        if (!suggestionBox.contains(e.target) && e.target !== inputField) {
-            suggestionBox.innerHTML = "";
-            suggestionBox.style.display = "none";
-        }
-    });
-}
-
-// Применяем автодополнение к нужному полю ввода
-document.addEventListener("DOMContentLoaded", () => {
     const inputField = document.getElementById("product-input");
-    setupAutocomplete(inputField);
-});
+    if (inputField) setupAutocomplete(inputField);
 
     document.getElementById("add-product").addEventListener("click", () => {
         setTimeout(() => {
             const newInput = document.querySelector("#product-list .product-item:last-child input[type='text']");
-            if (newInput) {
-                console.log("🆕 Добавлено новое поле, подключаем автодополнение...");
-                setupAutocomplete(newInput);
-            }
+            if (newInput) setupAutocomplete(newInput);
         }, 100);
     });
-
-}); // ✅ ОДИН `DOMContentLoaded`
+});
