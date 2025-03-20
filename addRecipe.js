@@ -118,71 +118,27 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    function setupMultiSelect(selector) {
-        document.querySelectorAll(selector).forEach(btn => {
-            btn.addEventListener("click", () => {
-                btn.classList.toggle("selected");
-
-                if (btn.classList.contains("selected")) {
-                    btn.style.backgroundColor = "#4CAF50";
-                    btn.style.color = "#fff";
-                } else {
-                    btn.style.backgroundColor = "";
-                    btn.style.color = "";
-                }
-            });
-        });
-    }
-
-    setTimeout(() => {
-        setupMultiSelect(".filter-btn");
-        setupMultiSelect(".category-btn");
-        setupMultiSelect(".tech-btn");
-    }, 500);
-
-    async function searchProducts(query) {
-        if (query.length < 2) return [];
-        let products = [];
+function setupAutocomplete(inputField) {
+    const suggestionBox = document.createElement("div");
+    suggestionBox.classList.add("suggestions");
+    inputField.parentNode.appendChild(suggestionBox);
     
-        console.log(`🔍 Ищем продукты по запросу: ${query}`);
-    
-        for (let i = 1; i <= 17; i++) {
-            const docRef = doc(db, "products", `${i}`);
-            const docSnap = await getDoc(docRef);
-    
-            if (docSnap.exists()) {
-                const productData = docSnap.data();
-                Object.values(productData).forEach(name => {
-                    const lowerName = name.toLowerCase();
-                    if (lowerName.startsWith(query.toLowerCase())) {
-                        console.log(`📌 Найден продукт: ${lowerName}`);
-                        products.push(name);
-                    }
-                });
-            }
-        }
-    
-        console.log(`✅ Итоговый список подсказок:`, products);
-        return products;
-    }
-
-    function setupAutocomplete(inputField) {
-    let suggestionBox = inputField.parentNode.querySelector(".suggestions");
-    
-    if (!suggestionBox) {
-        suggestionBox = document.createElement("div");
-        suggestionBox.classList.add("suggestions");
-        inputField.parentNode.appendChild(suggestionBox);
-    }
-
     inputField.addEventListener("input", async () => {
         const query = inputField.value.trim();
         suggestionBox.innerHTML = "";
 
-        if (query.length < 2) return;
+        if (query.length < 2) {
+            suggestionBox.style.display = "none";
+            return;
+        }
 
         const results = await searchProducts(query);
         console.log(`📋 Подсказки для ${query}:`, results);
+
+        if (results.length === 0) {
+            suggestionBox.style.display = "none";
+            return;
+        }
 
         results.forEach(product => {
             const item = document.createElement("div");
@@ -191,17 +147,22 @@ document.addEventListener("DOMContentLoaded", () => {
             item.addEventListener("click", () => {
                 inputField.value = product;
                 suggestionBox.innerHTML = "";
+                suggestionBox.style.display = "none";
             });
             suggestionBox.appendChild(item);
         });
+
+        suggestionBox.style.display = "block";
     });
 
     document.addEventListener("click", (e) => {
         if (!suggestionBox.contains(e.target) && e.target !== inputField) {
             suggestionBox.innerHTML = "";
+            suggestionBox.style.display = "none";
         }
     });
 }
+
 
 document.getElementById("add-product").addEventListener("click", () => {
     setTimeout(() => {
