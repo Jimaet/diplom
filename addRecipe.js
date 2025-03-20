@@ -167,26 +167,24 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function setupAutocomplete(inputField) {
-    const suggestionBox = document.createElement("div");
-    suggestionBox.classList.add("suggestions");
-    inputField.parentNode.style.position = "relative"; // Делаем родителя позиционируемым
-    inputField.parentNode.appendChild(suggestionBox);
-
-    let selectedIndex = -1; // Индекс для навигации стрелками
+    let suggestionBox = inputField.parentNode.querySelector(".suggestions");
+    
+    if (!suggestionBox) {
+        suggestionBox = document.createElement("div");
+        suggestionBox.classList.add("suggestions");
+        inputField.parentNode.appendChild(suggestionBox);
+    }
 
     inputField.addEventListener("input", async () => {
         const query = inputField.value.trim();
         suggestionBox.innerHTML = "";
-        selectedIndex = -1; // Сброс индекса
 
         if (query.length < 2) return;
 
         const results = await searchProducts(query);
         console.log(`📋 Подсказки для ${query}:`, results);
 
-        if (results.length === 0) return;
-
-        results.forEach((product, index) => {
+        results.forEach(product => {
             const item = document.createElement("div");
             item.classList.add("suggestion-item");
             item.textContent = product;
@@ -198,26 +196,6 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 
-    inputField.addEventListener("keydown", (e) => {
-        const items = suggestionBox.querySelectorAll(".suggestion-item");
-
-        if (e.key === "ArrowDown") {
-            selectedIndex = (selectedIndex + 1) % items.length;
-        } else if (e.key === "ArrowUp") {
-            selectedIndex = (selectedIndex - 1 + items.length) % items.length;
-        } else if (e.key === "Enter") {
-            if (selectedIndex >= 0) {
-                inputField.value = items[selectedIndex].textContent;
-                suggestionBox.innerHTML = "";
-                e.preventDefault();
-            }
-        }
-
-        items.forEach((item, index) => {
-            item.classList.toggle("active", index === selectedIndex);
-        });
-    });
-
     document.addEventListener("click", (e) => {
         if (!suggestionBox.contains(e.target) && e.target !== inputField) {
             suggestionBox.innerHTML = "";
@@ -225,14 +203,12 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 }
 
-    document.getElementById("add-product").addEventListener("click", () => {
-        setTimeout(() => {
-            const newInput = document.querySelector("#product-list .product-item:last-child input[type='text']");
-            if (newInput) {
-                console.log("🆕 Добавлено новое поле, подключаем автодополнение...");
-                setupAutocomplete(newInput);
-            }
-        }, 100);
-    });
-
-}); // ✅ ОДИН `DOMContentLoaded`
+document.getElementById("add-product").addEventListener("click", () => {
+    setTimeout(() => {
+        const newInput = document.querySelector("#product-list .product-item:last-child input[type='text']");
+        if (newInput) {
+            console.log("🆕 Добавлено новое поле, подключаем автодополнение...");
+            setupAutocomplete(newInput);
+        }
+    }, 100);
+});
