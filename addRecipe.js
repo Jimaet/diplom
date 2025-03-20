@@ -166,38 +166,46 @@ document.addEventListener("DOMContentLoaded", () => {
         return products;
     }
 
-    function setupAutocomplete(inputField) {
-        const suggestionBox = document.createElement("div");
-        suggestionBox.classList.add("suggestions");
-        inputField.parentNode.appendChild(suggestionBox);
+function setupAutocomplete(inputField) {
+    const suggestionBox = document.createElement("div");
+    suggestionBox.classList.add("suggestions");
+    inputField.parentNode.appendChild(suggestionBox);
     
-        inputField.addEventListener("input", async () => {
-            const query = inputField.value.trim();
-            suggestionBox.innerHTML = "";
-    
-            if (query.length < 2) return;
-    
-            const results = await searchProducts(query);
-            console.log(`📋 Подсказки для ${query}:`, results);
-    
-            results.forEach(product => {
-                const item = document.createElement("div");
-                item.classList.add("suggestion-item");
-                item.textContent = product;
-                item.addEventListener("click", () => {
-                    inputField.value = product;
-                    suggestionBox.innerHTML = "";
-                });
-                suggestionBox.appendChild(item);
-            });
-        });
+    inputField.addEventListener("input", async () => {
+        const query = inputField.value.trim();
+        suggestionBox.innerHTML = "";
 
-        document.addEventListener("click", (e) => {
-            if (!suggestionBox.contains(e.target) && e.target !== inputField) {
+        if (query.length < 2) return;
+
+        const results = await searchProducts(query);
+        console.log(`📋 Подсказки для ${query}:`, results);
+
+        if (results.length === 0) {
+            suggestionBox.style.display = "none";
+            return;
+        }
+
+        suggestionBox.style.display = "block";
+        results.forEach(product => {
+            const item = document.createElement("div");
+            item.classList.add("suggestion-item");
+            item.textContent = product;
+            item.addEventListener("click", () => {
+                inputField.value = product;
                 suggestionBox.innerHTML = "";
-            }
+                suggestionBox.style.display = "none";
+            });
+            suggestionBox.appendChild(item);
         });
-    }
+    });
+
+    document.addEventListener("click", (e) => {
+        if (!suggestionBox.contains(e.target) && e.target !== inputField) {
+            suggestionBox.innerHTML = "";
+            suggestionBox.style.display = "none";
+        }
+    });
+}
 
     document.getElementById("add-product").addEventListener("click", () => {
         setTimeout(() => {
