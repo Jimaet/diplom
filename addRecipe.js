@@ -167,37 +167,63 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     function setupAutocomplete(inputField) {
-        const suggestionBox = document.createElement("div");
-        suggestionBox.classList.add("suggestions");
-        inputField.parentNode.appendChild(suggestionBox);
-    
-        inputField.addEventListener("input", async () => {
-            const query = inputField.value.trim();
-            suggestionBox.innerHTML = "";
-    
-            if (query.length < 2) return;
-    
-            const results = await searchProducts(query);
-            console.log(`📋 Подсказки для ${query}:`, results);
-    
-            results.forEach(product => {
-                const item = document.createElement("div");
-                item.classList.add("suggestion-item");
-                item.textContent = product;
-                item.addEventListener("click", () => {
-                    inputField.value = product;
-                    suggestionBox.innerHTML = "";
-                });
-                suggestionBox.appendChild(item);
-            });
-        });
+    const suggestionBox = document.createElement("div");
+    suggestionBox.classList.add("suggestions");
+    inputField.parentNode.style.position = "relative"; // Делаем родителя позиционируемым
+    inputField.parentNode.appendChild(suggestionBox);
 
-        document.addEventListener("click", (e) => {
-            if (!suggestionBox.contains(e.target) && e.target !== inputField) {
+    let selectedIndex = -1; // Индекс для навигации стрелками
+
+    inputField.addEventListener("input", async () => {
+        const query = inputField.value.trim();
+        suggestionBox.innerHTML = "";
+        selectedIndex = -1; // Сброс индекса
+
+        if (query.length < 2) return;
+
+        const results = await searchProducts(query);
+        console.log(`📋 Подсказки для ${query}:`, results);
+
+        if (results.length === 0) return;
+
+        results.forEach((product, index) => {
+            const item = document.createElement("div");
+            item.classList.add("suggestion-item");
+            item.textContent = product;
+            item.addEventListener("click", () => {
+                inputField.value = product;
                 suggestionBox.innerHTML = "";
-            }
+            });
+            suggestionBox.appendChild(item);
         });
-    }
+    });
+
+    inputField.addEventListener("keydown", (e) => {
+        const items = suggestionBox.querySelectorAll(".suggestion-item");
+
+        if (e.key === "ArrowDown") {
+            selectedIndex = (selectedIndex + 1) % items.length;
+        } else if (e.key === "ArrowUp") {
+            selectedIndex = (selectedIndex - 1 + items.length) % items.length;
+        } else if (e.key === "Enter") {
+            if (selectedIndex >= 0) {
+                inputField.value = items[selectedIndex].textContent;
+                suggestionBox.innerHTML = "";
+                e.preventDefault();
+            }
+        }
+
+        items.forEach((item, index) => {
+            item.classList.toggle("active", index === selectedIndex);
+        });
+    });
+
+    document.addEventListener("click", (e) => {
+        if (!suggestionBox.contains(e.target) && e.target !== inputField) {
+            suggestionBox.innerHTML = "";
+        }
+    });
+}
 
     document.getElementById("add-product").addEventListener("click", () => {
         setTimeout(() => {
