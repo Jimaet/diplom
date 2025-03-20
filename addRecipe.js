@@ -71,7 +71,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     });
 
-   async function saveCategories(docName, fieldName, selector) {
+    async function saveCategories(docName, fieldName, selector) {
         let selectedItems = Array.from(document.querySelectorAll(selector + ".selected")).map(btn => btn.textContent.trim());
 
         let categoryData = {};
@@ -118,7 +118,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     }
 
-    // ✅ Новый код с кэшированием продуктов
     let cachedProducts = [];
 
     async function loadProducts() {
@@ -181,39 +180,19 @@ document.addEventListener("DOMContentLoaded", async () => {
                 setupAutocomplete(newInput);
             }
         }, 100);
-document.getElementById("add-product").addEventListener("click", () => {
-    setTimeout(() => {
-        const newInput = document.querySelector("#product-list .product-item:last-child input[type='text']");
-        if (newInput) {
-            console.log("🆕 Добавлено новое поле, подключаем автодополнение...");
-            setupAutocomplete(newInput);
-        }
-    }, 100);
-});
-
-// Исправленная функция setupMultiSelect
-function setupMultiSelect(selector) {
-    document.querySelectorAll(selector).forEach(btn => {
-        btn.addEventListener("click", () => {
-            console.log(`🔹 Нажата кнопка: ${btn.textContent.trim()}`);
-            btn.classList.toggle("selected");
-
-            if (btn.classList.contains("selected")) {
-                btn.style.backgroundColor = "#4CAF50"; // Выбранный цвет
-                btn.style.color = "#fff";
-            } else {
-                btn.style.backgroundColor = ""; // Вернуть стандартный стиль
-                btn.style.color = "";
-            }
-
-            console.log(`📌 ${btn.textContent.trim()} теперь ${btn.classList.contains("selected") ? "выбран" : "снят"}`);
-        });
     });
-}
 
-// Дожидаемся полной загрузки DOM перед навешиванием событий
-setTimeout(() => {
-    setupMultiSelect(".filter-btn");   // Первая категория (карусель)
-    setupMultiSelect(".category-btn"); // Вторая категория (например, горячее, закуски)
-    setupMultiSelect(".tech-btn");     // Третья категория (оборудование)
-}, 500);
+    function setupMultiSelect(selector) {
+        document.querySelectorAll(selector).forEach(btn => {
+            btn.addEventListener("click", () => {
+                btn.classList.toggle("selected");
+            });
+        });
+    }
+
+    setTimeout(() => {
+        setupMultiSelect(".filter-btn");
+        setupMultiSelect(".category-btn");
+        setupMultiSelect(".tech-btn");
+    }, 500);
+});
