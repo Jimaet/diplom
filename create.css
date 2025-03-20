@@ -379,21 +379,3 @@ p {
     background-color: #5D7B76;
     color: white;
 }
-.suggestions {
-    position: absolute;
-    background: white;
-    border: 1px solid #ccc;
-    width: 100%;
-    max-height: 200px;
-    overflow-y: auto;
-    z-index: 1000;
-}
-
-.suggestion-item {
-    padding: 8px;
-    cursor: pointer;
-}
-
-.suggestion-item:hover {
-    background: #f0f0f0;
-}
