@@ -197,5 +197,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 if (newInput) setupAutocomplete(newInput);
             }, 100);
         });
+
+        document.querySelectorAll("#product-list .product-item input[type='text']").forEach(setupAutocomplete);
     });
 });
