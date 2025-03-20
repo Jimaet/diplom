@@ -190,12 +190,6 @@ document.addEventListener("DOMContentLoaded", () => {
             });
         });
     
-        document.addEventListener("click", (e) => {
-            if (!suggestionBox.contains(e.target) && e.target !== inputField) {
-                suggestionBox.innerHTML = "";
-            }
-        });
-    }
 
 
         document.addEventListener("click", (e) => {
