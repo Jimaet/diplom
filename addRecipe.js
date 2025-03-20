@@ -105,7 +105,28 @@ document.addEventListener("DOMContentLoaded", () => {
 
         return newNumber;
     }
+let allProducts = [];
 
+async function loadAllProducts() {
+    const db = firebase.firestore();
+    allProducts = [];
+
+    for (let i = 1; i <= 17; i++) {
+        const docRef = db.collection("products").doc(i.toString());
+        const docSnap = await docRef.get();
+        
+        if (docSnap.exists) {
+            const data = docSnap.data();
+            if (data && data.list) {
+                allProducts = allProducts.concat(data.list);
+            }
+        }
+    }
+    console.log("✅ Все продукты загружены:", allProducts);
+}
+
+// Загружаем продукты при открытии страницы
+document.addEventListener("DOMContentLoaded", loadAllProducts);
     async function uploadToImgBB(imageFile) {
         let formData = new FormData();
         formData.append("image", imageFile);
@@ -170,23 +191,26 @@ function setupAutocomplete(inputField) {
     const suggestionBox = document.createElement("div");
     suggestionBox.classList.add("suggestions");
     inputField.parentNode.appendChild(suggestionBox);
-    
-    inputField.addEventListener("input", async () => {
-        const query = inputField.value.trim();
+
+    inputField.addEventListener("input", () => {
+        const query = inputField.value.trim().toLowerCase();
         suggestionBox.innerHTML = "";
 
         if (query.length < 2) return;
 
-        const results = await searchProducts(query);
-        console.log(`📋 Подсказки для ${query}:`, results);
+        const filteredProducts = allProducts.filter(product => 
+            product.toLowerCase().includes(query)
+        );
 
-        if (results.length === 0) {
+        console.log(`📋 Подсказки для "${query}":`, filteredProducts);
+
+        if (filteredProducts.length === 0) {
             suggestionBox.style.display = "none";
             return;
         }
 
         suggestionBox.style.display = "block";
-        results.forEach(product => {
+        filteredProducts.forEach(product => {
             const item = document.createElement("div");
             item.classList.add("suggestion-item");
             item.textContent = product;
@@ -206,6 +230,12 @@ function setupAutocomplete(inputField) {
         }
     });
 }
+
+// Применяем автодополнение к нужному полю ввода
+document.addEventListener("DOMContentLoaded", () => {
+    const inputField = document.getElementById("product-input");
+    setupAutocomplete(inputField);
+});
 
     document.getElementById("add-product").addEventListener("click", () => {
         setTimeout(() => {
