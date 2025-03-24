@@ -7,6 +7,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     setupAutocompleteForExistingInputs();
     setupMultiSelect(".equipment-btn"); // ✅ Добавляем множественный выбор для оборудования
 });
+
 document.querySelector(".recipe-btn").addEventListener("click", async () => {
     const selectedProducts = [...document.querySelectorAll("#product-list .product-item input[type='text']")]
         .map(input => input.value.trim())
@@ -114,7 +115,6 @@ async function loadProducts() {
         if (docSnap.exists()) {
             cachedProducts.push(...Object.values(docSnap.data()));
             console.log("Добавлено в кэш:", Object.values(docSnap.data()));
-
         }
     }
     console.log("✅ Продукты загружены в кэш:", cachedProducts);
@@ -173,50 +173,43 @@ function setupMultiSelect(selector) {
         });
     });
 }
+
 function createRecipeCard(recipeData, recipeId, photoUrl, recipeDis) {
     try {
-    const card = document.createElement("div");
-    card.classList.add("recipe-card");
+        const card = document.createElement("div");
+        card.classList.add("recipe-card");
 
-    const img = document.createElement("img");
-    img.src = photoUrl;
-    img.alt = recipeData.name || "Рецепт без названия";
+        const img = document.createElement("img");
+        img.src = photoUrl;
+        img.alt = recipeData.name || "Рецепт без названия";
 
-    const infoContainer = document.createElement("div");
-    infoContainer.classList.add("recipe-info");
+        const infoContainer = document.createElement("div");
+        infoContainer.classList.add("recipe-info");
 
-    const title = document.createElement("h3");
-    title.classList.add("recipe-title");
-    title.textContent = recipeData.name || "Без названия";
+        const title = document.createElement("h3");
+        title.classList.add("recipe-title");
+        title.textContent = recipeData.name || "Без названия";
 
-    const description = document.createElement("p");
-    description.classList.add("recipe-description");
-    description.textContent = recipeDis || "Описание отсутствует";
+        const description = document.createElement("p");
+        description.classList.add("recipe-description");
+        description.textContent = recipeDis || "Описание отсутствует";
 
-    const startButton = document.createElement("button");
-    startButton.classList.add("start-button");
-    startButton.textContent = "Начать";
-    startButton.addEventListener("click", () => {
-        window.location.href = `recipe.html?id=${recipeId}`;
-    });
+        const startButton = document.createElement("button");
+        startButton.classList.add("start-button");
+        startButton.textContent = "Начать";
+        startButton.addEventListener("click", () => {
+            window.location.href = `recipe.html?id=${recipeId}`;
+        });
 
-    const favoriteButton = document.createElement("button");
-    favoriteButton.classList.add("favorite-button");
-    favoriteButton.innerHTML = "❤️";
-    favoriteButton.addEventListener("click", () => {
-        favoriteButton.classList.toggle("active");
-    });
+        infoContainer.appendChild(title);
+        infoContainer.appendChild(description);
+        card.appendChild(img);
+        card.appendChild(infoContainer);
+        card.appendChild(startButton);
 
-    infoContainer.appendChild(title);
-    infoContainer.appendChild(description);
-    card.appendChild(img);
-    card.appendChild(infoContainer);
-    card.appendChild(startButton);
-    card.appendChild(favoriteButton);
-
-    console.log("✅ Успешно создана карточка рецепта:", recipeData.name);
-    return card;
-} catch (error) {
-    console.error("❌ Ошибка при создании карточки рецепта:", error);
-    return null;
+        return card;
+    } catch (error) {
+        console.error("❌ Ошибка при создании карточки рецепта:", error);
+        return null;
+    }
 }
