@@ -1,5 +1,5 @@
 import { db } from "./firebase-config.js";
-import { collection, doc, getDocs, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { collection, getDocs, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 document.querySelector(".recipe-btn").addEventListener("click", async () => {
     const userProducts = Array.from(document.querySelectorAll("#product-list input[type='text']"))
@@ -15,28 +15,32 @@ document.querySelector(".recipe-btn").addEventListener("click", async () => {
 
     let matchingRecipes = [];
 
-    for (let i = 0; i <= 9; i++) { // Перебираем рецепты receptmain0 - receptmain9
-        const prodRef = doc(db, `receptmain${i}`, "prod");
+    // Получаем список всех рецептов (receptmainX)
+    const receptmainRef = collection(db, "receptmain");
+    const receptmainSnapshot = await getDocs(receptmainRef);
+
+    for (const receptmainDoc of receptmainSnapshot.docs) {
+        const receptmainId = receptmainDoc.id; // например, receptmain0
+        const prodRef = doc(db, receptmainId, "prod");
         const prodSnap = await getDoc(prodRef);
 
         if (prodSnap.exists()) {
             const prodData = prodSnap.data();
-            const recipeProducts = Object.values(prodData)
-                .filter((_, key) => !key.includes("-")) // Игнорируем граммовку
-                .map(p => p.toLowerCase());
+            const recipeProducts = Object.entries(prodData)
+                .filter(([key, _]) => !key.includes("-")) // Игнорируем граммовку
+                .map(([_, value]) => value.toLowerCase());
 
-            console.log(`📖 Продукты в receptmain${i}:`, recipeProducts);
+            console.log(`📖 Продукты в ${receptmainId}:`, recipeProducts);
 
             // Проверяем, есть ли все продукты пользователя в рецепте
             if (userProducts.every(p => recipeProducts.includes(p))) {
-                matchingRecipes.push(`recept${i}`);
+                matchingRecipes.push(receptmainId.replace("receptmain", "recept"));
             }
         }
     }
 
     console.log("✅ Подходящие рецепты:", matchingRecipes);
 });
-
 // 📌 Выводим найденные рецепты
 function displayRecipes(recipes) {
     let container = document.getElementById("recipe-list");
