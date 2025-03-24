@@ -13,31 +13,25 @@ document.querySelector(".recipe-btn").addEventListener("click", async () => {
         return;
     }
 
-    // Загружаем рецепты из Firestore
-    const recipesRef = collection(db, "rec"); // Коллекция с рецептами
-    const querySnapshot = await getDocs(recipesRef);
     let matchingRecipes = [];
 
-    for (const docSnap of querySnapshot.docs) {
-        const recipeId = docSnap.id; // ID рецепта (например, recept0)
-
-        // Загружаем продукты рецепта
-        const prodRef = doc(db, `rec/${recipeId}/receptmain${recipeId.replace('recept', '')}`, "prod");
+    // Проходим по возможным рецептам
+    for (let i = 0; i <= 9; i++) {
+        const prodRef = doc(db, `receptmain${i}`, "prod");
         const prodSnap = await getDoc(prodRef);
 
         if (prodSnap.exists()) {
             const recipeProducts = Object.values(prodSnap.data()).map(p => p.toLowerCase());
-            console.log(`📖 Продукты в ${recipeId}:`, recipeProducts);
+            console.log(`📖 Продукты в receptmain${i}:`, recipeProducts);
 
-            // Новая проверка: ВСЕ введённые продукты должны быть в рецепте, но рецепт может содержать больше продуктов
-            if (userProducts.every(prod => recipeProducts.includes(prod))) {
-                matchingRecipes.push(recipeId);
+            // Проверяем, содержит ли рецепт только введённые продукты
+            if (recipeProducts.every(prod => userProducts.includes(prod))) {
+                matchingRecipes.push(`recept${i}`);
             }
         }
     }
 
     console.log("✅ Подходящие рецепты:", matchingRecipes);
-    displayRecipes(matchingRecipes);
 });
 
 // 📌 Выводим найденные рецепты
