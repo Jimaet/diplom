@@ -48,7 +48,8 @@ document.addEventListener("DOMContentLoaded", async () => {
                     prodData[`${index + 1}-1`] = `${amount} ${formattedUnit}`;
                 }
             });
-            console.log("✅ Продукты:", prodData);
+
+            await checkAndSaveProducts(prodData); // Проверяем наличие продуктов
             await setDoc(doc(db, receptMainName, "prod"), prodData);
 
             let stepData = {};
@@ -57,7 +58,6 @@ document.addEventListener("DOMContentLoaded", async () => {
                     stepData[`${index + 1}`] = step.value;
                 }
             });
-            console.log("✅ Шаги приготовления:", stepData);
             await setDoc(doc(db, receptMainName, "step"), stepData);
 
             await saveCategories(receptMainName, "type", ".filter-btn");
@@ -71,15 +71,33 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     });
 
+    async function checkAndSaveProducts(prodData) {
+        const missingProducts = {};
+        const productSet = new Set(cachedProducts); // Используем кэш для быстрого поиска
+
+        for (let key in prodData) {
+            if (!key.includes("-1")) { // Пропускаем ключи с количеством
+                const productName = prodData[key];
+                if (!productSet.has(productName)) {
+                    missingProducts[key] = productName;
+                }
+            }
+        }
+
+        if (Object.keys(missingProducts).length > 0) {
+            console.warn("⚠️ Найдены отсутствующие продукты:", missingProducts);
+            await setDoc(doc(db, "products", "18"), missingProducts, { merge: true });
+        }
+    }
+
     async function saveCategories(docName, fieldName, selector) {
         let selectedItems = Array.from(document.querySelectorAll(selector + ".selected")).map(btn => btn.textContent.trim());
 
         let categoryData = {};
         selectedItems.forEach((item, index) => {
-            categoryData[`${fieldName}${index + 1}`] = item; // Генерируем ключи: type1, type2, type3...
+            categoryData[`${fieldName}${index + 1}`] = item;
         });
 
-        console.log(`✅ ${fieldName}:`, categoryData);
         await setDoc(doc(db, docName, fieldName), categoryData);
     }
 
@@ -151,7 +169,6 @@ document.addEventListener("DOMContentLoaded", async () => {
             if (query.length < 2) return;
 
             const results = searchProducts(query);
-            console.log(`📋 Подсказки для ${query}:`, results);
 
             results.forEach(product => {
                 const item = document.createElement("div");
@@ -176,7 +193,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         setTimeout(() => {
             const newInput = document.querySelector("#product-list .product-item:last-child input[type='text']");
             if (newInput) {
-                console.log("🆕 Добавлено новое поле, подключаем автодополнение...");
                 setupAutocomplete(newInput);
             }
         }, 100);
