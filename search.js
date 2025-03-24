@@ -47,7 +47,15 @@ function displayRecipes(recipes) {
         ? recipes.map(id => `<p>Рецепт: ${id}</p>`).join("")
         : "<p>Нет подходящих рецептов</p>";
 }
-
+console.log(`📌 Проверяем рецепты...`);
+for (let i = 0; i <= 9; i++) {
+    const docRef = doc(db, "rec", `recept${i}`, "receptmain", `${i}`);
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+        const recipeProducts = Object.values(docSnap.data().prod || {});
+        console.log(`📖 recept${i} содержит:`, recipeProducts);
+    }
+}
 // 🔧 Создаем контейнер для вывода рецептов (если его нет)
 function createRecipeListContainer() {
     const container = document.createElement("div");
