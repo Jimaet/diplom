@@ -1,16 +1,17 @@
 import { db } from "./firebase-config.js";
-import { collection, doc, setDoc, getDocs, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { collection, doc, getDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 let cachedProducts = [];
 document.addEventListener("DOMContentLoaded", async () => {
     await loadProducts();
+    console.log("✅ Продукты загружены, настраиваем интерфейс...");
     setupAutocompleteForExistingInputs();
-    setupMultiSelect(".equipment-btn"); // ✅ Добавляем множественный выбор для оборудования
+    setupMultiSelect(".equipment-btn");
 });
 
 document.querySelector(".recipe-btn").addEventListener("click", async () => {
     const selectedProducts = [...document.querySelectorAll("#product-list .product-item input[type='text']")]
-        .map(input => input.value.trim())
+        .map(input => input.value.trim().toLowerCase())
         .filter(value => value);
 
     if (selectedProducts.length === 0) {
@@ -24,71 +25,65 @@ document.querySelector(".recipe-btn").addEventListener("click", async () => {
 
     let foundRecipes = [];
 
-for (let i = 0; i < 100; i++) {
-    try {
-        const recipeMainRef = collection(db, `receptmain${i}`);
-        const prodDoc = await getDoc(doc(recipeMainRef, "prod"));
+    for (let i = 0; i < 100; i++) {
+        try {
+            const recipeMainRef = collection(db, `receptmain${i}`);
+            const [prodDoc, photoDoc, mainDoc] = await Promise.all([
+                getDoc(doc(recipeMainRef, "prod")),
+                getDoc(doc(recipeMainRef, "photo")),
+                getDoc(doc(recipeMainRef, "main"))
+            ]);
 
-        if (!prodDoc.exists()) continue;
+            if (!prodDoc.exists() || !mainDoc.exists()) continue;
 
-        const recipeProducts = Object.values(prodDoc.data()).filter(value =>
-            typeof value === "string" && !value.includes("г.") && !value.includes("шт.")
-        );
+            const recipeProducts = Object.entries(prodDoc.data())
+                .filter(([key]) => !key.includes("-"))
+                .map(([_, value]) => value.toLowerCase());
 
-        console.log(`🔍 Рецепт receptmain${i} содержит:`, recipeProducts);
+            console.log(`🔍 Рецепт receptmain${i} содержит:`, recipeProducts);
 
-        if (selectedProducts.every(product => recipeProducts.includes(product))) {
-            console.log(`✅ Рецепт receptmain${i} подходит!`);
-            foundRecipes.push(i);
+            if (selectedProducts.every(product => recipeProducts.includes(product))) {
+                console.log(`✅ Рецепт receptmain${i} подходит!`);
+                foundRecipes.push(i);
 
-            const photoDoc = await getDoc(doc(recipeMainRef, "photo"));
-            const photoUrl = photoDoc.exists() ? photoDoc.data().url : "https://via.placeholder.com/90";
+                const photoUrl = photoDoc.exists() ? photoDoc.data().url : "https://via.placeholder.com/90";
 
-            const recipeRef = doc(db, "rec", `recept${i}`);
-            const recipeSnap = await getDoc(recipeRef);
-            const recipeDis = recipeSnap.exists() ? recipeSnap.data().dis : "Описание отсутствует";
+                const recipeRef = doc(db, "rec", `recept${i}`);
+                const recipeSnap = await getDoc(recipeRef);
+                const recipeDis = recipeSnap.exists() ? recipeSnap.data().dis : "Описание отсутствует";
 
-            const mainDoc = await getDoc(doc(recipeMainRef, "main"));
-            if (!mainDoc.exists()) continue;
+                const recipeData = mainDoc.data();
+                let recipeCard = createRecipeCard(recipeData, i, photoUrl, recipeDis);
 
-            const recipeData = mainDoc.data();
-            
-            let recipeCard = createRecipeCard(recipeData, i, photoUrl, recipeDis); // ✅ исправлено
-
-            if (recipeCard) {
-                recipesContainer.appendChild(recipeCard);
+                if (recipeCard) {
+                    recipesContainer.appendChild(recipeCard);
+                }
             }
+        } catch (error) {
+            console.error(`❌ Ошибка при обработке рецепта receptmain${i}:`, error);
         }
-    } catch (error) {
-        console.error(`❌ Ошибка при обработке рецепта receptmain${i}:`, error);
     }
-}
 
     if (foundRecipes.length === 0) {
         recipesContainer.innerHTML = "<p>❌ Нет рецептов с выбранными продуктами</p>";
     }
 });
 
-
 document.getElementById("add-product").addEventListener("click", () => {
     const productList = document.getElementById("product-list");
 
-    // Создаём новый элемент
     const newProductItem = document.createElement("div");
     newProductItem.classList.add("product-item");
 
-    // Поле ввода названия продукта
     const newInput = document.createElement("input");
     newInput.type = "text";
     newInput.placeholder = "Введите продукт...";
 
-    // Поле ввода количества
     const quantityInput = document.createElement("input");
     quantityInput.type = "text";
     quantityInput.placeholder = "грамм/штук";
     quantityInput.classList.add("quantity-input");
 
-    // Кнопка удаления
     const deleteButton = document.createElement("button");
     deleteButton.textContent = "❌";
     deleteButton.classList.add("delete-btn");
@@ -96,42 +91,38 @@ document.getElementById("add-product").addEventListener("click", () => {
         productList.removeChild(newProductItem);
     });
 
-    // Добавляем элементы в строку продукта
     newProductItem.appendChild(newInput);
     newProductItem.appendChild(quantityInput);
     newProductItem.appendChild(deleteButton);
     productList.appendChild(newProductItem);
 
-    // Дожидаемся добавления в DOM и включаем автодополнение
     setTimeout(() => {
         console.log("🆕 Новое поле добавлено, включаем автодополнение...");
         setupAutocomplete(newInput);
     }, 100);
 });
 
-// ⚡ Загружаем продукты в кэш из Firestore
 async function loadProducts() {
     console.log("📥 Загружаем продукты в кэш...");
-    cachedProducts = []; // Очищаем кэш перед загрузкой
+    cachedProducts = [];
 
     for (let i = 1; i <= 18; i++) {
         const docRef = doc(db, "products", `${i}`);
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
-            cachedProducts.push(...Object.values(docSnap.data()));
+            cachedProducts.push(...Object.values(docSnap.data()).map(p => p.toLowerCase()));
             console.log("Добавлено в кэш:", Object.values(docSnap.data()));
         }
     }
     console.log("✅ Продукты загружены в кэш:", cachedProducts);
 }
 
-// 🔍 Ищем продукты в кэше
 function searchProducts(query) {
     if (query.length < 2) return [];
-    return cachedProducts.filter(name => name.toLowerCase().startsWith(query.toLowerCase()));
+    const lowerQuery = query.toLowerCase();
+    return cachedProducts.filter(name => name.startsWith(lowerQuery));
 }
 
-// ✨ Включаем автодополнение
 function setupAutocomplete(inputField) {
     const suggestionBox = document.createElement("div");
     suggestionBox.classList.add("suggestions");
@@ -165,12 +156,10 @@ function setupAutocomplete(inputField) {
     });
 }
 
-// 🔄 Автодополнение для уже существующих полей
 function setupAutocompleteForExistingInputs() {
     document.querySelectorAll("#product-list .product-item input[type='text']").forEach(setupAutocomplete);
 }
 
-// 🔘 Настраиваем множественный выбор кнопок
 function setupMultiSelect(selector) {
     document.querySelectorAll(selector).forEach(btn => {
         btn.addEventListener("click", (event) => {
@@ -204,7 +193,6 @@ function createRecipeCard(recipeData, recipeId, photoUrl, recipeDis) {
         startButton.textContent = "Начать";
         startButton.addEventListener("click", () => {
             window.location.href = `recipe.html?id=${recipeId}`;
-
         });
 
         infoContainer.appendChild(title);
