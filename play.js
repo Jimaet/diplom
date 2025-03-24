@@ -21,27 +21,34 @@ document.querySelector(".recipe-btn").addEventListener("click", async () => {
     const recipesContainer = document.getElementById("recipes");
     recipesContainer.innerHTML = "";
 
-    // Получаем все рецепты напрямую из `receptmainX`
-    for (let i = 0; i < 100; i++) {  // Ограничиваем до 100 рецептов, чтобы не перегружать
+    let foundRecipes = []; // Список найденных рецептов
+
+    // Проверяем рецепты в Firestore
+    for (let i = 0; i < 100; i++) { // Ограничиваем до 100 рецептов
         const recipeMainRef = collection(db, `receptmain${i}`);
         const prodDoc = await getDoc(doc(recipeMainRef, "prod"));
 
         if (!prodDoc.exists()) continue;
 
-        // Фильтруем продукты, убирая граммовку и количество
+        // Фильтруем только основные продукты (без граммовки)
         const recipeProducts = Object.values(prodDoc.data()).filter(value => !value.includes("г.") && !value.includes("шт."));
         console.log(`🔍 Рецепт receptmain${i} содержит:`, recipeProducts);
 
         if (selectedProducts.every(product => recipeProducts.includes(product))) {
             console.log(`✅ Рецепт receptmain${i} подходит!`);
+            foundRecipes.push(`recept${i}`);
 
-            // Загружаем основные данные рецепта
+            // Загружаем данные рецепта
             const mainDoc = await getDoc(doc(recipeMainRef, "main"));
             if (!mainDoc.exists()) continue;
 
             const recipeData = mainDoc.data();
-            recipesContainer.appendChild(createRecipeCard(recipeData));
+            recipesContainer.appendChild(createRecipeCard(recipeData, i));
         }
+    }
+
+    if (foundRecipes.length === 0) {
+        recipesContainer.innerHTML = "<p>❌ Нет рецептов с выбранными продуктами</p>";
     }
 });
 
@@ -154,7 +161,7 @@ function setupMultiSelect(selector) {
         });
     });
 }
-function createRecipeCard(recipeData) {
+function createRecipeCard(recipeData, recipeId) {
     const recipeCard = document.createElement("div");
     recipeCard.classList.add("recipe-card");
 
@@ -164,7 +171,13 @@ function createRecipeCard(recipeData) {
         <p>${recipeData.dis}</p>
         <p><strong>Время приготовления:</strong> ${recipeData.timemin} мин</p>
         <p><strong>Порции:</strong> ${recipeData.porcii}</p>
+        <button class="open-recipe" data-id="${recipeId}">Открыть рецепт</button>
     `;
+
+    // Добавляем обработчик клика для кнопки "Открыть рецепт"
+    recipeCard.querySelector(".open-recipe").addEventListener("click", () => {
+        window.location.href = `recipe.html?id=${recipeId}`;
+    });
 
     return recipeCard;
 }
