@@ -2,13 +2,31 @@ import { db } from "./firebase-config.js";
 import { collection, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 document.querySelector(".recipe-btn").addEventListener("click", async () => {
-    const userProducts = getUserProducts();
-    console.log("🔍 Пользователь выбрал:", userProducts);
+    let selectedProducts = Array.from(document.querySelectorAll("#product-list input[type='text']"))
+        .map(input => input.value.trim().toLowerCase())
+        .filter(product => product !== "");
 
-    const matchingRecipes = await findMatchingRecipes(userProducts);
+    console.log("🛒 Пользователь выбрал:", selectedProducts);
+
+    let matchingRecipes = [];
+
+    for (let i = 0; i <= 9; i++) {
+        const docRef = doc(db, "rec", `recept${i}`, "receptmain", `${i}`);
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+            const recipeProducts = Object.values(docSnap.data().prod || {}).map(p => p.toLowerCase());
+
+            console.log(`📖 recept${i} содержит:`, recipeProducts);
+
+            // Проверяем, что ВСЕ продукты из рецепта есть у пользователя и нет лишних
+            if (recipeProducts.every(p => selectedProducts.includes(p)) && selectedProducts.every(p => recipeProducts.includes(p))) {
+                matchingRecipes.push(`recept${i}`);
+            }
+        }
+    }
+
     console.log("✅ Подходящие рецепты:", matchingRecipes);
-
-    displayRecipes(matchingRecipes);
 });
 
 // 📝 Получаем продукты, введенные пользователем
