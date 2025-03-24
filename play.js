@@ -30,7 +30,7 @@ document.querySelector(".recipe-btn").addEventListener("click", async () => {
     let foundRecipes = [];
 
     for (const recDoc of recSnapshot.docs) {
-        const receptId = recDoc.id.replace("recept", ""); // Получаем номер рецепта
+        const receptId = recDoc.id.replace("recept", "");
         const prodRef = doc(db, `receptmain${receptId}`, "prod");
         const prodSnap = await getDoc(prodRef);
 
@@ -38,17 +38,17 @@ document.querySelector(".recipe-btn").addEventListener("click", async () => {
 
         const recipeProducts = new Set(
             Object.entries(prodSnap.data())
-                .filter(([key]) => !key.includes("-"))
+                .filter(([key]) => !key.includes("-")) // Игнорируем граммовку и количество
                 .map(([_, value]) => value.toLowerCase())
         );
 
         console.log(`📖 Рецепт receptmain${receptId}:`, recipeProducts);
 
-        // Проверяем, содержит ли рецепт все выбранные продукты
-        if ([...selectedProducts].every(p => recipeProducts.has(p))) {
+        if ([...recipeProducts].every(p => selectedProducts.has(p))) {
             console.log(`✅ Подходит: receptmain${receptId}`);
             foundRecipes.push(receptId);
         }
+
     }
 
     if (foundRecipes.length === 0) {
@@ -56,7 +56,6 @@ document.querySelector(".recipe-btn").addEventListener("click", async () => {
         return;
     }
 
-    // Загружаем данные рецептов и отображаем их
     for (const recipeId of foundRecipes) {
         const [mainSnap, photoSnap] = await Promise.all([
             getDoc(doc(db, `receptmain${recipeId}`, "main")),
