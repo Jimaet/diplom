@@ -3,9 +3,13 @@ import { collection, doc, setDoc, getDocs, getDoc } from "https://www.gstatic.co
 
 let cachedProducts = [];
 document.addEventListener("DOMContentLoaded", async () => {
-    await loadProducts();
-    setupAutocompleteForExistingInputs();
-    setupMultiSelect(".equipment-btn"); // ✅ Добавляем множественный выбор для оборудования
+    try {
+        await loadProducts();
+        setupAutocompleteForExistingInputs();
+        setupMultiSelect(".equipment-btn");
+    } catch (error) {
+        console.error("❌ Ошибка инициализации:", error);
+    }
 });
 
 document.querySelector(".recipe-btn").addEventListener("click", async () => {
@@ -18,72 +22,63 @@ document.querySelector(".recipe-btn").addEventListener("click", async () => {
         return;
     }
 
-    console.log("📌 Выбранные продукты:", selectedProducts);
     const recipesContainer = document.getElementById("recipes");
     recipesContainer.innerHTML = "";
-
     let foundRecipes = [];
 
-    for (let i = 0; i < 100; i++) {
-        const recipeMainRef = collection(db, `receptmain${i}`);
-        const prodDoc = await getDoc(doc(recipeMainRef, "prod"));
+    try {
+        for (let i = 0; i < 100; i++) {
+            const recipeMainRef = collection(db, `receptmain${i}`);
+            const prodDoc = await getDoc(doc(recipeMainRef, "prod"));
 
-        if (!prodDoc.exists()) continue;
+            if (!prodDoc.exists()) continue;
 
-        // ✅ Берём только основные продукты (без граммовки и количества)
-        const recipeProducts = Object.values(prodDoc.data()).filter(value => 
-            typeof value === "string" && !value.includes("г.") && !value.includes("шт.")
-        );
+            const recipeProducts = Object.values(prodDoc.data()).filter(value => 
+                typeof value === "string" && !value.includes("г.") && !value.includes("шт.")
+            );
 
-        console.log(`🔍 Рецепт receptmain${i} содержит:`, recipeProducts);
+            if (selectedProducts.every(product => recipeProducts.includes(product))) {
+                foundRecipes.push(`recept${i}`);
 
-        // ✅ Проверяем, что все введённые продукты есть в рецепте (но в рецепте могут быть другие)
-        if (selectedProducts.every(product => recipeProducts.includes(product))) {
-            console.log(`✅ Рецепт receptmain${i} подходит!`);
-            foundRecipes.push(`recept${i}`);
+                const [photoDoc, recipeSnap, mainDoc] = await Promise.all([
+                    getDoc(doc(recipeMainRef, "Photo")),
+                    getDoc(doc(db, "rec", `recept${i}`)),
+                    getDoc(doc(recipeMainRef, "main"))
+                ]);
 
-            // 📥 Загружаем фото
-            const photoDoc = await getDoc(doc(recipeMainRef, "Photo"));
-            const photoUrl = photoDoc.exists() ? photoDoc.data().url : "https://via.placeholder.com/90";
+                if (!mainDoc.exists()) continue;
+                
+                const photoUrl = photoDoc.exists() ? photoDoc.data().url : "https://via.placeholder.com/90";
+                const recipeDis = recipeSnap.exists() ? recipeSnap.data().dis : "";
+                const recipeData = mainDoc.data();
 
-            // 📥 Загружаем описание из `rec/receptX`
-            const recipeRef = doc(db, "rec", `recept${i}`);
-            const recipeSnap = await getDoc(recipeRef);
-            const recipeDis = recipeSnap.exists() ? recipeSnap.data().dis : "Описание отсутствует";
-
-            // 📥 Загружаем основную инфу из `main`
-            const mainDoc = await getDoc(doc(recipeMainRef, "main"));
-            if (!mainDoc.exists()) continue;
-            
-            const recipeData = mainDoc.data();
-            recipesContainer.appendChild(createRecipeCard(recipeData, i, photoUrl, recipeDis));
+                recipesContainer.appendChild(createRecipeCard(recipeData, i, photoUrl, recipeDis));
+            }
         }
-    }
 
-    if (foundRecipes.length === 0) {
-        recipesContainer.innerHTML = "<p>❌ Нет рецептов с выбранными продуктами</p>";
+        if (foundRecipes.length === 0) {
+            recipesContainer.innerHTML = "<p>❌ Нет рецептов с выбранными продуктами</p>";
+        }
+    } catch (error) {
+        console.error("❌ Ошибка загрузки рецептов:", error);
+        recipesContainer.innerHTML = "<p>⚠ Произошла ошибка при загрузке рецептов.</p>";
     }
 });
 
 document.getElementById("add-product").addEventListener("click", () => {
     const productList = document.getElementById("product-list");
-
-    // Создаём новый элемент
     const newProductItem = document.createElement("div");
     newProductItem.classList.add("product-item");
 
-    // Поле ввода названия продукта
     const newInput = document.createElement("input");
     newInput.type = "text";
     newInput.placeholder = "Введите продукт...";
 
-    // Поле ввода количества
     const quantityInput = document.createElement("input");
     quantityInput.type = "text";
     quantityInput.placeholder = "грамм/штук";
     quantityInput.classList.add("quantity-input");
 
-    // Кнопка удаления
     const deleteButton = document.createElement("button");
     deleteButton.textContent = "❌";
     deleteButton.classList.add("delete-btn");
@@ -91,42 +86,36 @@ document.getElementById("add-product").addEventListener("click", () => {
         productList.removeChild(newProductItem);
     });
 
-    // Добавляем элементы в строку продукта
-    newProductItem.appendChild(newInput);
-    newProductItem.appendChild(quantityInput);
-    newProductItem.appendChild(deleteButton);
+    newProductItem.append(newInput, quantityInput, deleteButton);
     productList.appendChild(newProductItem);
 
-    // Дожидаемся добавления в DOM и включаем автодополнение
-    setTimeout(() => {
-        console.log("🆕 Новое поле добавлено, включаем автодополнение...");
-        setupAutocomplete(newInput);
-    }, 100);
+    setTimeout(() => setupAutocomplete(newInput), 100);
 });
 
-// ⚡ Загружаем продукты в кэш из Firestore
 async function loadProducts() {
-    console.log("📥 Загружаем продукты в кэш...");
-    cachedProducts = []; // Очищаем кэш перед загрузкой
-
-    for (let i = 1; i <= 18; i++) {
-        const docRef = doc(db, "products", `${i}`);
-        const docSnap = await getDoc(docRef);
-        if (docSnap.exists()) {
-            cachedProducts.push(...Object.values(docSnap.data()));
-            console.log("Добавлено в кэш:", Object.values(docSnap.data()));
+    cachedProducts = [];
+    try {
+        const productPromises = [];
+        for (let i = 1; i <= 18; i++) {
+            productPromises.push(getDoc(doc(db, "products", `${i}`)));
         }
+        const productDocs = await Promise.all(productPromises);
+
+        productDocs.forEach(docSnap => {
+            if (docSnap.exists()) {
+                cachedProducts.push(...Object.values(docSnap.data()));
+            }
+        });
+    } catch (error) {
+        console.error("❌ Ошибка загрузки продуктов:", error);
     }
-    console.log("✅ Продукты загружены в кэш:", cachedProducts);
 }
 
-// 🔍 Ищем продукты в кэше
 function searchProducts(query) {
     if (query.length < 2) return [];
     return cachedProducts.filter(name => name.toLowerCase().startsWith(query.toLowerCase()));
 }
 
-// ✨ Включаем автодополнение
 function setupAutocomplete(inputField) {
     const suggestionBox = document.createElement("div");
     suggestionBox.classList.add("suggestions");
@@ -135,12 +124,9 @@ function setupAutocomplete(inputField) {
     inputField.addEventListener("input", () => {
         const query = inputField.value.trim();
         suggestionBox.innerHTML = "";
-
         if (query.length < 2) return;
 
         const results = searchProducts(query);
-        console.log(`📋 Подсказки для ${query}:`, results);
-
         results.forEach(product => {
             const item = document.createElement("div");
             item.classList.add("suggestion-item");
@@ -160,12 +146,10 @@ function setupAutocomplete(inputField) {
     });
 }
 
-// 🔄 Автодополнение для уже существующих полей
 function setupAutocompleteForExistingInputs() {
     document.querySelectorAll("#product-list .product-item input[type='text']").forEach(setupAutocomplete);
 }
 
-// 🔘 Настраиваем множественный выбор кнопок
 function setupMultiSelect(selector) {
     document.querySelectorAll(selector).forEach(btn => {
         btn.addEventListener("click", (event) => {
@@ -190,10 +174,6 @@ function createRecipeCard(recipeData, recipeId, photoUrl, recipeDis) {
         title.classList.add("recipe-title");
         title.textContent = recipeData.name || "Без названия";
 
-        const description = document.createElement("p");
-        description.classList.add("recipe-description");
-        description.textContent = recipeDis || "Описание отсутствует";
-
         const startButton = document.createElement("button");
         startButton.classList.add("start-button");
         startButton.textContent = "Начать";
@@ -202,11 +182,14 @@ function createRecipeCard(recipeData, recipeId, photoUrl, recipeDis) {
         });
 
         infoContainer.appendChild(title);
-        infoContainer.appendChild(description);
-        card.appendChild(img);
-        card.appendChild(infoContainer);
-        card.appendChild(startButton);
+        if (recipeDis) {
+            const description = document.createElement("p");
+            description.classList.add("recipe-description");
+            description.textContent = recipeDis;
+            infoContainer.appendChild(description);
+        }
 
+        card.append(img, infoContainer, startButton);
         return card;
     } catch (error) {
         console.error("❌ Ошибка при создании карточки рецепта:", error);
