@@ -1,5 +1,5 @@
 import { db } from "./firebase-config.js";
-import { collection, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { collection, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 document.querySelector(".recipe-btn").addEventListener("click", async () => {
     let selectedProducts = Array.from(document.querySelectorAll("#product-list input[type='text']"))
