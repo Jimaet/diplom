@@ -24,11 +24,12 @@ document.querySelector(".recipe-btn").addEventListener("click", async () => {
     let foundRecipes = [];
 
     for (let i = 0; i < 100; i++) {
-        const prodRef = doc(db, `receptmain${i}`, "prod");
-        const prodDoc = await getDoc(prodRef);
+        const recipeMainRef = collection(db, `receptmain${i}`);
+        const prodDoc = await getDoc(doc(recipeMainRef, "prod"));
 
         if (!prodDoc.exists()) continue;
 
+        // 🛠️ Фикс ошибки includes
         const recipeProducts = Object.values(prodDoc.data()).filter(value => 
             typeof value === "string" && !value.includes("г.") && !value.includes("шт.")
         );
@@ -39,12 +40,11 @@ document.querySelector(".recipe-btn").addEventListener("click", async () => {
             console.log(`✅ Рецепт receptmain${i} подходит!`);
             foundRecipes.push(`recept${i}`);
 
-            const mainDoc = await getDoc(doc(db, `receptmain${i}`, "main"));
+            const mainDoc = await getDoc(doc(recipeMainRef, "main"));
             if (!mainDoc.exists()) continue;
             
             const recipeData = mainDoc.data();
-            const recipeCard = await createRecipeCard(recipeData, i);
-            recipesContainer.appendChild(recipeCard);
+            recipesContainer.appendChild(createRecipeCard(recipeData, i));
         }
     }
 
@@ -52,8 +52,7 @@ document.querySelector(".recipe-btn").addEventListener("click", async () => {
         recipesContainer.innerHTML = "<p>❌ Нет рецептов с выбранными продуктами</p>";
     }
 });
-const recipeCard = await createRecipeCard(recipeData, recipeId);
-document.getElementById("recipes-container").appendChild(recipeCard);
+
 document.getElementById("add-product").addEventListener("click", () => {
     const productList = document.getElementById("product-list");
 
@@ -163,23 +162,13 @@ function setupMultiSelect(selector) {
         });
     });
 }
-async function createRecipeCard(recipeData, recipeId) {
+async function createRecipeCard(recipeData, recipeId, recipeMainRef) {
     const card = document.createElement("div");
     card.classList.add("recipe-card");
 
-    // Ссылка на Firestore
-    const recipeMainRef = doc(db, `receptmain${recipeId}`, "photo");
-
-    let photoUrl = "https://via.placeholder.com/90"; // Заглушка
-
-    try {
-        const photoDoc = await getDoc(recipeMainRef);
-        if (photoDoc.exists() && photoDoc.data().url) {
-            photoUrl = photoDoc.data().url;
-        }
-    } catch (error) {
-        console.error("Ошибка загрузки фото:", error);
-    }
+    // Получаем фото из Firestore
+    const photoDoc = await getDoc(doc(recipeMainRef, "photo"));
+    const photoUrl = (photoDoc.exists() && photoDoc.data().url) ? photoDoc.data().url : "https://via.placeholder.com/90";
 
     // Фото рецепта
     const img = document.createElement("img");
