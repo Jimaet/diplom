@@ -190,4 +190,7 @@ if (homeButton) {
         }
         lastClickTime = currentTime;
     });
+document.getElementById("play-btn").addEventListener("click", function() {
+    window.location.href = "play.html";
+});
 }
