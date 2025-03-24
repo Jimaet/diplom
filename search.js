@@ -1,5 +1,5 @@
 import { db } from "./firebase-config.js";
-import { collection, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { collection, doc, getDocs, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 document.querySelector(".recipe-btn").addEventListener("click", async () => {
     const userProducts = Array.from(document.querySelectorAll("#product-list input[type='text']"))
@@ -18,7 +18,7 @@ document.querySelector(".recipe-btn").addEventListener("click", async () => {
     const querySnapshot = await getDocs(recipesRef);
     let matchingRecipes = [];
 
-    querySnapshot.forEach(async (docSnap) => {
+    for (const docSnap of querySnapshot.docs) {
         const recipeId = docSnap.id; // ID рецепта (например, recept0)
         const recipeData = docSnap.data();
 
@@ -35,9 +35,9 @@ document.querySelector(".recipe-btn").addEventListener("click", async () => {
                 matchingRecipes.push(recipeId);
             }
         }
-    });
+    }
 
-    setTimeout(() => console.log("✅ Подходящие рецепты:", matchingRecipes), 2000);
+    console.log("✅ Подходящие рецепты:", matchingRecipes);
 });
 
 // 📝 Получаем продукты, введенные пользователем
