@@ -129,3 +129,39 @@ body {
 .recipe-btn:hover {
     background-color: #4A6562;
 }
+.suggestions {
+    position: absolute;
+    background: white;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    max-height: 200px;
+    overflow-y: auto;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    width: calc(100% - 2px);
+    z-index: 1000;
+}
+
+.suggestion-item {
+    padding: 10px;
+    cursor: pointer;
+    transition: background 0.2s ease-in-out;
+    font-size: 14px;
+    color: #333;
+}
+
+.suggestion-item:hover {
+    background: #f5f5f5;
+}
+
+.suggestions::-webkit-scrollbar {
+    width: 6px;
+}
+
+.suggestions::-webkit-scrollbar-thumb {
+    background-color: #ccc;
+    border-radius: 4px;
+}
+
+.suggestions::-webkit-scrollbar-track {
+    background: transparent;
+}
