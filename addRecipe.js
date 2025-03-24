@@ -33,8 +33,10 @@ document.addEventListener("DOMContentLoaded", async () => {
             const recDocName = `recept${nextIndex}`;
             const receptMainName = `receptmain${nextIndex}`;
 
-            console.log("Создаём документы в Firestore...");
+            console.log("Создаём коллекцию receptmainX...");
+            await setDoc(doc(db, receptMainName, "init"), { created: new Date() });
 
+            console.log("Создаём документы в Firestore...");
             await setDoc(doc(db, "p_rec", recDocName), { name, dis, image: imageUrl, status: "pending" });
             await setDoc(doc(db, receptMainName, "main"), { dis: about, name, porcii: portions, timemin: time });
             await setDoc(doc(db, receptMainName, "photo"), { url: imageUrl });
@@ -46,12 +48,12 @@ document.addEventListener("DOMContentLoaded", async () => {
             document.querySelectorAll("#product-list .product-item").forEach((product, index) => {
                 const title = product.querySelector("input:nth-of-type(1)").value.trim();
                 const amount = product.querySelector("input:nth-of-type(2)").value.trim();
-                const unit = product.querySelector("select").value; 
+                const unit = product.querySelector("select").value;
 
                 if (title && amount) {
                     const formattedUnit = unit === "грамм" ? "г." : "шт.";
-                    prodData[`${index + 1}`] = title;
-                    prodData[`${index + 1}-1`] = `${amount} ${formattedUnit}`;
+                    prodData[`p${index + 1}`] = title;
+                    prodData[`p${index + 1}-1`] = `${amount} ${formattedUnit}`;
 
                     if (!usedProducts.has(title)) {
                         newProducts[title] = title;
@@ -65,7 +67,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             let stepData = {};
             document.querySelectorAll("#step-list .step-item input").forEach((step, index) => {
                 if (step.value) {
-                    stepData[`${index + 1}`] = step.value;
+                    stepData[`s${index + 1}`] = step.value;
                 }
             });
 
@@ -93,7 +95,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         let categoryData = {};
 
         selectedItems.forEach((item, index) => {
-            categoryData[`${fieldName}${index + 1}`] = item;
+            categoryData[`c${index + 1}`] = item;
         });
 
         console.log(`✅ ${fieldName}:`, categoryData);
@@ -147,7 +149,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             }
         }
     
-        cachedProducts = productSet; // сохраняем загруженные продукты
+        cachedProducts = productSet; 
         console.log("✅ Продукты загружены в кэш:", cachedProducts);
         return productSet;
     }
@@ -193,16 +195,6 @@ document.addEventListener("DOMContentLoaded", async () => {
             }
         });
     }
-
-    document.getElementById("add-product").addEventListener("click", () => {
-        setTimeout(() => {
-            const newInput = document.querySelector("#product-list .product-item:last-child input[type='text']");
-            if (newInput) {
-                console.log("🆕 Добавлено новое поле, подключаем автодополнение...");
-                setupAutocomplete(newInput);
-            }
-        }, 100);
-    });
 
     function setupMultiSelect(selector) {
         document.querySelectorAll(selector).forEach(btn => {
