@@ -42,7 +42,7 @@ document.querySelector(".recipe-btn").addEventListener("click", async () => {
 
             const mainDoc = await getDoc(doc(recipeMainRef, "main"));
             if (!mainDoc.exists()) continue;
-
+            
             const recipeData = mainDoc.data();
             recipesContainer.appendChild(createRecipeCard(recipeData, i));
         }
@@ -163,22 +163,52 @@ function setupMultiSelect(selector) {
     });
 }
 function createRecipeCard(recipeData, recipeId) {
-    const recipeCard = document.createElement("div");
-    recipeCard.classList.add("recipe-card");
+    const card = document.createElement("div");
+    card.classList.add("recipe-card");
 
-    recipeCard.innerHTML = `
-        <img src="${recipeData.photo || 'default.jpg'}" alt="${recipeData.name}">
-        <h3>${recipeData.name}</h3>
-        <p>${recipeData.dis}</p>
-        <p><strong>Время приготовления:</strong> ${recipeData.timemin} мин</p>
-        <p><strong>Порции:</strong> ${recipeData.porcii}</p>
-        <button class="open-recipe" data-id="${recipeId}">Открыть рецепт</button>
-    `;
+    // Фото рецепта
+    const img = document.createElement("img");
+    img.src = recipeData.photo || "https://via.placeholder.com/90"; // Заглушка если нет фото
+    img.alt = recipeData.name;
 
-    // Добавляем обработчик клика для кнопки "Открыть рецепт"
-    recipeCard.querySelector(".open-recipe").addEventListener("click", () => {
+    // Контейнер для текста
+    const infoContainer = document.createElement("div");
+    infoContainer.classList.add("recipe-info");
+
+    // Заголовок рецепта
+    const title = document.createElement("h3");
+    title.classList.add("recipe-title");
+    title.textContent = recipeData.name;
+
+    // Описание рецепта
+    const description = document.createElement("p");
+    description.classList.add("recipe-description");
+    description.textContent = recipeData.dis || "Описание отсутствует";
+
+    // Кнопка "Начать"
+    const startButton = document.createElement("button");
+    startButton.classList.add("start-button");
+    startButton.textContent = "Начать";
+    startButton.addEventListener("click", () => {
         window.location.href = `recipe.html?id=${recipeId}`;
     });
 
-    return recipeCard;
+    // Кнопка "Избранное"
+    const favoriteButton = document.createElement("button");
+    favoriteButton.classList.add("favorite-button");
+    favoriteButton.innerHTML = "❤️"; // Значок сердечка
+    favoriteButton.addEventListener("click", () => {
+        favoriteButton.classList.toggle("active");
+        // Логика добавления в избранное
+    });
+
+    // Собираем карточку
+    infoContainer.appendChild(title);
+    infoContainer.appendChild(description);
+    card.appendChild(img);
+    card.appendChild(infoContainer);
+    card.appendChild(startButton);
+    card.appendChild(favoriteButton);
+
+    return card;
 }
