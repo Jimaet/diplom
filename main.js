@@ -16,9 +16,13 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 let selectedFilters = new Set(); // Хранение выбранных фильтров
+let isLoading = false; // Флаг для предотвращения дублирования рецептов
 
 // 🔹 Функция загрузки всех рецептов или отфильтрованных 🔹
 async function loadFilteredRecipes() {
+    if (isLoading) return; // Предотвращение множественных запросов
+    isLoading = true;
+
     const recipesContainer = document.getElementById("recipes-container");
     if (!recipesContainer) {
         console.error("❌ Ошибка: recipes-container не найден!");
@@ -65,6 +69,7 @@ async function loadFilteredRecipes() {
     }
 
     console.log(`✅ Отображено рецептов: ${loadedRecipes.size}`);
+    isLoading = false; // Сброс флага после загрузки
 }
 
 // 🔹 Проверяем, есть ли совпадения фильтров в receptmainX/type и type2 🔹
@@ -81,10 +86,10 @@ async function checkRecipeCategories(recipeId) {
     return [...selectedFilters].some(filter => categories.has(filter));
 }
 
-// 🔹 Функция для установки обработчиков фильтров 🔹
+// 🔹 Функция для установки обработчиков фильтров во всех каруселях 🔹
 function setupMultiSelect(selector) {
     document.querySelectorAll(selector).forEach(button => {
-        button.addEventListener("click", () => {
+        button.addEventListener("click", async () => {
             const filterName = button.textContent.trim();
             if (selectedFilters.has(filterName)) {
                 selectedFilters.delete(filterName);
@@ -95,7 +100,8 @@ function setupMultiSelect(selector) {
                 button.classList.add("selected"); // Добавляем активный стиль
                 console.log(`✅ Фильтр добавлен: ${filterName}`);
             }
-            loadFilteredRecipes(); // Перезагружаем рецепты с учетом фильтров
+
+            await loadFilteredRecipes(); // Загружаем рецепты после смены фильтра
         });
     });
 }
