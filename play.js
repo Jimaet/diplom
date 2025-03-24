@@ -107,6 +107,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     // Ждём загрузки продуктов, затем активируем кнопки
-    await loadProducts();
+    
     setupMultiSelect(".tech-btn"); // Для выбора техники
+    await loadProducts();
 });
+
