@@ -1,7 +1,7 @@
 import { db } from "./firebase-config.js";
 import { collection, doc, setDoc, getDocs, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-const IMGBB_API_KEY = "6353a9ccc652efaad72bf6c7b2b4fbf3"; // Вставь свой ключ от ImgBB
+const IMGBB_API_KEY = "6353a9ccc652efaad72bf6c7b2b4fbf3";
 
 document.addEventListener("DOMContentLoaded", async () => {
     const submitButton = document.querySelector(".submit-btn");
@@ -37,17 +37,25 @@ document.addEventListener("DOMContentLoaded", async () => {
             await setDoc(doc(db, receptMainName, "photo"), { url: imageUrl });
 
             let prodData = {};
+            let usedProducts = new Set(await loadProducts());
+
+            let newProducts = {};
             document.querySelectorAll("#product-list .product-item").forEach((product, index) => {
                 const title = product.querySelector("input:nth-of-type(1)").value.trim();
                 const amount = product.querySelector("input:nth-of-type(2)").value.trim();
                 const unit = product.querySelector("select").value; 
-            
+
                 if (title && amount) {
                     const formattedUnit = unit === "грамм" ? "г." : "шт.";
                     prodData[`${index + 1}`] = title;
                     prodData[`${index + 1}-1`] = `${amount} ${formattedUnit}`;
+
+                    if (!usedProducts.has(title)) {
+                        newProducts[title] = title;
+                    }
                 }
             });
+
             console.log("✅ Продукты:", prodData);
             await setDoc(doc(db, receptMainName, "prod"), prodData);
 
@@ -57,12 +65,18 @@ document.addEventListener("DOMContentLoaded", async () => {
                     stepData[`${index + 1}`] = step.value;
                 }
             });
+
             console.log("✅ Шаги приготовления:", stepData);
             await setDoc(doc(db, receptMainName, "step"), stepData);
 
             await saveCategories(receptMainName, "type", ".filter-btn");
             await saveCategories(receptMainName, "type2", ".category-btn");
             await saveCategories(receptMainName, "items", ".tech-btn");
+
+            if (Object.keys(newProducts).length > 0) {
+                console.log("➕ Добавляем новые продукты в products/18...");
+                await setDoc(doc(db, "products", "18"), newProducts, { merge: true });
+            }
 
             console.log("🎉 Рецепт успешно сохранён!");
 
@@ -73,10 +87,10 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     async function saveCategories(docName, fieldName, selector) {
         let selectedItems = Array.from(document.querySelectorAll(selector + ".selected")).map(btn => btn.textContent.trim());
-
         let categoryData = {};
+
         selectedItems.forEach((item, index) => {
-            categoryData[`${fieldName}${index + 1}`] = item; // Генерируем ключи: type1, type2, type3...
+            categoryData[`${fieldName}${index + 1}`] = item;
         });
 
         console.log(`✅ ${fieldName}:`, categoryData);
@@ -118,25 +132,25 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     }
 
-    let cachedProducts = [];
-
     async function loadProducts() {
         console.log("📥 Загружаем продукты в кэш...");
-        for (let i = 1; i <= 17; i++) {
+        let productSet = new Set();
+
+        for (let i = 1; i <= 18; i++) {
             const docRef = doc(db, "products", `${i}`);
             const docSnap = await getDoc(docRef);
             if (docSnap.exists()) {
-                cachedProducts.push(...Object.values(docSnap.data()));
+                Object.values(docSnap.data()).forEach(product => productSet.add(product));
             }
         }
-        console.log("✅ Продукты загружены в кэш:", cachedProducts);
-    }
 
-    
+        console.log("✅ Продукты загружены в кэш:", productSet);
+        return productSet;
+    }
 
     function searchProducts(query) {
         if (query.length < 2) return [];
-        return cachedProducts.filter(name => name.toLowerCase().startsWith(query.toLowerCase()));
+        return Array.from(cachedProducts).filter(name => name.toLowerCase().startsWith(query.toLowerCase()));
     }
 
     function setupAutocomplete(inputField) {
