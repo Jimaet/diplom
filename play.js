@@ -3,23 +3,25 @@ import { collection, doc, setDoc, getDocs, getDoc } from "https://www.gstatic.co
 
 let cachedProducts = [];
 
-document.addEventListener("DOMContentLoaded", async () => {
-    await loadProducts(); // Загружаем продукты в кэш
+document.getElementById("add-product").addEventListener("click", () => {
+    const productList = document.getElementById("product-list");
 
-    setupMultiSelect(".equipment-btn"); // Настраиваем множественный выбор кнопок
-    setupMultiSelect(".tech-btn");
+    // Создаём новый элемент
+    const newProductItem = document.createElement("div");
+    newProductItem.classList.add("product-item");
 
-    setupAutocompleteForExistingInputs(); // Включаем автодополнение для существующих полей
+    const newInput = document.createElement("input");
+    newInput.type = "text";
+    newInput.placeholder = "Введите продукт...";
 
-    document.getElementById("add-product").addEventListener("click", () => {
-        setTimeout(() => {
-            const newInput = document.querySelector("#product-list .product-item:last-child input[type='text']");
-            if (newInput) {
-                console.log("🆕 Новое поле, включаем автодополнение...");
-                setupAutocomplete(newInput);
-            }
-        }, 100);
-    });
+    newProductItem.appendChild(newInput);
+    productList.appendChild(newProductItem);
+
+    // Дожидаемся добавления в DOM и включаем автодополнение
+    setTimeout(() => {
+        console.log("🆕 Новое поле добавлено, включаем автодополнение...");
+        setupAutocomplete(newInput);
+    }, 100);
 });
 
 // ⚡ Загружаем продукты в кэш из Firestore
