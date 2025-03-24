@@ -27,6 +27,8 @@ document.querySelector(".recipe-btn").addEventListener("click", async () => {
     for (let i = 0; i < 100; i++) {
         try {
             const recipeMainRef = collection(db, `receptmain${i}`);
+
+
             const prodDoc = await getDoc(doc(recipeMainRef, "prod"));
 
             if (!prodDoc.exists()) continue;
@@ -43,7 +45,8 @@ document.querySelector(".recipe-btn").addEventListener("click", async () => {
                 foundRecipes.push(i);
 
                 // 📥 Загружаем фото
-                const photoDoc = await getDoc(doc(recipeMainRef, "Photo"));
+                const photoDoc = await getDoc(doc(recipeMainRef, "photo"));
+
                 const photoUrl = photoDoc.exists() ? photoDoc.data().url : "https://via.placeholder.com/90";
 
                 // 📥 Загружаем описание из rec/receptX
@@ -58,9 +61,11 @@ document.querySelector(".recipe-btn").addEventListener("click", async () => {
                 const recipeData = mainDoc.data();
                 const recipeCard = createRecipeCard(recipeData, i, photoUrl, recipeDis);
 
+                const recipeCard = createRecipeCard(recipeData, i, photoUrl, recipeDis);
                 if (recipeCard) {
                     recipesContainer.appendChild(recipeCard);
                 }
+
             }
         } catch (error) {
             console.error(`❌ Ошибка при обработке рецепта receptmain${i}:`, error);
@@ -118,7 +123,7 @@ async function loadProducts() {
     cachedProducts = []; // Очищаем кэш перед загрузкой
 
     for (let i = 1; i <= 18; i++) {
-        const docRef = doc(db, "products", ${i});
+        const docRef = doc(db, "products", `${i}`);
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
             cachedProducts.push(...Object.values(docSnap.data()));
@@ -147,7 +152,7 @@ function setupAutocomplete(inputField) {
         if (query.length < 2) return;
 
         const results = searchProducts(query);
-        console.log(📋 Подсказки для ${query}:, results);
+        console.log(`📋 Подсказки для ${query}:`, results);
 
         results.forEach(product => {
             const item = document.createElement("div");
@@ -206,7 +211,8 @@ function createRecipeCard(recipeData, recipeId, photoUrl, recipeDis) {
         startButton.classList.add("start-button");
         startButton.textContent = "Начать";
         startButton.addEventListener("click", () => {
-            window.location.href = recipe.html?id=${recipeId};
+            window.location.href = `recipe.html?id=${recipeId}`;
+
         });
 
         infoContainer.appendChild(title);
