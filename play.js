@@ -22,46 +22,57 @@ document.querySelector(".recipe-btn").addEventListener("click", async () => {
         return;
     }
 
+    console.log("📌 Выбранные продукты:", selectedProducts);
     const recipesContainer = document.getElementById("recipes");
-    recipesContainer.innerHTML = "";
+    recipesContainer.innerHTML = ""; // Очищаем контейнер перед загрузкой рецептов
+
     let foundRecipes = [];
 
-    try {
-        for (let i = 0; i < 100; i++) {
+    for (let i = 0; i < 100; i++) {
+        try {
             const recipeMainRef = collection(db, `receptmain${i}`);
             const prodDoc = await getDoc(doc(recipeMainRef, "prod"));
 
             if (!prodDoc.exists()) continue;
 
+            // ✅ Берём только основные продукты (без граммовки и количества)
             const recipeProducts = Object.values(prodDoc.data()).filter(value => 
                 typeof value === "string" && !value.includes("г.") && !value.includes("шт.")
             );
 
+            console.log(`🔍 Рецепт receptmain${i} содержит:`, recipeProducts);
+
             if (selectedProducts.every(product => recipeProducts.includes(product))) {
-                foundRecipes.push(`recept${i}`);
+                console.log(`✅ Рецепт receptmain${i} подходит!`);
+                foundRecipes.push(i);
 
-                const [photoDoc, recipeSnap, mainDoc] = await Promise.all([
-                    getDoc(doc(recipeMainRef, "Photo")),
-                    getDoc(doc(db, "rec", `recept${i}`)),
-                    getDoc(doc(recipeMainRef, "main"))
-                ]);
-
-                if (!mainDoc.exists()) continue;
-                
+                // 📥 Загружаем фото
+                const photoDoc = await getDoc(doc(recipeMainRef, "Photo"));
                 const photoUrl = photoDoc.exists() ? photoDoc.data().url : "https://via.placeholder.com/90";
-                const recipeDis = recipeSnap.exists() ? recipeSnap.data().dis : "";
+
+                // 📥 Загружаем описание из rec/receptX
+                const recipeRef = doc(db, "rec", `recept${i}`);
+                const recipeSnap = await getDoc(recipeRef);
+                const recipeDis = recipeSnap.exists() ? recipeSnap.data().dis : "Описание отсутствует";
+
+                // 📥 Загружаем основную инфу из main
+                const mainDoc = await getDoc(doc(recipeMainRef, "main"));
+                if (!mainDoc.exists()) continue;
+
                 const recipeData = mainDoc.data();
+                const recipeCard = createRecipeCard(recipeData, i, photoUrl, recipeDis);
 
-                recipesContainer.appendChild(createRecipeCard(recipeData, i, photoUrl, recipeDis));
+                if (recipeCard) {
+                    recipesContainer.appendChild(recipeCard);
+                }
             }
+        } catch (error) {
+            console.error(`❌ Ошибка при обработке рецепта receptmain${i}:`, error);
         }
+    }
 
-        if (foundRecipes.length === 0) {
-            recipesContainer.innerHTML = "<p>❌ Нет рецептов с выбранными продуктами</p>";
-        }
-    } catch (error) {
-        console.error("❌ Ошибка загрузки рецептов:", error);
-        recipesContainer.innerHTML = "<p>⚠ Произошла ошибка при загрузке рецептов.</p>";
+    if (foundRecipes.length === 0) {
+        recipesContainer.innerHTML = "<p>❌ Нет рецептов с выбранными продуктами</p>";
     }
 });
 
