@@ -2,7 +2,7 @@ import { db } from "./firebase-config.js";
 import { collection, doc, setDoc, getDocs, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 const IMGBB_API_KEY = "6353a9ccc652efaad72bf6c7b2b4fbf3";
-
+let cachedProducts = new Set();
 document.addEventListener("DOMContentLoaded", async () => {
     const submitButton = document.querySelector(".submit-btn");
 
@@ -135,7 +135,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     async function loadProducts() {
         console.log("📥 Загружаем продукты в кэш...");
         let productSet = new Set();
-
+    
         for (let i = 1; i <= 18; i++) {
             const docRef = doc(db, "products", `${i}`);
             const docSnap = await getDoc(docRef);
@@ -143,6 +143,11 @@ document.addEventListener("DOMContentLoaded", async () => {
                 Object.values(docSnap.data()).forEach(product => productSet.add(product));
             }
         }
+    
+        cachedProducts = productSet; // сохраняем загруженные продукты
+        console.log("✅ Продукты загружены в кэш:", cachedProducts);
+    }
+
 
         console.log("✅ Продукты загружены в кэш:", productSet);
         return productSet;
