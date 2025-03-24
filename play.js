@@ -162,13 +162,13 @@ function setupMultiSelect(selector) {
         });
     });
 }
-function createRecipeCard(recipeData, recipeId) {
+function createRecipeCard(recipeData, recipeId, photoUrl, recipeDis) {
     const card = document.createElement("div");
     card.classList.add("recipe-card");
 
     // Фото рецепта
     const img = document.createElement("img");
-    img.src = recipeData.photo || "https://via.placeholder.com/90"; // Заглушка если нет фото
+    img.src = photoUrl;
     img.alt = recipeData.name;
 
     // Контейнер для текста
@@ -180,10 +180,10 @@ function createRecipeCard(recipeData, recipeId) {
     title.classList.add("recipe-title");
     title.textContent = recipeData.name;
 
-    // Описание рецепта
+    // Описание рецепта (теперь из `rec/receptX`)
     const description = document.createElement("p");
     description.classList.add("recipe-description");
-    description.textContent = recipeData.dis || "Описание отсутствует";
+    description.textContent = recipeDis;
 
     // Кнопка "Начать"
     const startButton = document.createElement("button");
@@ -196,10 +196,9 @@ function createRecipeCard(recipeData, recipeId) {
     // Кнопка "Избранное"
     const favoriteButton = document.createElement("button");
     favoriteButton.classList.add("favorite-button");
-    favoriteButton.innerHTML = "❤️"; // Значок сердечка
+    favoriteButton.innerHTML = "❤️";
     favoriteButton.addEventListener("click", () => {
         favoriteButton.classList.toggle("active");
-        // Логика добавления в избранное
     });
 
     // Собираем карточку
