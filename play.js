@@ -24,7 +24,7 @@ document.querySelector(".recipe-btn").addEventListener("click", async () => {
     let foundRecipes = [];
 
     for (let i = 0; i < 100; i++) {
-        const recipeMainRef = collection(db, `receptmain${i}`);
+        const recipeMainRef = doc(db, `receptmain${i}`);
         const prodDoc = await getDoc(doc(recipeMainRef, "prod"));
 
         if (!prodDoc.exists()) continue;
@@ -44,7 +44,9 @@ document.querySelector(".recipe-btn").addEventListener("click", async () => {
             if (!mainDoc.exists()) continue;
             
             const recipeData = mainDoc.data();
-            recipesContainer.appendChild(createRecipeCard(recipeData, i));
+            const recipeCard = await createRecipeCard(recipeData, i, recipeMainRef);
+            recipesContainer.appendChild(recipeCard);
+
         }
     }
 
