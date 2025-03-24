@@ -87,8 +87,8 @@ function setupAutocompleteForExistingInputs() {
 // 🔘 Настраиваем множественный выбор кнопок
 function setupMultiSelect(selector) {
     document.querySelectorAll(selector).forEach(btn => {
-        btn.addEventListener("click", () => {
-            btn.classList.toggle("selected");
+        btn.addEventListener("click", (event) => {
+            event.target.classList.toggle("selected");
         });
     });
 }
