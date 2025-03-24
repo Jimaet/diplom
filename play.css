@@ -1,6 +1,6 @@
 body {
     font-family: Arial, sans-serif;
-    background: linear-gradient(to bottom, #FFD194, #D1913C);
+    background: linear-gradient(to bottom, #FFC684, #B1FF3B);
     margin: 0;
     padding: 20px;
     max-width: 100vw;
@@ -110,11 +110,12 @@ body {
     background-color: #5D7B76; /* Цвет при выборе */
 }
 
+/* Кнопка "Подобрать рецепты" теперь тёмно-зелёного цвета */
 .recipe-btn {
     display: block;
     width: 100%;
     padding: 12px;
-    background-color: #FF4500;
+    background-color: #5D7B76;
     color: white;
     font-size: 18px;
     font-weight: bold;
@@ -126,5 +127,5 @@ body {
 }
 
 .recipe-btn:hover {
-    background-color: #D12E00;
+    background-color: #4A6562;
 }
