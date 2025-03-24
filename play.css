@@ -91,17 +91,23 @@ body {
 }
 
 .equipment-buttons button {
-    background-color: #FF7F50;
+    background-color: #FFBE62; /* Обычный цвет */
     color: white;
     border: none;
     padding: 10px;
     border-radius: 7px;
     cursor: pointer;
     font-size: 14px;
+    transition: background 0.3s;
 }
 
 .equipment-buttons button:hover {
-    background-color: #FF6347;
+    background-color: #E6A856;
+}
+
+/* Выбранная кнопка */
+.equipment-buttons button.selected {
+    background-color: #5D7B76; /* Цвет при выборе */
 }
 
 .recipe-btn {
