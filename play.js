@@ -174,29 +174,25 @@ function setupMultiSelect(selector) {
     });
 }
 function createRecipeCard(recipeData, recipeId, photoUrl, recipeDis) {
+    try {
     const card = document.createElement("div");
     card.classList.add("recipe-card");
 
-    // Фото рецепта
     const img = document.createElement("img");
     img.src = photoUrl;
-    img.alt = recipeData.name;
+    img.alt = recipeData.name || "Рецепт без названия";
 
-    // Контейнер для текста
     const infoContainer = document.createElement("div");
     infoContainer.classList.add("recipe-info");
 
-    // Заголовок рецепта
     const title = document.createElement("h3");
     title.classList.add("recipe-title");
-    title.textContent = recipeData.name;
+    title.textContent = recipeData.name || "Без названия";
 
-    // Описание рецепта (теперь из `rec/receptX`)
     const description = document.createElement("p");
     description.classList.add("recipe-description");
-    description.textContent = recipeDis;
+    description.textContent = recipeDis || "Описание отсутствует";
 
-    // Кнопка "Начать"
     const startButton = document.createElement("button");
     startButton.classList.add("start-button");
     startButton.textContent = "Начать";
@@ -204,7 +200,6 @@ function createRecipeCard(recipeData, recipeId, photoUrl, recipeDis) {
         window.location.href = `recipe.html?id=${recipeId}`;
     });
 
-    // Кнопка "Избранное"
     const favoriteButton = document.createElement("button");
     favoriteButton.classList.add("favorite-button");
     favoriteButton.innerHTML = "❤️";
@@ -212,7 +207,6 @@ function createRecipeCard(recipeData, recipeId, photoUrl, recipeDis) {
         favoriteButton.classList.toggle("active");
     });
 
-    // Собираем карточку
     infoContainer.appendChild(title);
     infoContainer.appendChild(description);
     card.appendChild(img);
@@ -220,5 +214,9 @@ function createRecipeCard(recipeData, recipeId, photoUrl, recipeDis) {
     card.appendChild(startButton);
     card.appendChild(favoriteButton);
 
+    console.log("✅ Успешно создана карточка рецепта:", recipeData.name);
     return card;
+} catch (error) {
+    console.error("❌ Ошибка при создании карточки рецепта:", error);
+    return null;
 }
