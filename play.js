@@ -24,29 +24,29 @@ document.querySelector(".recipe-btn").addEventListener("click", async () => {
     let foundRecipes = [];
 
     for (let i = 0; i < 100; i++) {
-    const recipeMainRef = collection(db, `receptmain${i}`); // ✅ Используем collection
-    const prodDoc = await getDoc(doc(db, `receptmain${i}`, "prod")); // ✅ Исправлено
+        const recipeMainRef = collection(db, `receptmain${i}`);
+        const prodDoc = await getDoc(doc(recipeMainRef, "prod"));
 
-    if (!prodDoc.exists()) continue;
+        if (!prodDoc.exists()) continue;
 
-    const recipeProducts = Object.values(prodDoc.data()).filter(value => 
-        typeof value === "string" && !value.includes("г.") && !value.includes("шт.")
-    );
+        // 🛠️ Фикс ошибки includes
+        const recipeProducts = Object.values(prodDoc.data()).filter(value => 
+            typeof value === "string" && !value.includes("г.") && !value.includes("шт.")
+        );
 
-    console.log(`🔍 Рецепт receptmain${i} содержит:`, recipeProducts);
+        console.log(`🔍 Рецепт receptmain${i} содержит:`, recipeProducts);
 
-    if (selectedProducts.every(product => recipeProducts.includes(product))) {
-        console.log(`✅ Рецепт receptmain${i} подходит!`);
-        foundRecipes.push(`recept${i}`);
+        if (selectedProducts.every(product => recipeProducts.includes(product))) {
+            console.log(`✅ Рецепт receptmain${i} подходит!`);
+            foundRecipes.push(`recept${i}`);
 
-        const mainDoc = await getDoc(doc(db, `receptmain${i}`, "main")); // ✅ Исправлено
-        if (!mainDoc.exists()) continue;
-
-        const recipeData = mainDoc.data();
-        const recipeCard = await createRecipeCard(recipeData, i);
-        recipesContainer.appendChild(recipeCard);
+            const mainDoc = await getDoc(doc(recipeMainRef, "main"));
+            if (!mainDoc.exists()) continue;
+            
+            const recipeData = mainDoc.data();
+            recipesContainer.appendChild(createRecipeCard(recipeData, i));
+        }
     }
-}
 
     if (foundRecipes.length === 0) {
         recipesContainer.innerHTML = "<p>❌ Нет рецептов с выбранными продуктами</p>";
@@ -162,17 +162,13 @@ function setupMultiSelect(selector) {
         });
     });
 }
-async function createRecipeCard(recipeData, recipeId, recipeMainRef) {
+function createRecipeCard(recipeData, recipeId) {
     const card = document.createElement("div");
     card.classList.add("recipe-card");
 
-    // Получаем фото из Firestore
-    const photoDoc = await getDoc(doc(recipeMainRef, "photo"));
-    const photoUrl = (photoDoc.exists() && photoDoc.data().url) ? photoDoc.data().url : "https://via.placeholder.com/90";
-
     // Фото рецепта
     const img = document.createElement("img");
-    img.src = photoUrl;
+    img.src = recipeData.photo || "https://via.placeholder.com/90"; // Заглушка если нет фото
     img.alt = recipeData.name;
 
     // Контейнер для текста
