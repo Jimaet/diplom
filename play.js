@@ -12,16 +12,18 @@ document.addEventListener("DOMContentLoaded", async () => {
     // Асинхронная загрузка продуктов
     async function loadProducts() {
         try {
-            const querySnapshot = await getDocs(collection(db, "products"));
-            querySnapshot.forEach((doc) => {
-                cachedProducts.push(...Object.values(doc.data()));
-            });
+            for (let i = 1; i <= 17; i++) {
+                const docRef = doc(db, "products", ${i});
+                const docSnap = await getDoc(docRef);
+                if (docSnap.exists()) {
+                    cachedProducts.push(...Object.values(docSnap.data()));
+                }
+            }
             console.log("✅ Продукты загружены в кэш:", cachedProducts);
         } catch (error) {
             console.error("❌ Ошибка загрузки продуктов:", error);
         }
     }
-
 
     // Функция поиска продуктов для автодополнения
     function searchProducts(query) {
@@ -91,16 +93,18 @@ document.addEventListener("DOMContentLoaded", async () => {
     addProductBtn.addEventListener("click", addProductField);
 
     // Функция включения множественного выбора
-   function setupMultiSelect(selector) {
-        document.addEventListener("click", (event) => {
-            const btn = event.target.closest(selector);
-            if (!btn) return;
-    
-            btn.classList.toggle("selected");
-            btn.style.backgroundColor = btn.classList.contains("selected") ? "#5D7B76" : "#FFBE62";
+    function setupMultiSelect(selector) {
+        document.querySelectorAll(selector).forEach(btn => {
+            btn.addEventListener("click", () => {
+                btn.classList.toggle("selected");
+                if (btn.classList.contains("selected")) {
+                    btn.style.backgroundColor = "#5D7B76";
+                } else {
+                    btn.style.backgroundColor = "#FFBE62";
+                }
+            });
         });
     }
-
 
     // Ждём загрузки продуктов, затем активируем кнопки
     await loadProducts();
