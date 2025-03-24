@@ -162,13 +162,17 @@ function setupMultiSelect(selector) {
         });
     });
 }
-function createRecipeCard(recipeData, recipeId) {
+async function createRecipeCard(recipeData, recipeId, recipeMainRef) {
     const card = document.createElement("div");
     card.classList.add("recipe-card");
 
+    // Получаем фото из Firestore
+    const photoDoc = await getDoc(doc(recipeMainRef, "photo"));
+    const photoUrl = (photoDoc.exists() && photoDoc.data().url) ? photoDoc.data().url : "https://via.placeholder.com/90";
+
     // Фото рецепта
     const img = document.createElement("img");
-    img.src = recipeData.photo || "https://via.placeholder.com/90"; // Заглушка если нет фото
+    img.src = photoUrl;
     img.alt = recipeData.name;
 
     // Контейнер для текста
