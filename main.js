@@ -193,4 +193,28 @@ if (homeButton) {
 document.getElementById("play-btn").addEventListener("click", function() {
     window.location.href = "play.html";
 });
+    function setupMultiSelect(selector) {
+    document.querySelectorAll(selector).forEach(button => {
+        button.addEventListener("click", () => {
+            const filterName = button.textContent.trim();
+            if (selectedFilters.has(filterName)) {
+                selectedFilters.delete(filterName);
+                button.classList.remove("selected"); // Убираем активный стиль
+                console.log(`❌ Фильтр удалён: ${filterName}`);
+            } else {
+                selectedFilters.add(filterName);
+                button.classList.add("selected"); // Добавляем активный стиль
+                console.log(`✅ Фильтр добавлен: ${filterName}`);
+            }
+            loadFilteredRecipes(); // Перезагружаем рецепты с учетом фильтров
+        });
+    });
+}
+document.addEventListener("DOMContentLoaded", () => {
+    setupMultiSelect(".filter-btn");
+    setupMultiSelect(".category-btn");
+    setupMultiSelect(".tech-btn");
+    loadFilteredRecipes(); // Загружаем рецепты после настройки фильтров
+});
+
 }
