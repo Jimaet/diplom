@@ -26,8 +26,9 @@ document.querySelector(".recipe-btn").addEventListener("click", async () => {
     for (const recipeDoc of querySnapshot.docs) {
         const recipeId = recipeDoc.id;
         const recipeMainRef = collection(db, `receptmain${recipeId}`);
-        const prodDoc = await getDoc(doc(recipeMainRef, "prod"));
 
+        // Получаем продукты
+        const prodDoc = await getDoc(doc(recipeMainRef, "prod"));
         if (!prodDoc.exists()) continue;
 
         const recipeProducts = Object.values(prodDoc.data()).filter(value => !value.includes("г.") && !value.includes("шт."));
@@ -35,7 +36,12 @@ document.querySelector(".recipe-btn").addEventListener("click", async () => {
 
         if (selectedProducts.every(product => recipeProducts.includes(product))) {
             console.log(`✅ Рецепт ${recipeId} подходит!`);
-            const recipeData = recipeDoc.data();
+
+            // 🔹 Получаем ДАННЫЕ рецепта (название, описание, фото)
+            const mainDoc = await getDoc(doc(recipeMainRef, "main"));
+            if (!mainDoc.exists()) continue;
+
+            const recipeData = mainDoc.data(); // ✅ Теперь мы берём нужные данные!
             recipesContainer.appendChild(createRecipeCard(recipeData));
         }
     }
