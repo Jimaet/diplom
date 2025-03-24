@@ -21,24 +21,25 @@ document.querySelector(".recipe-btn").addEventListener("click", async () => {
     const recipesContainer = document.getElementById("recipes");
     recipesContainer.innerHTML = "";
 
-    let foundRecipes = []; // Список найденных рецептов
+    let foundRecipes = [];
 
-    // Проверяем рецепты в Firestore
-    for (let i = 0; i < 100; i++) { // Ограничиваем до 100 рецептов
+    for (let i = 0; i < 100; i++) {
         const recipeMainRef = collection(db, `receptmain${i}`);
         const prodDoc = await getDoc(doc(recipeMainRef, "prod"));
 
         if (!prodDoc.exists()) continue;
 
-        // Фильтруем только основные продукты (без граммовки)
-        const recipeProducts = Object.values(prodDoc.data()).filter(value => !value.includes("г.") && !value.includes("шт."));
+        // 🛠️ Фикс ошибки includes
+        const recipeProducts = Object.values(prodDoc.data()).filter(value => 
+            typeof value === "string" && !value.includes("г.") && !value.includes("шт.")
+        );
+
         console.log(`🔍 Рецепт receptmain${i} содержит:`, recipeProducts);
 
         if (selectedProducts.every(product => recipeProducts.includes(product))) {
             console.log(`✅ Рецепт receptmain${i} подходит!`);
             foundRecipes.push(`recept${i}`);
 
-            // Загружаем данные рецепта
             const mainDoc = await getDoc(doc(recipeMainRef, "main"));
             if (!mainDoc.exists()) continue;
 
