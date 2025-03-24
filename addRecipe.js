@@ -122,7 +122,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     async function loadProducts() {
         console.log("📥 Загружаем продукты в кэш...");
-        for (let i = 1; i <= 17; i++) {
+        for (let i = 1; i <= 18; i++) {
             const docRef = doc(db, "products", `${i}`);
             const docSnap = await getDoc(docRef);
             if (docSnap.exists()) {
