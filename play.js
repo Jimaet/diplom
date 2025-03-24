@@ -112,10 +112,16 @@ document.getElementById("add-product").addEventListener("click", () => {
 
 async function loadProducts() {
     console.log("📥 Загружаем продукты в кэш...");
+    cachedProducts = [];
 
-    const snapshot = await getDocs(collection(db, "products"));
-    cachedProducts = snapshot.docs.flatMap(doc => Object.values(doc.data()).map(p => p.toLowerCase()));
-
+    for (let i = 1; i <= 18; i++) {
+        const docRef = doc(db, "products", ${i});
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+            cachedProducts.push(...Object.values(docSnap.data()).map(p => p.toLowerCase()));
+            console.log("Добавлено в кэш:", Object.values(docSnap.data()));
+        }
+    }
     console.log("✅ Продукты загружены в кэш:", cachedProducts);
 }
 
