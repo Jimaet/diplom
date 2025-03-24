@@ -34,9 +34,9 @@ document.querySelector(".recipe-btn").addEventListener("click", async () => {
 
             console.log(`📖 Продукты в ${receptmainId}:`, recipeProducts);
 
-            // Проверяем, есть ли все продукты пользователя в рецепте
-            if (userProducts.every(p => recipeProducts.some(rp => rp.includes(p)))) {
-                matchingRecipes.push(receptId); // Используем receptX, а не receptmainX
+            // 🛠 Новый алгоритм: рецепт подходит, если все его продукты есть в userProducts
+            if (recipeProducts.every(rp => userProducts.includes(rp))) {
+                matchingRecipes.push(receptId); // Добавляем подходящий рецепт
             }
         }
     }
