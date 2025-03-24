@@ -24,31 +24,29 @@ document.querySelector(".recipe-btn").addEventListener("click", async () => {
     let foundRecipes = [];
 
     for (let i = 0; i < 100; i++) {
-        const recipeMainRef = doc(db, `receptmain${i}`);
-        const prodDoc = await getDoc(doc(recipeMainRef, "prod"));
+    const recipeMainRef = collection(db, `receptmain${i}`); // ✅ Используем collection
+    const prodDoc = await getDoc(doc(db, `receptmain${i}`, "prod")); // ✅ Исправлено
 
-        if (!prodDoc.exists()) continue;
+    if (!prodDoc.exists()) continue;
 
-        // 🛠️ Фикс ошибки includes
-        const recipeProducts = Object.values(prodDoc.data()).filter(value => 
-            typeof value === "string" && !value.includes("г.") && !value.includes("шт.")
-        );
+    const recipeProducts = Object.values(prodDoc.data()).filter(value => 
+        typeof value === "string" && !value.includes("г.") && !value.includes("шт.")
+    );
 
-        console.log(`🔍 Рецепт receptmain${i} содержит:`, recipeProducts);
+    console.log(`🔍 Рецепт receptmain${i} содержит:`, recipeProducts);
 
-        if (selectedProducts.every(product => recipeProducts.includes(product))) {
-            console.log(`✅ Рецепт receptmain${i} подходит!`);
-            foundRecipes.push(`recept${i}`);
+    if (selectedProducts.every(product => recipeProducts.includes(product))) {
+        console.log(`✅ Рецепт receptmain${i} подходит!`);
+        foundRecipes.push(`recept${i}`);
 
-            const mainDoc = await getDoc(doc(recipeMainRef, "main"));
-            if (!mainDoc.exists()) continue;
-            
-            const recipeData = mainDoc.data();
-            const recipeCard = await createRecipeCard(recipeData, i, recipeMainRef);
-            recipesContainer.appendChild(recipeCard);
+        const mainDoc = await getDoc(doc(db, `receptmain${i}`, "main")); // ✅ Исправлено
+        if (!mainDoc.exists()) continue;
 
-        }
+        const recipeData = mainDoc.data();
+        const recipeCard = await createRecipeCard(recipeData, i);
+        recipesContainer.appendChild(recipeCard);
     }
+}
 
     if (foundRecipes.length === 0) {
         recipesContainer.innerHTML = "<p>❌ Нет рецептов с выбранными продуктами</p>";
