@@ -3,15 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Play</title>
+    <title>Выбор продуктов</title>
     <link rel="stylesheet" href="play.css">
 </head>
 <body>
-    <div class="play-container">
-        <h1>Play Page</h1>
-        <button id="back-btn">Назад</button>
-    </div>
+    <div class="container">
+        <a href="index.html" class="back-button">← Назад</a>
+        <p class="info-text">Выберите блюда, которые есть у Вас в холодильнике, и мы подберем рецепты!</p>
 
+        <button id="add-product" class="add-btn">+ добавить продукт</button>
+        <div id="product-list"></div>
+    </div>
     <script src="play.js"></script>
 </body>
 </html>
