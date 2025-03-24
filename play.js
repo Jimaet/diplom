@@ -24,12 +24,11 @@ document.querySelector(".recipe-btn").addEventListener("click", async () => {
     let foundRecipes = [];
 
     for (let i = 0; i < 100; i++) {
-        const recipeMainRef = collection(db, `receptmain${i}`);
-        const prodDoc = await getDoc(doc(recipeMainRef, "prod"));
+        const prodRef = doc(db, `receptmain${i}`, "prod");
+        const prodDoc = await getDoc(prodRef);
 
         if (!prodDoc.exists()) continue;
 
-        // 🛠️ Фикс ошибки includes
         const recipeProducts = Object.values(prodDoc.data()).filter(value => 
             typeof value === "string" && !value.includes("г.") && !value.includes("шт.")
         );
@@ -40,11 +39,12 @@ document.querySelector(".recipe-btn").addEventListener("click", async () => {
             console.log(`✅ Рецепт receptmain${i} подходит!`);
             foundRecipes.push(`recept${i}`);
 
-            const mainDoc = await getDoc(doc(recipeMainRef, "main"));
+            const mainDoc = await getDoc(doc(db, `receptmain${i}`, "main"));
             if (!mainDoc.exists()) continue;
             
             const recipeData = mainDoc.data();
-            recipesContainer.appendChild(createRecipeCard(recipeData, i));
+            const recipeCard = await createRecipeCard(recipeData, i);
+            recipesContainer.appendChild(recipeCard);
         }
     }
 
