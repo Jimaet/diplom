@@ -24,53 +24,45 @@ document.querySelector(".recipe-btn").addEventListener("click", async () => {
 
     let foundRecipes = [];
 
-    for (let i = 0; i < 100; i++) {
-        try {
-            const recipeMainRef = collection(db, `receptmain${i}`);
+for (let i = 0; i < 100; i++) {
+    try {
+        const recipeMainRef = collection(db, `receptmain${i}`);
+        const prodDoc = await getDoc(doc(recipeMainRef, "prod"));
 
+        if (!prodDoc.exists()) continue;
 
-            const prodDoc = await getDoc(doc(recipeMainRef, "prod"));
+        const recipeProducts = Object.values(prodDoc.data()).filter(value =>
+            typeof value === "string" && !value.includes("г.") && !value.includes("шт.")
+        );
 
-            if (!prodDoc.exists()) continue;
+        console.log(`🔍 Рецепт receptmain${i} содержит:`, recipeProducts);
 
-            // ✅ Берём только основные продукты (без граммовки и количества)
-            const recipeProducts = Object.values(prodDoc.data()).filter(value => 
-                typeof value === "string" && !value.includes("г.") && !value.includes("шт.")
-            );
+        if (selectedProducts.every(product => recipeProducts.includes(product))) {
+            console.log(`✅ Рецепт receptmain${i} подходит!`);
+            foundRecipes.push(i);
 
-            console.log(`🔍 Рецепт receptmain${i} содержит:`, recipeProducts);
+            const photoDoc = await getDoc(doc(recipeMainRef, "photo"));
+            const photoUrl = photoDoc.exists() ? photoDoc.data().url : "https://via.placeholder.com/90";
 
-            if (selectedProducts.every(product => recipeProducts.includes(product))) {
-                console.log(`✅ Рецепт receptmain${i} подходит!`);
-                foundRecipes.push(i);
+            const recipeRef = doc(db, "rec", `recept${i}`);
+            const recipeSnap = await getDoc(recipeRef);
+            const recipeDis = recipeSnap.exists() ? recipeSnap.data().dis : "Описание отсутствует";
 
-                // 📥 Загружаем фото
-                const photoDoc = await getDoc(doc(recipeMainRef, "photo"));
+            const mainDoc = await getDoc(doc(recipeMainRef, "main"));
+            if (!mainDoc.exists()) continue;
 
-                const photoUrl = photoDoc.exists() ? photoDoc.data().url : "https://via.placeholder.com/90";
+            const recipeData = mainDoc.data();
+            
+            let recipeCard = createRecipeCard(recipeData, i, photoUrl, recipeDis); // ✅ исправлено
 
-                // 📥 Загружаем описание из rec/receptX
-                const recipeRef = doc(db, "rec", `recept${i}`);
-                const recipeSnap = await getDoc(recipeRef);
-                const recipeDis = recipeSnap.exists() ? recipeSnap.data().dis : "Описание отсутствует";
-
-                // 📥 Загружаем основную инфу из main
-                const mainDoc = await getDoc(doc(recipeMainRef, "main"));
-                if (!mainDoc.exists()) continue;
-
-                const recipeData = mainDoc.data();
-                const recipeCard = createRecipeCard(recipeData, i, photoUrl, recipeDis);
-
-                const recipeCard = createRecipeCard(recipeData, i, photoUrl, recipeDis);
-                if (recipeCard) {
-                    recipesContainer.appendChild(recipeCard);
-                }
-
+            if (recipeCard) {
+                recipesContainer.appendChild(recipeCard);
             }
-        } catch (error) {
-            console.error(`❌ Ошибка при обработке рецепта receptmain${i}:`, error);
         }
+    } catch (error) {
+        console.error(`❌ Ошибка при обработке рецепта receptmain${i}:`, error);
     }
+}
 
     if (foundRecipes.length === 0) {
         recipesContainer.innerHTML = "<p>❌ Нет рецептов с выбранными продуктами</p>";
