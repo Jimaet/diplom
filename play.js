@@ -3,9 +3,9 @@ import { collection, doc, setDoc, getDocs, getDoc } from "https://www.gstatic.co
 
 let cachedProducts = [];
 document.addEventListener("DOMContentLoaded", async () => {
-    await loadProducts(); // Загружаем продукты в кэш
-
-    setupAutocompleteForExistingInputs(); // Включаем автодополнение для существующих полей
+    await loadProducts();
+    setupAutocompleteForExistingInputs();
+    setupMultiSelect(".equipment-btn"); // ✅ Добавляем множественный выбор для оборудования
 });
 document.getElementById("add-product").addEventListener("click", () => {
     const productList = document.getElementById("product-list");
@@ -14,11 +14,29 @@ document.getElementById("add-product").addEventListener("click", () => {
     const newProductItem = document.createElement("div");
     newProductItem.classList.add("product-item");
 
+    // Поле ввода названия продукта
     const newInput = document.createElement("input");
     newInput.type = "text";
     newInput.placeholder = "Введите продукт...";
 
+    // Поле ввода количества
+    const quantityInput = document.createElement("input");
+    quantityInput.type = "text";
+    quantityInput.placeholder = "грамм/штук";
+    quantityInput.classList.add("quantity-input");
+
+    // Кнопка удаления
+    const deleteButton = document.createElement("button");
+    deleteButton.textContent = "❌";
+    deleteButton.classList.add("delete-btn");
+    deleteButton.addEventListener("click", () => {
+        productList.removeChild(newProductItem);
+    });
+
+    // Добавляем элементы в строку продукта
     newProductItem.appendChild(newInput);
+    newProductItem.appendChild(quantityInput);
+    newProductItem.appendChild(deleteButton);
     productList.appendChild(newProductItem);
 
     // Дожидаемся добавления в DOM и включаем автодополнение
