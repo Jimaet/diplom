@@ -3,7 +3,10 @@ import { collection, doc, setDoc, getDocs, getDoc } from "https://www.gstatic.co
 
 const IMGBB_API_KEY = "6353a9ccc652efaad72bf6c7b2b4fbf3";
 let cachedProducts = new Set();
+
 document.addEventListener("DOMContentLoaded", async () => {
+    await loadProducts();
+
     const submitButton = document.querySelector(".submit-btn");
 
     submitButton?.addEventListener("click", async function () {
@@ -38,8 +41,8 @@ document.addEventListener("DOMContentLoaded", async () => {
 
             let prodData = {};
             let usedProducts = new Set(await loadProducts());
-
             let newProducts = {};
+
             document.querySelectorAll("#product-list .product-item").forEach((product, index) => {
                 const title = product.querySelector("input:nth-of-type(1)").value.trim();
                 const amount = product.querySelector("input:nth-of-type(2)").value.trim();
@@ -146,16 +149,16 @@ document.addEventListener("DOMContentLoaded", async () => {
     
         cachedProducts = productSet; // сохраняем загруженные продукты
         console.log("✅ Продукты загружены в кэш:", cachedProducts);
-    }
-
-
-        console.log("✅ Продукты загружены в кэш:", productSet);
         return productSet;
     }
 
     function searchProducts(query) {
         if (query.length < 2) return [];
-        return Array.from(cachedProducts).filter(name => name.toLowerCase().startsWith(query.toLowerCase()));
+        if (!cachedProducts || cachedProducts.size === 0) return [];
+
+        return Array.from(cachedProducts).filter(name => 
+            name.toLowerCase().startsWith(query.toLowerCase())
+        );
     }
 
     function setupAutocomplete(inputField) {
@@ -209,10 +212,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         });
     }
 
-    setTimeout(() => {
-        setupMultiSelect(".filter-btn");
-        setupMultiSelect(".category-btn");
-        setupMultiSelect(".tech-btn");
-    }, 500);
-    await loadProducts();
+    setupMultiSelect(".filter-btn");
+    setupMultiSelect(".category-btn");
+    setupMultiSelect(".tech-btn");
 });
