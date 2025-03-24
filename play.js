@@ -29,22 +29,33 @@ document.querySelector(".recipe-btn").addEventListener("click", async () => {
 
         if (!prodDoc.exists()) continue;
 
-        // 🛠️ Фикс ошибки includes
+        // ✅ Берём только основные продукты (без граммовки и количества)
         const recipeProducts = Object.values(prodDoc.data()).filter(value => 
             typeof value === "string" && !value.includes("г.") && !value.includes("шт.")
         );
 
         console.log(`🔍 Рецепт receptmain${i} содержит:`, recipeProducts);
 
+        // ✅ Проверяем, что все введённые продукты есть в рецепте (но в рецепте могут быть другие)
         if (selectedProducts.every(product => recipeProducts.includes(product))) {
             console.log(`✅ Рецепт receptmain${i} подходит!`);
             foundRecipes.push(`recept${i}`);
 
+            // 📥 Загружаем фото
+            const photoDoc = await getDoc(doc(recipeMainRef, "Photo"));
+            const photoUrl = photoDoc.exists() ? photoDoc.data().url : "https://via.placeholder.com/90";
+
+            // 📥 Загружаем описание из `rec/receptX`
+            const recipeRef = doc(db, "rec", `recept${i}`);
+            const recipeSnap = await getDoc(recipeRef);
+            const recipeDis = recipeSnap.exists() ? recipeSnap.data().dis : "Описание отсутствует";
+
+            // 📥 Загружаем основную инфу из `main`
             const mainDoc = await getDoc(doc(recipeMainRef, "main"));
             if (!mainDoc.exists()) continue;
             
             const recipeData = mainDoc.data();
-            recipesContainer.appendChild(createRecipeCard(recipeData, i));
+            recipesContainer.appendChild(createRecipeCard(recipeData, i, photoUrl, recipeDis));
         }
     }
 
