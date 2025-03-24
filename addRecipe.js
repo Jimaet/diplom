@@ -132,7 +132,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         console.log("✅ Продукты загружены в кэш:", cachedProducts);
     }
 
-    await loadProducts();
+    
 
     function searchProducts(query) {
         if (query.length < 2) return [];
@@ -195,4 +195,5 @@ document.addEventListener("DOMContentLoaded", async () => {
         setupMultiSelect(".category-btn");
         setupMultiSelect(".tech-btn");
     }, 500);
+    await loadProducts();
 });
