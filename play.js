@@ -1,37 +1,52 @@
 import { db } from "./firebase-config.js";
-import { collection, doc, setDoc, getDocs, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+import { collection, doc, setDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 document.addEventListener("DOMContentLoaded", async () => {
-    console.log("📥 Загружаем продукты в кэш...");
+    console.log("📥 Загружаем кнопки...");
+    
+    // Включаем множественный выбор
+    function setupMultiSelect(selector) {
+        document.querySelectorAll(selector).forEach(btn => {
+            btn.addEventListener("click", () => {
+                btn.classList.toggle("selected");
+                btn.style.backgroundColor = btn.classList.contains("selected") ? "#5D7B76" : "#FFBE62";
+            });
+        });
+    }
+    
+    setupMultiSelect(".tech-btn"); // Множественный выбор техники
+    setupMultiSelect(".filter-btn"); // Фильтры
+    setupMultiSelect(".category-btn"); // Категории
 
-    const addProductBtn = document.getElementById("add-product");
-    const productList = document.getElementById("product-list");
+    console.log("✅ Кнопки загружены!");
 
+    // Начинаем загрузку продуктов в фоновом режиме
     let cachedProducts = [];
+    loadProducts();
 
-    // Асинхронная загрузка продуктов
+    // Загружаем продукты одним запросом (ускорение!)
     async function loadProducts() {
         try {
-            for (let i = 1; i <= 17; i++) {
-                const docRef = doc(db, "products", `${i}`);
-                const docSnap = await getDoc(docRef);
-                if (docSnap.exists()) {
-                    cachedProducts.push(...Object.values(docSnap.data()));
-                }
-            }
+            console.log("📥 Загружаем продукты в кэш...");
+
+            const querySnapshot = await getDocs(collection(db, "products")); // 1 запрос вместо 17
+            querySnapshot.forEach((doc) => {
+                cachedProducts.push(...Object.values(doc.data()));
+            });
+
             console.log("✅ Продукты загружены в кэш:", cachedProducts);
         } catch (error) {
             console.error("❌ Ошибка загрузки продуктов:", error);
         }
     }
 
-    // Функция поиска продуктов для автодополнения
+    // Поиск продуктов
     function searchProducts(query) {
         if (query.length < 2) return [];
         return cachedProducts.filter(name => name.toLowerCase().startsWith(query.toLowerCase()));
     }
 
-    // Функция автодополнения
+    // Автодополнение
     function setupAutocomplete(inputField) {
         const suggestionBox = document.createElement("div");
         suggestionBox.classList.add("suggestions");
@@ -63,7 +78,10 @@ document.addEventListener("DOMContentLoaded", async () => {
         });
     }
 
-    // Функция добавления нового продукта
+    // Добавление продукта
+    const addProductBtn = document.getElementById("add-product");
+    const productList = document.getElementById("product-list");
+
     function addProductField() {
         const productItem = document.createElement("div");
         productItem.classList.add("product-item");
@@ -73,7 +91,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         nameInput.placeholder = "Введите продукт";
 
         const amountInput = document.createElement("input");
-        amountInput.type = "number"; // Теперь ввод только числа
+        amountInput.type = "number";
         amountInput.placeholder = "Граммы / штуки";
 
         const deleteBtn = document.createElement("button");
@@ -91,24 +109,4 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     addProductBtn.addEventListener("click", addProductField);
-
-    // Функция включения множественного выбора
-    function setupMultiSelect(selector) {
-        document.querySelectorAll(selector).forEach(btn => {
-            btn.addEventListener("click", () => {
-                btn.classList.toggle("selected");
-                if (btn.classList.contains("selected")) {
-                    btn.style.backgroundColor = "#5D7B76";
-                } else {
-                    btn.style.backgroundColor = "#FFBE62";
-                }
-            });
-        });
-    }
-
-    // Ждём загрузки продуктов, затем активируем кнопки
-    
-    setupMultiSelect(".tech-btn"); // Для выбора техники
-    await loadProducts();
 });
-
