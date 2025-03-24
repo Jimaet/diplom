@@ -11,7 +11,7 @@ document.addEventListener("DOMContentLoaded", () => {
         nameInput.placeholder = "Введите продукт";
 
         const amountInput = document.createElement("input");
-        amountInput.type = "number"; // Теперь ввод только числовой
+        amountInput.type = "number"; // Только числовой ввод
         amountInput.placeholder = "Граммы / штуки";
 
         const deleteBtn = document.createElement("button");
@@ -23,5 +23,14 @@ document.addEventListener("DOMContentLoaded", () => {
         productItem.appendChild(amountInput);
         productItem.appendChild(deleteBtn);
         productList.appendChild(productItem);
+    });
+
+    // Логика множественного выбора кнопок техники и посуды
+    const equipmentButtons = document.querySelectorAll(".equipment-buttons button");
+
+    equipmentButtons.forEach(button => {
+        button.addEventListener("click", () => {
+            button.classList.toggle("selected");
+        });
     });
 });
