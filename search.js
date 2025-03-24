@@ -15,19 +15,20 @@ document.querySelector(".recipe-btn").addEventListener("click", async () => {
 
     let matchingRecipes = [];
 
-    for (let i = 0; i <= 9; i++) {
+    for (let i = 0; i <= 9; i++) { // Перебираем рецепты receptmain0 - receptmain9
         const prodRef = doc(db, `receptmain${i}`, "prod");
         const prodSnap = await getDoc(prodRef);
 
         if (prodSnap.exists()) {
             const prodData = prodSnap.data();
             const recipeProducts = Object.values(prodData)
-                .map(p => (typeof p === "string" ? p.toLowerCase() : ""))
-                .filter(p => p !== ""); // Убираем пустые строки
+                .filter((_, key) => !key.includes("-")) // Игнорируем граммовку
+                .map(p => p.toLowerCase());
 
             console.log(`📖 Продукты в receptmain${i}:`, recipeProducts);
 
-            if (recipeProducts.every(prod => userProducts.includes(prod))) {
+            // Проверяем, есть ли все продукты пользователя в рецепте
+            if (userProducts.every(p => recipeProducts.includes(p))) {
                 matchingRecipes.push(`recept${i}`);
             }
         }
