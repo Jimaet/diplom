@@ -7,7 +7,7 @@ const firebaseConfig = {
     apiKey: "AIzaSyDqIDTQrS14wTLsh_jFkD0GZAmEEWW8TDk",
     authDomain: "cooker-62216.firebaseapp.com",
     projectId: "cooker-62216",
-    storageBucket: "cooker-62216.firebasestorage.app",
+    storageBucket: "cooker-62216.appspot.com",
     messagingSenderId: "994568659489",
     appId: "1:994568659489:web:18c15bc15fa5b723a03960"
 };
@@ -70,41 +70,35 @@ async function loadFilteredRecipes() {
 // 🔹 Проверяем, есть ли совпадения фильтров в receptmainX/type и type2 🔹
 async function checkRecipeCategories(recipeId) {
     const receptMainRef = `receptmain${recipeId.slice(6)}`;
-
     const typeDoc = await getDoc(doc(db, receptMainRef, "type"));
     const type2Doc = await getDoc(doc(db, receptMainRef, "type2"));
 
-    let categories = new Set();
-    if (typeDoc.exists()) {
-        Object.values(typeDoc.data()).forEach(value => categories.add(value));
-    }
-    if (type2Doc.exists()) {
-        Object.values(type2Doc.data()).forEach(value => categories.add(value));
-    }
+    const categories = new Set([
+        ...Object.values(typeDoc.exists() ? typeDoc.data() : {}),
+        ...Object.values(type2Doc.exists() ? type2Doc.data() : {})
+    ]);
 
-    for (let filter of selectedFilters) {
-        if (categories.has(filter)) return true;
-    }
-    return false;
+    return [...selectedFilters].some(filter => categories.has(filter));
 }
 
-// 🔹 Обработчики кликов по фильтрам 🔹
-document.querySelectorAll(".filter-btn, .category-btn").forEach(button => {
-    button.addEventListener("click", () => {
-        const filterName = button.textContent.trim();
-        if (selectedFilters.has(filterName)) {
-            selectedFilters.delete(filterName);
-            console.log(`❌ Фильтр удалён: ${filterName}`);
-        } else {
-            selectedFilters.add(filterName);
-            console.log(`✅ Фильтр добавлен: ${filterName}`);
-        }
-        loadFilteredRecipes(); // Обновляем список рецептов
+// 🔹 Функция для установки обработчиков фильтров 🔹
+function setupMultiSelect(selector) {
+    document.querySelectorAll(selector).forEach(button => {
+        button.addEventListener("click", () => {
+            const filterName = button.textContent.trim();
+            if (selectedFilters.has(filterName)) {
+                selectedFilters.delete(filterName);
+                button.classList.remove("selected"); // Убираем активный стиль
+                console.log(`❌ Фильтр удалён: ${filterName}`);
+            } else {
+                selectedFilters.add(filterName);
+                button.classList.add("selected"); // Добавляем активный стиль
+                console.log(`✅ Фильтр добавлен: ${filterName}`);
+            }
+            loadFilteredRecipes(); // Перезагружаем рецепты с учетом фильтров
+        });
     });
-});
-
-// 🔹 Загружаем рецепты при загрузке страницы 🔹
-document.addEventListener("DOMContentLoaded", loadFilteredRecipes);
+}
 
 // 🔹 Поиск рецептов 🔹
 let searchTimeout;
@@ -172,9 +166,12 @@ if (searchInput) {
 }
 
 // 🔹 Кнопка "Мои рецепты" 🔹
-document.getElementById("my-recipes-btn").addEventListener("click", () => {
-    window.location.href = "create.html";
-});
+const myRecipesBtn = document.getElementById("my-recipes-btn");
+if (myRecipesBtn) {
+    myRecipesBtn.addEventListener("click", () => {
+        window.location.href = "create.html";
+    });
+}
 
 // 🔹 Кнопка "Домой" с прокруткой вверх или обновлением 🔹
 let homeButton = document.querySelector(".nav-btn:first-child");
@@ -190,31 +187,20 @@ if (homeButton) {
         }
         lastClickTime = currentTime;
     });
-document.getElementById("play-btn").addEventListener("click", function() {
-    window.location.href = "play.html";
-});
-    function setupMultiSelect(selector) {
-    document.querySelectorAll(selector).forEach(button => {
-        button.addEventListener("click", () => {
-            const filterName = button.textContent.trim();
-            if (selectedFilters.has(filterName)) {
-                selectedFilters.delete(filterName);
-                button.classList.remove("selected"); // Убираем активный стиль
-                console.log(`❌ Фильтр удалён: ${filterName}`);
-            } else {
-                selectedFilters.add(filterName);
-                button.classList.add("selected"); // Добавляем активный стиль
-                console.log(`✅ Фильтр добавлен: ${filterName}`);
-            }
-            loadFilteredRecipes(); // Перезагружаем рецепты с учетом фильтров
-        });
+}
+
+// 🔹 Кнопка "Играть" 🔹
+const playBtn = document.getElementById("play-btn");
+if (playBtn) {
+    playBtn.addEventListener("click", function() {
+        window.location.href = "play.html";
     });
 }
+
+// 🔹 Устанавливаем обработчики фильтров и загружаем рецепты при загрузке страницы 🔹
 document.addEventListener("DOMContentLoaded", () => {
     setupMultiSelect(".filter-btn");
     setupMultiSelect(".category-btn");
     setupMultiSelect(".tech-btn");
     loadFilteredRecipes(); // Загружаем рецепты после настройки фильтров
 });
-
-}
