@@ -52,7 +52,8 @@ document.querySelector(".recipe-btn").addEventListener("click", async () => {
         recipesContainer.innerHTML = "<p>❌ Нет рецептов с выбранными продуктами</p>";
     }
 });
-
+const recipeCard = await createRecipeCard(recipeData, recipeId);
+document.getElementById("recipes-container").appendChild(recipeCard);
 document.getElementById("add-product").addEventListener("click", () => {
     const productList = document.getElementById("product-list");
 
@@ -162,13 +163,23 @@ function setupMultiSelect(selector) {
         });
     });
 }
-async function createRecipeCard(recipeData, recipeId, recipeMainRef) {
+async function createRecipeCard(recipeData, recipeId) {
     const card = document.createElement("div");
     card.classList.add("recipe-card");
 
-    // Получаем фото из Firestore
-    const photoDoc = await getDoc(doc(recipeMainRef, "photo"));
-    const photoUrl = (photoDoc.exists() && photoDoc.data().url) ? photoDoc.data().url : "https://via.placeholder.com/90";
+    // Ссылка на Firestore
+    const recipeMainRef = doc(db, `receptmain${recipeId}`, "photo");
+
+    let photoUrl = "https://via.placeholder.com/90"; // Заглушка
+
+    try {
+        const photoDoc = await getDoc(recipeMainRef);
+        if (photoDoc.exists() && photoDoc.data().url) {
+            photoUrl = photoDoc.data().url;
+        }
+    } catch (error) {
+        console.error("Ошибка загрузки фото:", error);
+    }
 
     // Фото рецепта
     const img = document.createElement("img");
