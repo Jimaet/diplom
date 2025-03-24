@@ -11,7 +11,7 @@ document.addEventListener("DOMContentLoaded", () => {
         nameInput.placeholder = "Введите продукт";
 
         const amountInput = document.createElement("input");
-        amountInput.type = "text";
+        amountInput.type = "number"; // Теперь ввод только числовой
         amountInput.placeholder = "Граммы / штуки";
 
         const deleteBtn = document.createElement("button");
