@@ -3,13 +3,9 @@ import { collection, doc, setDoc, getDocs, getDoc } from "https://www.gstatic.co
 
 let cachedProducts = [];
 document.addEventListener("DOMContentLoaded", async () => {
-    try {
-        await loadProducts();
-        setupAutocompleteForExistingInputs();
-        setupMultiSelect(".equipment-btn");
-    } catch (error) {
-        console.error("❌ Ошибка инициализации:", error);
-    }
+    await loadProducts();
+    setupAutocompleteForExistingInputs();
+    setupMultiSelect(".equipment-btn"); // ✅ Добавляем множественный выбор для оборудования
 });
 
 document.querySelector(".recipe-btn").addEventListener("click", async () => {
@@ -76,20 +72,26 @@ document.querySelector(".recipe-btn").addEventListener("click", async () => {
     }
 });
 
+
 document.getElementById("add-product").addEventListener("click", () => {
     const productList = document.getElementById("product-list");
+
+    // Создаём новый элемент
     const newProductItem = document.createElement("div");
     newProductItem.classList.add("product-item");
 
+    // Поле ввода названия продукта
     const newInput = document.createElement("input");
     newInput.type = "text";
     newInput.placeholder = "Введите продукт...";
 
+    // Поле ввода количества
     const quantityInput = document.createElement("input");
     quantityInput.type = "text";
     quantityInput.placeholder = "грамм/штук";
     quantityInput.classList.add("quantity-input");
 
+    // Кнопка удаления
     const deleteButton = document.createElement("button");
     deleteButton.textContent = "❌";
     deleteButton.classList.add("delete-btn");
@@ -97,36 +99,42 @@ document.getElementById("add-product").addEventListener("click", () => {
         productList.removeChild(newProductItem);
     });
 
-    newProductItem.append(newInput, quantityInput, deleteButton);
+    // Добавляем элементы в строку продукта
+    newProductItem.appendChild(newInput);
+    newProductItem.appendChild(quantityInput);
+    newProductItem.appendChild(deleteButton);
     productList.appendChild(newProductItem);
 
-    setTimeout(() => setupAutocomplete(newInput), 100);
+    // Дожидаемся добавления в DOM и включаем автодополнение
+    setTimeout(() => {
+        console.log("🆕 Новое поле добавлено, включаем автодополнение...");
+        setupAutocomplete(newInput);
+    }, 100);
 });
 
+// ⚡ Загружаем продукты в кэш из Firestore
 async function loadProducts() {
-    cachedProducts = [];
-    try {
-        const productPromises = [];
-        for (let i = 1; i <= 18; i++) {
-            productPromises.push(getDoc(doc(db, "products", `${i}`)));
-        }
-        const productDocs = await Promise.all(productPromises);
+    console.log("📥 Загружаем продукты в кэш...");
+    cachedProducts = []; // Очищаем кэш перед загрузкой
 
-        productDocs.forEach(docSnap => {
-            if (docSnap.exists()) {
-                cachedProducts.push(...Object.values(docSnap.data()));
-            }
-        });
-    } catch (error) {
-        console.error("❌ Ошибка загрузки продуктов:", error);
+    for (let i = 1; i <= 18; i++) {
+        const docRef = doc(db, "products", ${i});
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+            cachedProducts.push(...Object.values(docSnap.data()));
+            console.log("Добавлено в кэш:", Object.values(docSnap.data()));
+        }
     }
+    console.log("✅ Продукты загружены в кэш:", cachedProducts);
 }
 
+// 🔍 Ищем продукты в кэше
 function searchProducts(query) {
     if (query.length < 2) return [];
     return cachedProducts.filter(name => name.toLowerCase().startsWith(query.toLowerCase()));
 }
 
+// ✨ Включаем автодополнение
 function setupAutocomplete(inputField) {
     const suggestionBox = document.createElement("div");
     suggestionBox.classList.add("suggestions");
@@ -135,9 +143,12 @@ function setupAutocomplete(inputField) {
     inputField.addEventListener("input", () => {
         const query = inputField.value.trim();
         suggestionBox.innerHTML = "";
+
         if (query.length < 2) return;
 
         const results = searchProducts(query);
+        console.log(📋 Подсказки для ${query}:, results);
+
         results.forEach(product => {
             const item = document.createElement("div");
             item.classList.add("suggestion-item");
@@ -157,10 +168,12 @@ function setupAutocomplete(inputField) {
     });
 }
 
+// 🔄 Автодополнение для уже существующих полей
 function setupAutocompleteForExistingInputs() {
     document.querySelectorAll("#product-list .product-item input[type='text']").forEach(setupAutocomplete);
 }
 
+// 🔘 Настраиваем множественный выбор кнопок
 function setupMultiSelect(selector) {
     document.querySelectorAll(selector).forEach(btn => {
         btn.addEventListener("click", (event) => {
@@ -185,22 +198,23 @@ function createRecipeCard(recipeData, recipeId, photoUrl, recipeDis) {
         title.classList.add("recipe-title");
         title.textContent = recipeData.name || "Без названия";
 
+        const description = document.createElement("p");
+        description.classList.add("recipe-description");
+        description.textContent = recipeDis || "Описание отсутствует";
+
         const startButton = document.createElement("button");
         startButton.classList.add("start-button");
         startButton.textContent = "Начать";
         startButton.addEventListener("click", () => {
-            window.location.href = `recipe.html?id=${recipeId}`;
+            window.location.href = recipe.html?id=${recipeId};
         });
 
         infoContainer.appendChild(title);
-        if (recipeDis) {
-            const description = document.createElement("p");
-            description.classList.add("recipe-description");
-            description.textContent = recipeDis;
-            infoContainer.appendChild(description);
-        }
+        infoContainer.appendChild(description);
+        card.appendChild(img);
+        card.appendChild(infoContainer);
+        card.appendChild(startButton);
 
-        card.append(img, infoContainer, startButton);
         return card;
     } catch (error) {
         console.error("❌ Ошибка при создании карточки рецепта:", error);
