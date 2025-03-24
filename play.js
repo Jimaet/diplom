@@ -7,6 +7,40 @@ document.addEventListener("DOMContentLoaded", async () => {
     setupAutocompleteForExistingInputs();
     setupMultiSelect(".equipment-btn"); // ✅ Добавляем множественный выбор для оборудования
 });
+document.querySelector(".recipe-btn").addEventListener("click", async () => {
+    const selectedProducts = [...document.querySelectorAll("#product-list .product-item input[type='text']")]
+        .map(input => input.value.trim())
+        .filter(value => value);
+
+    if (selectedProducts.length === 0) {
+        alert("Выберите хотя бы один продукт!");
+        return;
+    }
+
+    console.log("📌 Выбранные продукты:", selectedProducts);
+    const recipesContainer = document.getElementById("recipes");
+    recipesContainer.innerHTML = "";
+
+    const querySnapshot = await getDocs(collection(db, "rec"));
+
+    for (const recipeDoc of querySnapshot.docs) {
+        const recipeId = recipeDoc.id;
+        const recipeMainRef = collection(db, `receptmain${recipeId}`);
+        const prodDoc = await getDoc(doc(recipeMainRef, "prod"));
+
+        if (!prodDoc.exists()) continue;
+
+        const recipeProducts = Object.values(prodDoc.data()).filter(value => !value.includes("г.") && !value.includes("шт."));
+        console.log(`🔍 Рецепт ${recipeId} содержит:`, recipeProducts);
+
+        if (selectedProducts.every(product => recipeProducts.includes(product))) {
+            console.log(`✅ Рецепт ${recipeId} подходит!`);
+            const recipeData = recipeDoc.data();
+            recipesContainer.appendChild(createRecipeCard(recipeData));
+        }
+    }
+});
+
 document.getElementById("add-product").addEventListener("click", () => {
     const productList = document.getElementById("product-list");
 
@@ -115,4 +149,18 @@ function setupMultiSelect(selector) {
             event.target.classList.toggle("selected");
         });
     });
+}
+function createRecipeCard(recipeData) {
+    const recipeCard = document.createElement("div");
+    recipeCard.classList.add("recipe-card");
+
+    recipeCard.innerHTML = `
+        <img src="${recipeData.photo || 'default.jpg'}" alt="${recipeData.name}">
+        <h3>${recipeData.name}</h3>
+        <p>${recipeData.dis}</p>
+        <p><strong>Время приготовления:</strong> ${recipeData.timemin} мин</p>
+        <p><strong>Порции:</strong> ${recipeData.porcii}</p>
+    `;
+
+    return recipeCard;
 }
