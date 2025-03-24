@@ -21,27 +21,25 @@ document.querySelector(".recipe-btn").addEventListener("click", async () => {
     const recipesContainer = document.getElementById("recipes");
     recipesContainer.innerHTML = "";
 
-    const querySnapshot = await getDocs(collection(db, "rec"));
-
-    for (const recipeDoc of querySnapshot.docs) {
-        const recipeId = recipeDoc.id;
-        const recipeMainRef = collection(db, `receptmain${recipeId}`);
-
-        // Получаем продукты
+    // Получаем все рецепты напрямую из `receptmainX`
+    for (let i = 0; i < 100; i++) {  // Ограничиваем до 100 рецептов, чтобы не перегружать
+        const recipeMainRef = collection(db, `receptmain${i}`);
         const prodDoc = await getDoc(doc(recipeMainRef, "prod"));
+
         if (!prodDoc.exists()) continue;
 
+        // Фильтруем продукты, убирая граммовку и количество
         const recipeProducts = Object.values(prodDoc.data()).filter(value => !value.includes("г.") && !value.includes("шт."));
-        console.log(`🔍 Рецепт ${recipeId} содержит:`, recipeProducts);
+        console.log(`🔍 Рецепт receptmain${i} содержит:`, recipeProducts);
 
         if (selectedProducts.every(product => recipeProducts.includes(product))) {
-            console.log(`✅ Рецепт ${recipeId} подходит!`);
+            console.log(`✅ Рецепт receptmain${i} подходит!`);
 
-            // 🔹 Получаем ДАННЫЕ рецепта (название, описание, фото)
+            // Загружаем основные данные рецепта
             const mainDoc = await getDoc(doc(recipeMainRef, "main"));
             if (!mainDoc.exists()) continue;
 
-            const recipeData = mainDoc.data(); // ✅ Теперь мы берём нужные данные!
+            const recipeData = mainDoc.data();
             recipesContainer.appendChild(createRecipeCard(recipeData));
         }
     }
