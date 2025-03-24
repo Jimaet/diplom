@@ -2,7 +2,11 @@ import { db } from "./firebase-config.js";
 import { collection, doc, setDoc, getDocs, getDoc } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
 let cachedProducts = [];
+document.addEventListener("DOMContentLoaded", async () => {
+    await loadProducts(); // Загружаем продукты в кэш
 
+    setupAutocompleteForExistingInputs(); // Включаем автодополнение для существующих полей
+});
 document.getElementById("add-product").addEventListener("click", () => {
     const productList = document.getElementById("product-list");
 
@@ -34,6 +38,8 @@ async function loadProducts() {
         const docSnap = await getDoc(docRef);
         if (docSnap.exists()) {
             cachedProducts.push(...Object.values(docSnap.data()));
+            console.log("Добавлено в кэш:", Object.values(docSnap.data()));
+
         }
     }
     console.log("✅ Продукты загружены в кэш:", cachedProducts);
