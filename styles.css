@@ -178,7 +178,13 @@ body {
     object-fit: cover;
     border-radius: 60px; /* Максимально закруглил */
 }
-
+.nav-btn-ai img {
+    width: 35px;
+    height: 35px;
+    margin-bottom: 4px;
+    filter: invert(30%) sepia(80%) saturate(200%) hue-rotate(180deg);
+    brightness(90%) contrast(85%);
+}
 .category-btn span {
     font-size: 14px;
     font-family: 'Inter', sans-serif; /* iOS-шрифт */
