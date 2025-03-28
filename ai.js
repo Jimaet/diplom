@@ -1,5 +1,5 @@
-const API_KEY = "YOUR_COHERE_API_KEY"; // Замените на свой API-ключ Cohere
-const API_URL = "https://api.cohere.ai/v1/chat/completions"; // URL для Cohere API
+const API_KEY = "AQVNzn4lu8GL0qtDP94czMV0uDfq9AuP8JqxqFxA"; // Замените на свой API-ключ Yandex
+const API_URL = "https://llm.api.cloud.yandex.net"; // API-URL для YandexGPT
 
 function sendMessage() {
     let userInput = document.getElementById("user-input").value;
@@ -16,19 +16,19 @@ function sendMessage() {
             "Authorization": `Bearer ${API_KEY}`
         },
         body: JSON.stringify({
-            model: "command-r-plus", // Используем модель Command R+
+            model: "yandex-gpt", // Указываем модель GPT от Yandex
             messages: [{ role: "user", content: userInput }],
-            max_tokens: 100
+            max_tokens: 100 // Ограничение на количество токенов
         })
     })
     .then(response => response.json())
     .then(data => {
         let reply = data.choices[0]?.message?.content || "Ошибка ответа от ИИ";
-        chatBox.innerHTML += `<p><strong>Cohere:</strong> ${reply}</p>`;
+        chatBox.innerHTML += `<p><strong>Yandex GPT:</strong> ${reply}</p>`;
         chatBox.scrollTop = chatBox.scrollHeight;
     })
     .catch(error => {
         console.error("Ошибка:", error);
-        chatBox.innerHTML += `<p><strong>Cohere:</strong> Ошибка при получении ответа</p>`;
+        chatBox.innerHTML += `<p><strong>Yandex GPT:</strong> Ошибка при получении ответа</p>`;
     });
 }
