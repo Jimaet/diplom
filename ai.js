@@ -1,5 +1,4 @@
-const API_KEY = "AQVNzn4lu8GL0qtDP94czMV0uDfq9AuP8JqxqFxA"; // Замените на свой API-ключ Yandex
-const API_URL = "https://llm.api.cloud.yandex.net"; // API-URL для YandexGPT
+const API_URL = "/.netlify/functions/chat"; // Прокси-сервер через Netlify Functions
 
 function sendMessage() {
     let userInput = document.getElementById("user-input").value;
@@ -12,14 +11,9 @@ function sendMessage() {
     fetch(API_URL, {
         method: "POST",
         headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${API_KEY}`
+            "Content-Type": "application/json"
         },
-        body: JSON.stringify({
-            model: "yandex-gpt", // Указываем модель GPT от Yandex
-            messages: [{ role: "user", content: userInput }],
-            max_tokens: 100 // Ограничение на количество токенов
-        })
+        body: JSON.stringify({ userInput }) // Отправляем данные на Netlify Function
     })
     .then(response => response.json())
     .then(data => {
