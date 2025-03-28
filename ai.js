@@ -1,28 +1,38 @@
-const API_URL = "/.netlify/functions/chat"; // Прокси-сервер через Netlify Functions
+async function sendMessage() {
+    const userInput = document.getElementById('user-input').value;
+    const chatBox = document.getElementById('chat-box');
+    
+    // Отображаем сообщение пользователя
+    chatBox.innerHTML += `<div class="user-message">${userInput}</div>`;
+    
+    // Очищаем поле ввода
+    document.getElementById('user-input').value = '';
 
-function sendMessage() {
-    let userInput = document.getElementById("user-input").value;
-    if (!userInput.trim()) return;
+    // Отправляем запрос к Яндекс GPT API
+    try {
+        const response = await fetch('https://api.chat.yandex.net/gpt', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': 'AQVNzn4lu8GL0qtDP94czMV0uDfq9AuP8JqxqFxA' // Замените на ваш API ключ
+            },
+            body: JSON.stringify({
+                prompt: userInput,
+                max_tokens: 150,
+                temperature: 0.7
+            })
+        });
+        const data = await response.json();
 
-    let chatBox = document.getElementById("chat-box");
-    chatBox.innerHTML += `<p><strong>Вы:</strong> ${userInput}</p>`;
-    document.getElementById("user-input").value = "";
-
-    fetch(API_URL, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ userInput }) // Отправляем данные на Netlify Function
-    })
-    .then(response => response.json())
-    .then(data => {
-        let reply = data.choices[0]?.message?.content || "Ошибка ответа от ИИ";
-        chatBox.innerHTML += `<p><strong>Yandex GPT:</strong> ${reply}</p>`;
-        chatBox.scrollTop = chatBox.scrollHeight;
-    })
-    .catch(error => {
-        console.error("Ошибка:", error);
-        chatBox.innerHTML += `<p><strong>Yandex GPT:</strong> Ошибка при получении ответа</p>`;
-    });
+        // Проверяем наличие ответа
+        if (data && data.choices && data.choices.length > 0) {
+            const aiResponse = data.choices[0].text;
+            // Отображаем ответ от AI
+            chatBox.innerHTML += `<div class="ai-message">${aiResponse}</div>`;
+        } else {
+            chatBox.innerHTML += `<div class="ai-message">Что-то пошло не так, попробуйте снова.</div>`;
+        }
+    } catch (error) {
+        chatBox.innerHTML += `<div class="ai-message">Ошибка: ${error.message}</div>`;
+    }
 }
