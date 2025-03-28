@@ -210,6 +210,6 @@ document.addEventListener("DOMContentLoaded", () => {
     setupMultiSelect(".tech-btn");
     loadFilteredRecipes(); // Загружаем рецепты после настройки фильтров
 });
-document.querySelector(".nav-btn").addEventListener("click", function () {
+document.querySelector(".nav-btn-ai").addEventListener("click", function () {
     window.location.href = "ai.html";
 });
