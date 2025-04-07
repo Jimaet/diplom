@@ -150,19 +150,30 @@ body {
 
 /* Шаги */
 .step {
-    margin-bottom: 10px;
-    padding: 10px;
-    background: rgba(255, 255, 255, 0.9);
-    border-radius: 10px;
-    transition: transform 0.3s;
-    display: flex;
-    align-items: center;
+    margin-bottom: 15px;
 }
 
-.step:hover {
-    transform: scale(1.02);
+.step-title {
+    font-weight: bold;
+    font-size: 1.2em;
 }
 
+.step-description {
+    font-size: 1em;
+    margin-top: 5px;
+}
+
+.question-button {
+    font-size: 1.5em;
+    color: #000;
+    cursor: pointer;
+    margin-left: 10px;
+    vertical-align: middle;
+}
+
+.question-button:hover {
+    color: #ff9800;
+}
 /* Кнопка вопроса */
 .question-button {
     display: inline-block;
