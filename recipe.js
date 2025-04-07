@@ -141,12 +141,12 @@ async function loadRecipe(receptId) {
 
     questionButton.addEventListener("click", function () {
         try {
-            const prompt = `Привет! Вот мой рецепт: Продукты: ${Object.values(ingredientsMap).join(". ")} Шаги: ${Object.entries(stepData).map(([num, text]) => `Шаг ${num}: ${text}`).join(". ")} У меня возник вопрос именно с шагом номер ${stepNum}: Вот он ${stepText}, расскажи мне про него подробнее!`;
+            const prompt = `Привет! Вот мой рецепт: Продукты: ${Object.values(ingredientsMap).join(". ")} У меня возник вопрос именно с шагом номер ${stepNum}: Вот он ${stepText}, расскажи мне про него подробнее!`;
 
             sessionStorage.setItem("question", prompt);
 
             const encodedPrompt = encodeURIComponent(prompt);
-            const maxUrlLength = 20000;
+            const maxUrlLength = 2000;
 
             if (encodedPrompt.length > maxUrlLength) {
                 alert("Ваш запрос слишком длинный. Пожалуйста, сократите его.");
