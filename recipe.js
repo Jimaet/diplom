@@ -143,7 +143,7 @@ async function loadRecipe(receptId) {
             stepDiv.appendChild(questionButton);
 
             // Добавляем обработчик события для кнопки
-           questionButton.addEventListener("click", function() {
+           questionButton.addEventListener("click", function () {
     try {
         const prompt = `Привет! Вот мой рецепт: Продукты: ${Object.values(ingredientsMap).join(". ")} Шаги: ${Object.entries(stepData).map(([num, text]) => `Шаг ${num}: ${text}`).join(". ")} У меня возник вопрос именно с шагом номер ${stepNum}: Вот он ${stepText}, расскажи мне про него подробнее!`;
 
@@ -151,6 +151,7 @@ async function loadRecipe(receptId) {
 
         const encodedPrompt = encodeURIComponent(prompt);
         const maxUrlLength = 2000;
+
         if (encodedPrompt.length > maxUrlLength) {
             alert("Ваш запрос слишком длинный. Пожалуйста, сократите его.");
         } else {
