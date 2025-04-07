@@ -125,42 +125,41 @@ async function loadRecipe(receptId) {
         const stepsContainer = document.getElementById("recipe-steps");
         stepsContainer.innerHTML = "";
         Object.entries(stepData).forEach(([stepNum, stepText]) => {
-            const stepDiv = document.createElement("div");
-            stepDiv.classList.add("step");
+    const stepDiv = document.createElement("div");
+    stepDiv.classList.add("step");
 
-            // Создаем кнопку вопросительного знака для конкретного шага
-            const questionButton = document.createElement("span");
-            questionButton.classList.add("question-button");
-            questionButton.textContent = "?";
+    const questionButton = document.createElement("span");
+    questionButton.classList.add("question-button");
+    questionButton.textContent = "?";
 
-            // Вставляем текст шага и кнопку вопроса
-            stepDiv.innerHTML = `
-                <p class="step-title">Шаг ${stepNum}:</p>
-                <p class="step-description">${stepText}</p>
-            `;
+    stepDiv.innerHTML = `
+        <p class="step-title">Шаг ${stepNum}:</p>
+        <p class="step-description">${stepText}</p>
+    `;
 
-            // Добавляем кнопку в шаг
-            stepDiv.appendChild(questionButton);
+    stepDiv.appendChild(questionButton);
 
-            // Добавляем обработчик события для кнопки
-           questionButton.addEventListener("click", function () {
-    try {
-        const prompt = `Привет! Вот мой рецепт: Продукты: ${Object.values(ingredientsMap).join(". ")} Шаги: ${Object.entries(stepData).map(([num, text]) => `Шаг ${num}: ${text}`).join(". ")} У меня возник вопрос именно с шагом номер ${stepNum}: Вот он ${stepText}, расскажи мне про него подробнее!`;
+    questionButton.addEventListener("click", function () {
+        try {
+            const prompt = `Привет! Вот мой рецепт: Продукты: ${Object.values(ingredientsMap).join(". ")} Шаги: ${Object.entries(stepData).map(([num, text]) => `Шаг ${num}: ${text}`).join(". ")} У меня возник вопрос именно с шагом номер ${stepNum}: Вот он ${stepText}, расскажи мне про него подробнее!`;
 
-        sessionStorage.setItem("question", prompt);
+            sessionStorage.setItem("question", prompt);
 
-        const encodedPrompt = encodeURIComponent(prompt);
-        const maxUrlLength = 2000;
+            const encodedPrompt = encodeURIComponent(prompt);
+            const maxUrlLength = 2000;
 
-        if (encodedPrompt.length > maxUrlLength) {
-            alert("Ваш запрос слишком длинный. Пожалуйста, сократите его.");
-        } else {
-            window.location.href = `help.html?prompt=${encodedPrompt}`;
+            if (encodedPrompt.length > maxUrlLength) {
+                alert("Ваш запрос слишком длинный. Пожалуйста, сократите его.");
+            } else {
+                window.location.href = `help.html?prompt=${encodedPrompt}`;
+            }
+        } catch (error) {
+            console.error("Ошибка при переходе на help.html:", error);
+            alert("Что-то пошло не так при обработке вашего запроса.");
         }
-    } catch (error) {
-        console.error("Ошибка при переходе на help.html:", error);
-        alert("Что-то пошло не так при обработке вашего запроса.");
-    }
+    });
+
+    stepsContainer.appendChild(stepDiv); // ⬅️ Не забудь добавить шаг в DOM
 });
 
 
