@@ -35,7 +35,7 @@ async function loadRecipe(receptId) {
         const prodRef = doc(db, receptMainId, "prod");
         const stepRef = doc(db, receptMainId, "step");
         const photoRef = doc(db, receptMainId, "photo");
-        const itemsRef = doc(db, receptMainId, "items");
+        const itemsRef = doc(db, receptMainId, "items"); 
 
         const [mainSnap, prodSnap, stepSnap, photoSnap, itemsSnap] = await Promise.all([
             getDoc(mainRef),
@@ -54,7 +54,7 @@ async function loadRecipe(receptId) {
         const prodData = prodSnap.exists() ? prodSnap.data() : {}; // 🔹 Исправлено
         const stepData = stepSnap.exists() ? stepSnap.data() : {};
         const photoData = photoSnap.exists() ? photoSnap.data() : {};
-        const itemsData = itemsSnap.exists() ? itemsSnap.data() : {};
+        const itemsData = itemsSnap.exists() ? itemsSnap.data() : {}; 
 
         console.log("📌 Загруженные данные рецепта:", { mainData, prodData, stepData, photoData, itemsData });
 
@@ -64,7 +64,7 @@ async function loadRecipe(receptId) {
         document.getElementById("recipe-image").src = photoData.url || "placeholder.jpg";
 
         // 🔹 Добавляем посуду и технику
-        if (itemsSnap.exists()) {
+        if (itemsSnap.exists()) { 
             const itemsContainer = document.createElement("div");
             itemsContainer.classList.add("items-container");
 
@@ -105,50 +105,50 @@ async function loadRecipe(receptId) {
         // Очищаем список перед добавлением новых элементов
         ingredientsList.innerHTML = "";
         
-        if (Object.keys(ingredientsMap).length === 0) {
-            ingredientsList.innerHTML = "<li>Продукты не указаны</li>";
-        } else {
-            Object.values(ingredientsMap).forEach((ingredient) => {
-                const li = document.createElement("li");
-                li.textContent = ingredient;
-                li.classList.add("ingredient-item"); // Можно стилизовать через CSS
-                ingredientsList.appendChild(li);
-            });
-        }
+        Object.values(ingredientsMap).forEach((ingredient) => {
+            const li = document.createElement("li");
+            li.textContent = ingredient;
+            li.classList.add("ingredient-item"); // Можно стилизовать через CSS
+            ingredientsList.appendChild(li);
+        });
 
         // ✅ Шаги приготовления
         const stepsContainer = document.getElementById("recipe-steps");
         stepsContainer.innerHTML = "";
+        Object.entries(stepData).forEach(([stepNum, stepText]) => {
+            const stepDiv = document.createElement("div");
+            stepDiv.classList.add("step");
         
-        if (Object.keys(stepData).length === 0) {
-            stepsContainer.innerHTML = "<p>Шаги не указаны</p>";
-        } else {
-            Object.entries(stepData).forEach(([stepNum, stepText]) => {
-                const stepDiv = document.createElement("div");
-                stepDiv.classList.add("step");
+            // Создаем кнопку вопросительного знака
+            const questionButton = document.createElement("span");
+            questionButton.classList.add("question-button");
+            questionButton.textContent = "?";
             
-                // Создаем кнопку вопросительного знака
-                const questionButton = document.createElement("span");
-                questionButton.classList.add("question-button");
-                questionButton.textContent = "?";
-                
-                // Вставляем текст шага и кнопку вопроса
-                stepDiv.innerHTML = `
-                    <p class="step-title">Шаг ${stepNum}:</p>
-                    <p class="step-description">${stepText}</p>
+            // Вставляем текст шага и кнопку вопроса
+            stepDiv.innerHTML = `
+                <p class="step-title">Шаг ${stepNum}:</p>
+                <p class="step-description">${stepText}</p>
+            `;
+            
+            // Добавляем кнопку в шаг
+            stepDiv.appendChild(questionButton);
+        
+            // Добавляем обработчик события для кнопки
+            questionButton.addEventListener("click", function() {
+                // Создаем промпт для страницы help.html
+                const prompt = `
+                    Вот рецепт:
+                    Продукты:
+                    ${Object.values(ingredientsMap).join(". ")}
+                    Шаги приготовления:
+                    ${Object.entries(stepData).map(([num, text]) => `Шаг ${num}: ${text}`).join(". ")}
                 `;
-                
-                // Добавляем кнопку в шаг
-                stepDiv.appendChild(questionButton);
-            
-                // Добавляем обработчик события для кнопки
-                questionButton.addEventListener("click", function() {
-                    window.location.href = `help.html?step=${stepNum}`; // Переходим на страницу help.html с параметром шага
-                });
-            
-                stepsContainer.appendChild(stepDiv);
+                const encodedPrompt = encodeURIComponent(prompt);
+                window.location.href = `help.html?prompt=${encodedPrompt}`; // Переходим на страницу help.html с параметром промпта
             });
-        }
+        
+            stepsContainer.appendChild(stepDiv);
+        });
 
         setupShowMoreButton();
 
@@ -157,6 +157,7 @@ async function loadRecipe(receptId) {
         showRecipeNotReady();
     }
 }
+
 // ✅ Функция для кнопки "Показать больше"
 function setupShowMoreButton() {
     const description = document.getElementById("recipe-description");
