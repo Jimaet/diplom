@@ -146,10 +146,13 @@ async function loadRecipe(receptId) {
             questionButton.addEventListener("click", function() {
                 // Формируем строку с вопросом для этого шага
                 const prompt = `
+                    Привет!
                     Вот мой рецепт:
                     Продукты:
                     ${Object.values(ingredientsMap).join(". ")}
-                    Шаг ${stepNum}: ${stepText}
+                    Шаги:
+                    ${Object.entries(stepData).map(([num, text]) => Шаг ${num}: ${text}).join(". ")}
+                    У меня возник вопрос именно с шагом номер ${stepNum}: Вот он ${stepText}, расскажи мне про него подробнее!
                 `;
 
                 // Кодируем строку в URL
