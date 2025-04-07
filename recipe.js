@@ -143,21 +143,25 @@ async function loadRecipe(receptId) {
             stepDiv.appendChild(questionButton);
 
             // Добавляем обработчик события для кнопки
-            questionButton.addEventListener("click", function() {
+           questionButton.addEventListener("click", function() {
     try {
-        // Формируем строку с вопросом для этого шага
         const prompt = `Привет! Вот мой рецепт: Продукты: ${Object.values(ingredientsMap).join(". ")} Шаги: ${Object.entries(stepData).map(([num, text]) => `Шаг ${num}: ${text}`).join(". ")} У меня возник вопрос именно с шагом номер ${stepNum}: Вот он ${stepText}, расскажи мне про него подробнее!`;
 
-        // Сохраняем вопрос в sessionStorage
         sessionStorage.setItem("question", prompt);
 
-        // Переходим на страницу help.html
-        window.location.href = `help.html`;
+        const encodedPrompt = encodeURIComponent(prompt);
+        const maxUrlLength = 2000;
+        if (encodedPrompt.length > maxUrlLength) {
+            alert("Ваш запрос слишком длинный. Пожалуйста, сократите его.");
+        } else {
+            window.location.href = `help.html?prompt=${encodedPrompt}`;
+        }
     } catch (error) {
         console.error("Ошибка при переходе на help.html:", error);
         alert("Что-то пошло не так при обработке вашего запроса.");
     }
 });
+
 
                 // Кодируем строку в URL
                 const encodedPrompt = encodeURIComponent(prompt);
