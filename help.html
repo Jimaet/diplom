@@ -25,10 +25,13 @@
 
     // Автозаполнение вопроса в поле для ввода и автоматическая отправка
     window.onload = function() {
-        const prompt = getQueryParam('prompt');
-        if (prompt) {
-            document.getElementById('text').value = decodeURIComponent(prompt);
-            send(); // Автоматически отправить после автозаполнения
+        // Извлекаем вопрос из sessionStorage, если он есть
+        const savedQuestion = sessionStorage.getItem("question");
+
+        if (savedQuestion) {
+            document.getElementById('text').value = savedQuestion; // Заполняем поле ввода
+            send(); // Автоматически отправляем вопрос
+            sessionStorage.removeItem("question"); // Удаляем вопрос после отправки
         }
     };
 
