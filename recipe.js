@@ -151,7 +151,7 @@ async function loadRecipe(receptId) {
                     Продукты:
                     ${Object.values(ingredientsMap).join(". ")}
                     Шаги:
-                    ${Object.entries(stepData).map(([num, text]) => Шаг ${num}: ${text}).join(". ")}
+                    ${Object.entries(stepData).map(([num, text]) => `Шаг ${num}: ${text}`).join(". ")}
                     У меня возник вопрос именно с шагом номер ${stepNum}: Вот он ${stepText}, расскажи мне про него подробнее!
                 `;
 
