@@ -3,59 +3,55 @@
 <head>
     <meta charset="UTF-8">
     <title>Чат с YandexGPT</title>
-    <style>
-        body { font-family: Arial; padding: 20px; background: #f0f0f0; }
-        #chat { max-width: 600px; margin: 0 auto; background: white; padding: 20px; border-radius: 12px; }
-        .msg { margin: 10px 0; padding: 10px; border-radius: 10px; }
-        .user { background: #d0f0ff; text-align: right; }
-        .bot { background: #e8e8e8; text-align: left; }
-        #inputArea { display: flex; margin-top: 20px; }
-        #text { flex: 1; padding: 10px; border-radius: 8px; border: 1px solid #ccc; }
-        button { margin-left: 10px; padding: 10px; border: none; background: #0077cc; color: white; border-radius: 8px; }
-    </style>
+    <link rel="stylesheet" href="ai.css">
 </head>
 <body>
-<div id="chat">
-    <h2>Чат с YandexGPT</h2>
-    <div id="messages"></div>
-    <div id="inputArea">
-        <input type="text" id="text" placeholder="Спроси что-нибудь...">
-        <button onclick="send()">Отправить</button>
+    <div id="chat">
+        <button id="backBtn" onclick="goBack()">← Назад</button>
+        <h2>Чат с YandexGPT</h2>
+        <div id="messages"></div>
+        <div id="inputArea">
+            <input type="text" id="text" placeholder="Спроси что-нибудь...">
+            <button onclick="send()">Отправить</button>
+        </div>
     </div>
-</div>
 
-<script>
-    function addMessage(text, role) {
-        const div = document.createElement('div');
-        div.className = 'msg ' + role;
-        div.textContent = text;
-        document.getElementById('messages').appendChild(div);
-        div.scrollIntoView({ behavior: 'smooth' });
-    }
-
-    async function send() {
-        const input = document.getElementById('text');
-        const msg = input.value.trim();
-        if (!msg) return;
-    
-        addMessage(msg, 'user');
-        input.value = '';
-    
-        try {
-            const res = await fetch("/.netlify/functions/askgpt", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({ prompt: msg })
-            });
-    
-            const data = await res.json();
-            addMessage(data.reply, 'bot');
-        } catch (err) {
-            addMessage("Ошибка: " + err.message, 'bot');
+    <script>
+        function goBack() {
+            window.location.href = "index.html"; // Переход на главную
         }
-    }
-</script>
+
+        function addMessage(text, role) {
+            const div = document.createElement('div');
+            div.className = 'msg ' + role;
+            div.textContent = text;
+            document.getElementById('messages').appendChild(div);
+            div.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        async function send() {
+            const input = document.getElementById('text');
+            const msg = input.value.trim();
+            if (!msg) return;
+
+            addMessage(msg, 'user');
+            input.value = '';
+
+            try {
+                const res = await fetch("/.netlify/functions/askgpt", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({ prompt: msg })
+                });
+
+                const data = await res.json();
+                addMessage(data.reply, 'bot');
+            } catch (err) {
+                addMessage("Ошибка: " + err.message, 'bot');
+            }
+        }
+    </script>
 </body>
 </html>
