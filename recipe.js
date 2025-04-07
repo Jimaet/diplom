@@ -146,7 +146,7 @@ async function loadRecipe(receptId) {
             sessionStorage.setItem("question", prompt);
 
             const encodedPrompt = encodeURIComponent(prompt);
-            const maxUrlLength = 2000;
+            const maxUrlLength = 20000;
 
             if (encodedPrompt.length > maxUrlLength) {
                 alert("Ваш запрос слишком длинный. Пожалуйста, сократите его.");
