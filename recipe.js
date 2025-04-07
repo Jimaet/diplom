@@ -166,7 +166,26 @@ async function loadRecipe(receptId) {
         showRecipeNotReady();
     }
 }
+// Обновленный обработчик кнопки вопросительного знака
+stepDiv.appendChild(questionButton);
 
+// Обработчик события для кнопки
+questionButton.addEventListener("click", function() {
+    // Формируем строку с вопросом, включая продукты и шаги
+    const prompt = `
+        Вот мой рецепт:
+        Продукты:
+        ${Object.values(ingredientsMap).join(". ")}
+        Шаги:
+        ${Object.entries(stepData).map(([num, text]) => `Шаг ${num}: ${text}`).join(". ")}
+    `;
+    
+    // Кодируем строку в URL
+    const encodedPrompt = encodeURIComponent(prompt);
+
+    // Переходим на страницу help.html с параметром prompt
+    window.location.href = `help.html?prompt=${encodedPrompt}`;
+});
 // ✅ Функция для кнопки "Показать больше"
 function setupShowMoreButton() {
     const description = document.getElementById("recipe-description");
