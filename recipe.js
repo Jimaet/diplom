@@ -58,6 +58,15 @@ async function loadRecipe(receptId) {
 
         console.log("📌 Загруженные данные рецепта:", { mainData, prodData, stepData, photoData, itemsData });
 
+        // Сохраняем данные в sessionStorage
+        sessionStorage.setItem("recipeMainData", JSON.stringify(mainData));
+        sessionStorage.setItem("recipeProdData", JSON.stringify(prodData));
+        sessionStorage.setItem("recipeStepData", JSON.stringify(stepData));
+
+        // Выводим продукты и шаги в консоль
+        console.log("📦 Продукты рецепта:", prodData);
+        console.log("📋 Шаги приготовления:", stepData);
+
         document.getElementById("recipe-title").textContent = mainData.name || "Без названия";
         document.getElementById("recipe-description").textContent = mainData.dis || "Описание отсутствует";
         document.getElementById("recipe-info").textContent = `Порции: ${mainData.porcii} | Время: ${mainData.timemin} мин`;
