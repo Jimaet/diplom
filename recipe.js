@@ -164,22 +164,6 @@ async function loadRecipe(receptId) {
 });
 
 
-                // Кодируем строку в URL
-                const encodedPrompt = encodeURIComponent(prompt);
-
-                // Переходим на страницу help.html с параметром prompt
-                // Убедимся, что URL не слишком длинный
-                const maxUrlLength = 2000;
-                if (encodedPrompt.length > maxUrlLength) {
-                    alert("Ваш запрос слишком длинный. Пожалуйста, сократите его.");
-                } else {
-                    window.location.href = `help.html?prompt=${encodedPrompt}`;
-                }
-            });
-
-            stepsContainer.appendChild(stepDiv);
-        });
-
         setupShowMoreButton();
 
     } catch (error) {
