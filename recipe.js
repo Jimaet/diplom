@@ -115,16 +115,27 @@ async function loadRecipe(receptId) {
 
         // ✅ Шаги приготовления
         const stepsContainer = document.getElementById("recipe-steps");
-        stepsContainer.innerHTML = "";
-        Object.entries(stepData).forEach(([stepNum, stepText]) => {
-            const stepDiv = document.createElement("div");
-            stepDiv.classList.add("step");
-            stepDiv.innerHTML = `
-                <p class="step-title">Шаг ${stepNum}:</p>
-                <p class="step-description">${stepText}</p>
-            `;
-            stepsContainer.appendChild(stepDiv);
-        });
+stepsContainer.innerHTML = "";
+Object.entries(stepData).forEach(([stepNum, stepText]) => {
+    const stepDiv = document.createElement("div");
+    stepDiv.classList.add("step");
+
+    // Создаем кнопку вопросительного знака
+    const questionButton = document.createElement("span");
+    questionButton.classList.add("question-button");
+    questionButton.textContent = "?";
+    
+    // Вставляем текст шага и кнопку вопроса
+    stepDiv.innerHTML = `
+        <p class="step-title">Шаг ${stepNum}:</p>
+        <p class="step-description">${stepText}</p>
+    `;
+    
+    // Добавляем кнопку в шаг
+    stepDiv.appendChild(questionButton);
+
+    stepsContainer.appendChild(stepDiv);
+});
 
         setupShowMoreButton();
 
