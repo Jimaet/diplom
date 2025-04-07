@@ -1,4 +1,4 @@
-son<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
@@ -23,19 +23,21 @@ son<!DOCTYPE html>
         return urlParams.get(name);
     }
 
-    // Автозаполнение вопроса в поле для ввода
+    // Автозаполнение вопроса в поле для ввода и автоматическая отправка
     window.onload = function() {
         const prompt = getQueryParam('prompt');
         if (prompt) {
             document.getElementById('text').value = decodeURIComponent(prompt);
+            send(); // Автоматически отправить после автозаполнения
         }
     };
 
-    // Существующий код для отправки сообщения
+    // Функция для перехода назад
     function goBack() {
         window.location.href = "index.html"; // Переход на главную
     }
 
+    // Функция для добавления сообщений в чат
     function addMessage(text, role) {
         const div = document.createElement('div');
         div.className = 'msg ' + role;
@@ -44,6 +46,7 @@ son<!DOCTYPE html>
         div.scrollIntoView({ behavior: 'smooth' });
     }
 
+    // Существующий код для отправки сообщения
     async function send() {
         const input = document.getElementById('text');
         const msg = input.value.trim();
@@ -67,7 +70,6 @@ son<!DOCTYPE html>
             addMessage("Ошибка: " + err.message, 'bot');
         }
     }
-</script>
-
+    </script>
 </body>
 </html>
