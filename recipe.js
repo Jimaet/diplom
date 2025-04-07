@@ -144,16 +144,15 @@ async function loadRecipe(receptId) {
 
             // Добавляем обработчик события для кнопки
             questionButton.addEventListener("click", function() {
-                // Формируем строку с вопросом для этого шага
-                const prompt = `
-                    Привет!
-                    Вот мой рецепт:
-                    Продукты:
-                    ${Object.values(ingredientsMap).join(". ")}
-                    Шаги:
-                    ${Object.entries(stepData).map(([num, text]) => `Шаг ${num}: ${text}`).join(". ")}
-                    У меня возник вопрос именно с шагом номер ${stepNum}: Вот он ${stepText}, расскажи мне про него подробнее!
-                `;
+    // Формируем строку с вопросом для этого шага
+    const prompt = `Привет! Вот мой рецепт: Продукты: ${Object.values(ingredientsMap).join(". ")} Шаги: ${Object.entries(stepData).map(([num, text]) => `Шаг ${num}: ${text}`).join(". ")} У меня возник вопрос именно с шагом номер ${stepNum}: Вот он ${stepText}, расскажи мне про него подробнее!`;
+
+    // Сохраняем вопрос в sessionStorage
+    sessionStorage.setItem("question", prompt);
+
+    // Переходим на страницу help.html
+    window.location.href = `help.html`;
+});
 
                 // Кодируем строку в URL
                 const encodedPrompt = encodeURIComponent(prompt);
