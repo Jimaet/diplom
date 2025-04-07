@@ -112,35 +112,43 @@ async function loadRecipe(receptId) {
             ingredientsList.appendChild(li);
         });
 
-
         // ✅ Шаги приготовления
         const stepsContainer = document.getElementById("recipe-steps");
-    stepsContainer.innerHTML = "";
-    Object.entries(stepData).forEach(([stepNum, stepText]) => {
-        const stepDiv = document.createElement("div");
-        stepDiv.classList.add("step");
-    
-        // Создаем кнопку вопросительного знака
-        const questionButton = document.createElement("span");
-        questionButton.classList.add("question-button");
-        questionButton.textContent = "?";
+        stepsContainer.innerHTML = "";
+        Object.entries(stepData).forEach(([stepNum, stepText]) => {
+            const stepDiv = document.createElement("div");
+            stepDiv.classList.add("step");
         
-        // Вставляем текст шага и кнопку вопроса
-        stepDiv.innerHTML = `
-            <p class="step-title">Шаг ${stepNum}:</p>
-            <p class="step-description">${stepText}</p>
-        `;
+            // Создаем кнопку вопросительного знака
+            const questionButton = document.createElement("span");
+            questionButton.classList.add("question-button");
+            questionButton.textContent = "?";
+            
+            // Вставляем текст шага и кнопку вопроса
+            stepDiv.innerHTML = `
+                <p class="step-title">Шаг ${stepNum}:</p>
+                <p class="step-description">${stepText}</p>
+            `;
+            
+            // Добавляем кнопку в шаг
+            stepDiv.appendChild(questionButton);
         
-        // Добавляем кнопку в шаг
-        stepDiv.appendChild(questionButton);
-    
-        // Добавляем обработчик события для кнопки
-        questionButton.addEventListener("click", function() {
-            window.location.href = `help.html?step=${stepNum}`; // Переходим на страницу help.html с параметром шага
+            // Добавляем обработчик события для кнопки
+            questionButton.addEventListener("click", function() {
+                // Создаем промпт для страницы help.html
+                const prompt = `
+                    Вот рецепт:
+                    Продукты:
+                    ${Object.values(ingredientsMap).join(". ")}
+                    Шаги приготовления:
+                    ${Object.entries(stepData).map(([num, text]) => `Шаг ${num}: ${text}`).join(". ")}
+                `;
+                const encodedPrompt = encodeURIComponent(prompt);
+                window.location.href = `help.html?prompt=${encodedPrompt}`; // Переходим на страницу help.html с параметром промпта
+            });
+        
+            stepsContainer.appendChild(stepDiv);
         });
-    
-        stepsContainer.appendChild(stepDiv);
-});
 
         setupShowMoreButton();
 
